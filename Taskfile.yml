@@ -1,0 +1,14 @@
+version: "3"
+
+tasks:
+  config:
+    cmds:
+      - cmake -B build -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+
+  build-tests:
+    cmds:
+      - cmake --build build --target nova_tests
+  run-tests:
+    deps: [build-tests]
+    cmds:
+      - build/tests/nova_tests

@@ -1,0 +1,157 @@
+# ===== IDE Files =============================================================
+# ----- Jetbrains -----
+.idea/
+cmake-build-*/
+.idea_modules/
+
+# Crashlytics plugin (for Android Studio and IntelliJ)
+com_crashlytics_export_strings.xml
+crashlytics.properties
+crashlytics-build.properties
+fabric.properties
+
+# ----- Visual Studio -----
+.vs/
+out/
+
+# ----- VSCode -----
+.vscode/*
+*.code-workspace
+.history/
+
+# Preserve project settings files, just make sure they're cross-platform
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+## Built extension files
+*.visix
+
+# ----- Sublime Text -----
+.sublime/
+*.sublime-project
+*.sublime-workspace
+
+Session.sublime_session
+
+# ----- Vim -----
+## Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+## Session
+Session.vim
+Sessionx.vim
+
+.netrwhist
+*~
+[._]*.un~
+
+# ----- Clangd LSP -----
+.cache/
+
+# ----- Xcode -----
+xcuserdata/
+
+# ----- General -----
+build/
+
+## Debugger
+*.dSYM/
+*.core
+*.lldb
+
+## Coverage files
+*.gcno
+*.gcda
+*.gcov
+
+# ===== OS Files ==============================================================
+
+# ----- MacOS -----
+**/.DS_Store
+.AppleDouble
+.LSOverride
+
+## Files that may appear in root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.comapple.timemachine.donotpresent
+
+## Directories possibly created on remote AFP share
+._*
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ----- Windows -----
+## Thumbnail cache files
+**/Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+## Dump file
+*.stackdump
+
+## Folder config file
+[Dd]esktop.ini
+
+## Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+## Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+## Windows shortcuts
+*.lnk
+
+# ===== C++ Files =============================================================
+
+## Prerequisites
+*.d
+
+## Compiled objects
+*.slo
+*.lo
+*.o
+*.obj
+
+## Precompiled Headers
+*.gch
+#*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
