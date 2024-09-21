@@ -1,14 +1,30 @@
 version: "3"
 
+dotnev: [".env"]
+
 tasks:
   config:
     cmds:
-      - cmake -B build -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+      - cmake -B build/desktop -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug
+  config-web:
+    cmds:
+      - cmake -B build/web -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
 
   build-tests:
     cmds:
-      - cmake --build build --target nova_tests
+      - cmake --build build/desktop --target nova_tests
   run-tests:
     deps: [build-tests]
     cmds:
-      - build/tests/nova_tests
+      - build/desktop/tests/nova_tests
+
+  build-sandbox:
+    cmds:
+      - cmake --build build/desktop --target nova_engine_sandbox
+  run-sandbox:
+    deps: [build-sandbox]
+    cmds:
+      - build/desktop/nova_engine_sandbox
+  build-sandbox-web:
+    cmds:
+      - cmake --build build/web --target nova_engine_sandbox
