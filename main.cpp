@@ -1,4 +1,4 @@
-#include <iostream>
+#include <nova/logging.h>
 #include <nova/macros/enum.h>
 
 NOVA_FLAGS_LEAN(AbilityFlag, CanFly, CanSwim, CanJump);
@@ -17,6 +17,10 @@ int main()
     abilities.reset();
 
     auto flags = MyStruct::MyFlags::A | MyStruct::MyFlags::B;
+
+    NOVA_LOG("Hello {}", "world");
+    NOVA_WARN("Hello {}", "warning");
+    NOVA_ERR("Hello {}", "error");
 
     return 0;
 }

@@ -8,25 +8,29 @@ include(nova_utils)
 
 # ===== C++ 20 Standard =======================================================
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_SCAN_FOR_MODULES OFF) # No C++20 Modules in this project
 
-
-# ===== Directory Variables ====================================================
+# ===== Directory Variables ===================================================
 if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
-    set(NOVA_IS_ROOT 1)
+    set(NOVA_IS_ROOT ON)
 else()
-    set(NOVA_IS_ROOT 0)
+    set(NOVA_IS_ROOT OFF)
 endif()
 
 set(NOVA_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+
+# ===== Build mode ============================================================
+if (${CMAKE_BUILD_TYPE} MATCHES "Deb")
+    set(NOVA_DEBUG 1)
+else()
+    set(NOVA_DEBUG 0)
+endif()
 
 if (NOT NOVA_NAMESPACE) # Set the namespace name, can be overridden by the user
     set (NOVA_NAMESPACE nova)
 endif()
 
-option(NOVA_BUILD_TESTS "Include Nova Unit Test Targets" ${NOVA_IS_ROOT})
-
-
-include(nova_dependencies)
+option(NOVA_BUILD_TESTS      "Include Nova Unit Test Targets"          ${NOVA_IS_ROOT})
 
 add_subdirectory(nova)
 
