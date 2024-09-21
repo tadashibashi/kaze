@@ -1,10 +1,11 @@
 #pragma once
-#ifndef NOVA_H
-#define NOVA_H
+#ifndef nova_nova_h_
+#define nova_nova_h_
 
 #include <array>
 #include <cstdint>
 #include <string>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
 
@@ -54,6 +55,7 @@ template <typename T, Uint Size>
 using FixedArray = std::array<T, Size>;
 
 using String = std::string;
+using StringView = std::string_view;
 
 NOVA_NAMESPACE_END
 
@@ -83,4 +85,4 @@ NOVA_NAMESPACE_END
 #   define NOVA_PACKED
 #endif
 
-#endif
+#endif // nova_nova_h_
