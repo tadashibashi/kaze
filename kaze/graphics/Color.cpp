@@ -1,0 +1,6 @@
+#include "Color.h"
+
+KAZE_NAMESPACE_BEGIN
+
+
+KAZE_NAMESPACE_END

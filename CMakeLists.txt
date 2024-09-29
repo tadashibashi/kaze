@@ -1,42 +1,49 @@
 cmake_minimum_required(VERSION 3.29)
-project(nova_engine LANGUAGES CXX)
-
-# Set CMake module path
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules)
-
-include(nova_utils)
+project(kaze_engine LANGUAGES CXX)
 
 # ===== C++ 20 Standard =======================================================
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF) # No C++20 Modules in this project
 
 # ===== Directory Variables ===================================================
-if (${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
-    set(NOVA_IS_ROOT ON)
+set(KAZE_ROOT ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Path to the entire project's root" FORCE)
+set(KAZE_SOURCE_ROOT ${KAZE_ROOT}/kaze    CACHE STRING "Path to the Kaze engine source code directory" FORCE)
+set(KAZE_BACKEND_ROOT ${KAZE_SOURCE_ROOT}/platform/backends CACHE STRING "Path to the Kaze engine backends" FORCE)
+set(KAZE_TESTS_ROOT ${KAZE_ROOT}/tests)
+
+list(APPEND CMAKE_MODULE_PATH ${KAZE_ROOT}/cmake/modules)
+
+if (KAZE_ROOT STREQUAL CMAKE_SOURCE_DIR)
+    set(KAZE_IS_ROOT ON CACHE BOOL "" FORCE)
 else()
-    set(NOVA_IS_ROOT OFF)
+    set(KAZE_IS_ROOT OFF CACHE BOOL "" FORCE)
 endif()
 
-set(NOVA_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
+# ===== Options =================================================================
+include(kaze/option_defaults)
 
-# ===== Build mode ============================================================
-if (${CMAKE_BUILD_TYPE} MATCHES "Deb")
-    set(NOVA_DEBUG 1)
-else()
-    set(NOVA_DEBUG 0)
+# Bring in user cmake file if it exists
+if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.user.txt)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.user.txt)
 endif()
 
-if (NOT NOVA_NAMESPACE) # Set the namespace name, can be overridden by the user
-    set (NOVA_NAMESPACE nova)
-endif()
+set(KAZE_BACKEND        ${KAZE_BACKEND_DEFAULT}         CACHE STRING "Backend to compile Kaze with: glfw3, sdl3")
+set(KAZE_BACKEND_SHARED ${KAZE_BACKEND_SHARED_DEFAULT}  CACHE BOOL   "Whether to link dynamically to backend library; static linkage if false")
+set(KAZE_NO_NAMESPACE    OFF                            CACHE BOOL   "Unwrap all kaze engine types and functions into the global namespace")
+set(KAZE_NAMESPACE      "kaze"                          CACHE STRING "Set the namespace name, KAZE_NO_NAMESPACE overrides this option")
 
-option(NOVA_BUILD_TESTS      "Include Nova Unit Test Targets"          ${NOVA_IS_ROOT})
+set(KAZE_DEBUG         ${KAZE_DEBUG_DEFAULT} CACHE BOOL   "Build with debug mode: logging and asserts")
+set(KAZE_BUILD_TESTS   ${KAZE_IS_ROOT}       CACHE BOOL   "Make kaze unit tests available for compilation")
 
-add_subdirectory(nova)
+set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland support on Linux")
 
-if (NOVA_BUILD_TESTS)
+# ===== Projects ==============================================================
+add_subdirectory(kaze)
+
+if (KAZE_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
 
 add_executable(${PROJECT_NAME}_sandbox main.cpp)
-target_link_libraries(${PROJECT_NAME}_sandbox PRIVATE nova)
+target_link_libraries(${PROJECT_NAME}_sandbox PRIVATE kaze)
+

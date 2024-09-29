@@ -54,12 +54,14 @@ Sessionx.vim
 
 # ----- Clangd LSP -----
 .cache/
+compile_commands.json
 
 # ----- Xcode -----
 xcuserdata/
 
 # ----- General -----
 build/
+CMakeLists.user.txt
 
 ## Debugger
 *.dSYM/

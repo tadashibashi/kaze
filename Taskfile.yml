@@ -6,25 +6,27 @@ tasks:
   config:
     cmds:
       - cmake -B build/desktop -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug
+      - cmake -E create_hardlink build/desktop/compile_commands.json build/compile_commands.json
   config-web:
     cmds:
       - cmake -B build/web -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+      - cmake -E create_hardlink build/web/compile_commands.json build/compile_commands.json
 
   build-tests:
     cmds:
-      - cmake --build build/desktop --target nova_tests
+      - cmake --build build/desktop --target kaze_tests
   run-tests:
     deps: [build-tests]
     cmds:
-      - build/desktop/tests/nova_tests
+      - build/desktop/tests/kaze_tests
 
   build-sandbox:
     cmds:
-      - cmake --build build/desktop --target nova_engine_sandbox
+      - cmake --build build/desktop --target kaze_engine_sandbox
   run-sandbox:
     deps: [build-sandbox]
     cmds:
-      - build/desktop/nova_engine_sandbox
+      - build/desktop/kaze_engine_sandbox
   build-sandbox-web:
     cmds:
-      - cmake --build build/web --target nova_engine_sandbox
+      - cmake --build build/web --target kaze_engine_sandbox

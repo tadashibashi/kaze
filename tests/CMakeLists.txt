@@ -1,20 +1,21 @@
-project(nova_tests)
-include(nova_tests_dependencies)
+project(kaze_tests)
+include(kaze/test_dependencies)
 
 add_executable(${PROJECT_NAME}
-    nova/graphics/Color.test.cpp
-    nova/macros/enum.test.cpp
-    nova/math/Circle.test.cpp
-    nova/math/geometry.test.cpp
-    nova/math/mathf.test.cpp
-    nova/math/Matrix.test.cpp
-    nova/math/Rect.test.cpp
-    nova/math/Rect3D.test.cpp
-    nova/math/Vec2.test.cpp
-    nova/math/Vec3.test.cpp
-    nova/math/Vec4.test.cpp
-    nova/ServiceProvider.test.cpp
+    kaze/debug.tests.cpp
+    kaze/graphics/Color.test.cpp
+    kaze/macros/enum.test.cpp
+    kaze/math/Circle.test.cpp
+    kaze/math/geometry.test.cpp
+    kaze/math/mathf.test.cpp
+    kaze/math/Matrix.test.cpp
+    kaze/math/Rect.test.cpp
+    kaze/math/Rect3D.test.cpp
+    kaze/math/Vec2.test.cpp
+    kaze/math/Vec3.test.cpp
+    kaze/math/Vec4.test.cpp
+    kaze/ServiceProvider.test.cpp
     tests.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE nova doctest::doctest)
+target_link_libraries(${PROJECT_NAME} PRIVATE kaze doctest::doctest)

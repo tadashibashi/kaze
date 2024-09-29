@@ -1,6 +1,0 @@
-#include "Color.h"
-
-NOVA_NAMESPACE_BEGIN
-
-
-NOVA_NAMESPACE_END
