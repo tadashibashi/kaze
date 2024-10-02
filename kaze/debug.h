@@ -2,6 +2,7 @@
 #ifndef kaze_debug_h_
 #define kaze_debug_h_
 #include <kaze/kaze.h>
+#include <kaze/errors.h>
 
 #if KAZE_DEBUG // =============================================================
 #include <spdlog/logger.h>
@@ -9,10 +10,16 @@
 
 #define KAZE_CORE_LOG(...)  KAZE_NAMESPACE::debug::getLogger()->info(__VA_ARGS__)
 #define KAZE_CORE_WARN(...) KAZE_NAMESPACE::debug::getLogger()->warn(__VA_ARGS__)
+#define KAZE_CORE_ERRCODE(code, ...) do { \
+    const auto message = std::format(__VA_ARGS__); \
+    KAZE_NAMESPACE::debug::getLogger()->error(message); \
+    KAZE_NAMESPACE::setError(message, (code), __FILE__, __LINE__); \
+} while(0)
+
 #define KAZE_CORE_ERR(...) do { \
     const auto message = std::format(__VA_ARGS__); \
     KAZE_NAMESPACE::debug::getLogger()->error(message); \
-    KAZE_NAMESPACE::setError(message); \
+    KAZE_NAMESPACE::setError(message, KAZE_NAMESPACE::Error::Code::Unspecified, __FILE__, __LINE__); \
 } while(0)
 
 #define KAZE_LOG(...)  KAZE_NAMESPACE::debug::getClientLogger()->info(__VA_ARGS__)
@@ -32,6 +39,7 @@ KAZE_NAMESPACE_END
 #define KAZE_CORE_LOG(...) KAZE_NOOP
 #define KAZE_CORE_WARN(...) KAZE_NOOP
 #define KAZE_CORE_ERR(...) KAZE_NAMESPACE::setError(std::format(__VA_ARGS__))
+#define KAZE_CORE_ERRCODE(code, ...) KAZE_NAMESPACE::setError(std::format(__VA_ARGS__), (code), __FILE__, __LINE__)
 
 #define KAZE_LOG(...) KAZE_NOOP
 #define KAZE_WARN(...) KAZE_NOOP
@@ -41,16 +49,8 @@ KAZE_NAMESPACE_END
 
 // Error functions
 KAZE_NAMESPACE_BEGIN
-/// Get the last error that occurred on the current thread
-const String &getError() noexcept;
-/// Set the current error message manually; this is normally reserved for core functionality.
-void setError(StringView message) noexcept;
-/// Set the error to an empty string
-/// Useful if you intend on handling errors gracefully
-/// and want continue program execution with a no error state.
-void clearError() noexcept;
-/// Check if there is any error available to get. Equivalent to `!getError().empty()`
-[[nodiscard]] bool hasError() noexcept;
+
+
 KAZE_NAMESPACE_END
 
 #endif // kaze_debug_h_

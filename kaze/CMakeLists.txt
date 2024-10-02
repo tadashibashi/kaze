@@ -6,8 +6,23 @@ endif()
 
 include(kaze/dependencies)
 
-add_library(${PROJECT_NAME})
+add_library(${PROJECT_NAME}
+
+)
 target_sources(${PROJECT_NAME} PRIVATE
+        app/Input.h
+        platform/Keyboard.cpp
+        platform/backends/sdl3/GamepadConstants.h
+        platform/Key.cpp
+        errors.h
+        errors.cpp
+        platform/backends/WindowHandleContainer.h
+        Optional.h
+
+        app/App.h
+        app/App.cpp
+        app/BackendInitGuard.h
+        app/BackendInitGuard.cpp
         concepts.h
         endian.h
         graphics/Color.cpp

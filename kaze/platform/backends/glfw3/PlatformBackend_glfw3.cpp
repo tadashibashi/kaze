@@ -25,12 +25,60 @@
 #endif
 
 #include <kaze/debug.h>
+#include <kaze/platform/backends/WindowHandleContainer.h>
 
 KAZE_NAMESPACE_BEGIN
+    /// Log error on glfw error then return false
+/// @param actionStr message containing the present-tense action describing the previous function's intended goal
+#define ERR_CHECK(code, actionStr) do { \
+    const char *message_for_error_check; \
+    auto err = glfwGetError(&message_for_error_check); \
+    if (err != GLFW_NO_ERROR && message_for_error_check) { \
+        KAZE_CORE_ERRCODE(code, "{}:{}: Failed to {}: {}", __FILE__, __LINE__, (actionStr), message_for_error_check); \
+        return false; \
+    } \
+} while(0)
+
+/// Log on glfw error, and call a block of code for cleanup, then return false
+/// @param actionStr message containing present-tense action describing the previous function's intended goal
+/// @param cleanupBlock code wrapped in braces to call for cleanup
+#define ERR_CHECK_CLEANUP(code, actionStr, cleanupBlock) do { \
+    const char *message; \
+    auto err = glfwGetError(&message); \
+    if (err != GLFW_NO_ERROR && message) { \
+        KAZE_CORE_ERR((code), "{}:{}: Failed to {}: {}", __FILE__, __LINE__, (actionStr), message); \
+        cleanupBlock \
+        return false; \
+    } \
+} while(0)
+
+#if KAZE_DEBUG
+/// Warn without returning
+/// @param actionStr message containing the present-tense action describing the previous function's intended goal
+#define WARN_CHECK(actionStr) do { \
+    const char *message; \
+    auto err = glfwGetError(&message); \
+    if (err != GLFW_NO_ERROR && message) { \
+        KAZE_CORE_WARN("{}:{}: Failed to {}: {}", __FILE__, __LINE__, (actionStr), message); \
+    } \
+} while(0)
+#else
+/// On non-debug mode, just consume the error, if any
+#define WARN_CHECK(actionStr) do { \
+    glfwGetError(nullptr); \
+} while(0)
+#endif
+
+#define RETURN_IF_NULL(obj) do { if ( !static_cast<bool>(obj) ) { \
+    KAZE_CORE_ERRCODE(Error::NullArgErr, "{}:{}: required parameter {} was null", __FILE__, __LINE__, #obj); \
+    return false; \
+} } while(0)
 
 namespace backend {
 
-    NativePlatformData PlatformBackend::windowGetNativeInfo(void *window)
+    static WindowHandleContainer<WindowData> s_windows;
+
+    NativePlatformData window::getNativeInfo(const WindowHandle window) noexcept
     {
     #if   KAZE_TARGET_WINDOWS
         return {
@@ -62,7 +110,7 @@ namespace backend {
     #endif
     }
 
-    static Uint16 s_keyToGlfwKey[] = {
+    static Array<Uint16, static_cast<Uint>(Key::Count)> s_keyToGlfwKey = {
         GLFW_KEY_ESCAPE,
         GLFW_KEY_ENTER,
         GLFW_KEY_TAB,
@@ -171,11 +219,9 @@ namespace backend {
         GLFW_KEY_Y,
         GLFW_KEY_Z,
     };
-    static_assert(std::size(s_keyToGlfwKey) == static_cast<Uint16>(Key::Count)-1); // -1 for unknown key sentry value
+    static Array<Uint16, GLFW_KEY_LAST + 1> s_glfwKeyToKey = {0};
 
-    static Uint16 s_glfwKeyToKey[GLFW_KEY_LAST + 1] = {0};
-
-    static Uint8 s_gamepadButtonToGlfw[] = {
+    static Array<Uint8, static_cast<unsigned>(GamepadBtn::Count)> s_gamepadButtonToGlfw = {
         GLFW_GAMEPAD_BUTTON_A,
         GLFW_GAMEPAD_BUTTON_B,
         GLFW_GAMEPAD_BUTTON_X,
@@ -192,11 +238,9 @@ namespace backend {
         GLFW_GAMEPAD_BUTTON_DPAD_UP,
         GLFW_GAMEPAD_BUTTON_DPAD_DOWN,
     };
-    static_assert(std::size(s_gamepadButtonToGlfw) == static_cast<Uint8>(GamepadBtn::Count));
+    static Array<Uint8, GLFW_GAMEPAD_BUTTON_LAST + 1> s_glfwToGamepadButton = {0};
 
-    static Uint8 s_glfwToGamepadButton[GLFW_GAMEPAD_BUTTON_LAST + 1] = {0};
-
-    static Uint8 s_gamepadAxisToGlfw[] = {
+    static Array<Uint8, static_cast<Uint8>(GamepadAxis::Count)> s_gamepadAxisToGlfw = {
         GLFW_GAMEPAD_AXIS_LEFT_X,
         GLFW_GAMEPAD_AXIS_LEFT_Y,
         GLFW_GAMEPAD_AXIS_RIGHT_X,
@@ -204,7 +248,8 @@ namespace backend {
         GLFW_GAMEPAD_AXIS_LEFT_TRIGGER,
         GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER,
     };
-    static_assert(std::size(s_gamepadAxisToGlfw) == static_cast<Uint8>(GamepadAxis::Count));
+
+    static Array<Uint8, GLFW_GAMEPAD_AXIS_LAST + 1> s_glfwToGamepadAxis{0};
 
     namespace {
         struct GamepadData {
@@ -212,7 +257,7 @@ namespace backend {
             GLFWgamepadstate states[2] = {};
             int currentState{};
 
-            void resetStates()
+            void resetStates() noexcept
             {
                 for (auto &state : states)
                 {
@@ -223,8 +268,8 @@ namespace backend {
                 currentState = 0;
             }
 
-            [[nodiscard]] const GLFWgamepadstate &getCurrentState() const { return states[currentState]; }
-            [[nodiscard]] const GLFWgamepadstate &getLastState() const { return states[!currentState]; }
+            [[nodiscard]] const GLFWgamepadstate &getCurrentState() const noexcept { return states[currentState]; }
+            [[nodiscard]] const GLFWgamepadstate &getLastState() const noexcept { return states[!currentState]; }
         };
     }
 
@@ -234,22 +279,15 @@ namespace backend {
     // ===== Static callbacks ===============================================
     static void glfwWindowCloseCallback(GLFWwindow *window)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = WindowEvent::Closed,
             .window = window,
         });
     }
 
-    #if KAZE_DEBUG
-    static void glfwErrorCallback(const int error, const char *description)
-    {
-        KAZE_CORE_ERR("GLFW Error: {}: {}", error, description);
-    }
-    #endif
-
     static void glfwScrollCallback(GLFWwindow *window, const double xoffset, const double yoffset)
     {
-        PlatformBackend::events.emit(MouseScrollEvent {
+        events.emit(MouseScrollEvent {
         .offset = {
             static_cast<float>(xoffset),
             static_cast<float>(yoffset)
@@ -260,7 +298,7 @@ namespace backend {
 
     static void glfwCursorPosCallback(GLFWwindow *window, const double x, const double y)
     {
-        PlatformBackend::events.emit(MouseMotionEvent {
+        events.emit(MouseMotionEvent {
            .position = {
                static_cast<Float>(x),
                static_cast<Float>(y),
@@ -271,7 +309,7 @@ namespace backend {
 
     static void glfwKeyCallback(GLFWwindow *window, const int key, const int scancode, const int action, const int mods)
     {
-        PlatformBackend::events.emit(KeyboardEvent {
+        events.emit(KeyboardEvent {
             .type = (action == GLFW_RELEASE ? KeyboardEvent::Up : KeyboardEvent::Down),
             .key = static_cast<Key>(s_glfwKeyToKey[key]),
             .isRepeat = (action == GLFW_REPEAT),
@@ -288,7 +326,7 @@ namespace backend {
 
     static void glfwMouseButtonCallback(GLFWwindow *window, const int button, const int action, const int mods)
     {
-        PlatformBackend::events.emit(MouseButtonEvent {
+        events.emit(MouseButtonEvent {
             .type = action == GLFW_RELEASE ? MouseButtonEvent::Up : MouseButtonEvent::Down,
             .button = toMouseBtn(button),
             .window = window,
@@ -297,7 +335,7 @@ namespace backend {
 
     static void glfwCursorEnterCallback(GLFWwindow *window, const int entered)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = entered == 0 ? WindowEvent::MouseExited : WindowEvent::MouseEntered,
             .window = window,
         });
@@ -309,7 +347,7 @@ namespace backend {
         if (event == GLFW_CONNECTED)
         {
             gamepad.isConnected = true;
-            PlatformBackend::events.emit(GamepadConnectEvent {
+            events.emit(GamepadConnectEvent {
                 .id = jid,
                 .type = GamepadConnectEvent::Connected
             });
@@ -318,7 +356,7 @@ namespace backend {
         {
             gamepad.isConnected = false;
             gamepad.resetStates();
-            PlatformBackend::events.emit(GamepadConnectEvent {
+            events.emit(GamepadConnectEvent {
                 .id = jid,
                 .type = GamepadConnectEvent::Disconnected
             });
@@ -327,7 +365,7 @@ namespace backend {
 
     static void glfwWindowSizeCallback(GLFWwindow *window, const int x, const int y)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = WindowEvent::Resized,
             .data0 = x,
             .data1 = y,
@@ -337,7 +375,7 @@ namespace backend {
 
     static void glfwFramebufferSize(GLFWwindow *window, const int x, const int y)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = WindowEvent::ResizedFramebuffer,
             .data0 = x,
             .data1 = y,
@@ -347,7 +385,7 @@ namespace backend {
 
     static void glfwWindowPosCallback(GLFWwindow *window, const int x, const int y)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = WindowEvent::Moved,
             .data0 = x,
             .data1 = y,
@@ -357,7 +395,7 @@ namespace backend {
 
     static void glfwWindowFocusCallback(GLFWwindow *window, const int focus)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = focus == 0 ? WindowEvent::FocusLost : WindowEvent::FocusGained,
             .window = window,
         });
@@ -365,7 +403,7 @@ namespace backend {
 
     static void glfwWindowMaximizeCallback(GLFWwindow *window, const int maximize)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = maximize == 0 ? WindowEvent::Restored : WindowEvent::Maximized,
             .window = window,
         });
@@ -373,7 +411,7 @@ namespace backend {
 
     static void glfwWindowIconifyCallback(GLFWwindow *window, const int iconify)
     {
-        PlatformBackend::events.emit(WindowEvent {
+        events.emit(WindowEvent {
             .type = iconify == 0 ? WindowEvent::Restored : WindowEvent::Minimized,
             .window = window,
         });
@@ -388,7 +426,7 @@ namespace backend {
                 double cursorX, cursorY;
                 glfwGetCursorPos(window, &cursorX, &cursorY);
 
-                PlatformBackend::events.emit(FileDropEvent {
+                events.emit(FileDropEvent {
                     .path = paths[i],
                     .window = window,
                     .position = {
@@ -400,24 +438,62 @@ namespace backend {
         }
     }
 
-
-    Bool PlatformBackend::init() noexcept
+    static const char *getGlfwErrorStr(int *outCode = nullptr)
     {
-    #if KAZE_DEBUG
-        glfwSetErrorCallback(glfwErrorCallback);
-    #endif
+        const char *message;
+        const auto code = glfwGetError(&message);
+        if (outCode)
+            *outCode = code;
 
-        if (!glfwInit())
+        return message;
+    }
+
+    /// Reset glfw error state
+    static void clearGlfwError()
+    {
+        glfwGetError(nullptr);
+    }
+
+    /// Private helper to safely grab window data associated with window
+    /// @param [in]  window  window to get data associated to
+    /// @param [out] outData retrieves pointer to data
+    /// @returns true if successfully retrieved, and false if missing or unsuccessfully retrieved
+    static auto getWindowData(const WindowHandle window, WindowData **outData) -> bool
+    {
+        KAZE_ASSERT(window);
+        KAZE_ASSERT(outData);
+
+        WindowData *data;
+        if ( !s_windows.getData(window, &data) )
+            return false;
+        if ( !data )
         {
-            return KAZE_FALSE;
+            KAZE_CORE_ERRCODE(Error::BE_LogicError, "missing window data");
+            return false;
+        }
+
+        *outData = data;
+        return true;
+    }
+
+    bool init() noexcept
+    {
+        if ( !glfwInit() )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_InitErr, "Failed to initialize glfw3: {}", getGlfwErrorStr());
+            return false;
         }
 
         glfwSetJoystickCallback(glfwJoystickCallback);
+        if (const auto err = getGlfwErrorStr())
+        {
+            KAZE_CORE_WARN("Failed to set joystick callback: {}", err); // warn, since platform may not support gamepads
+        }
 
         // set up input query arrays
         if (s_glfwKeyToKey[GLFW_KEY_Z] == 0)
         {
-            for (auto i = 1; const auto key : s_keyToGlfwKey)
+            for (auto i = 0; const auto key : s_keyToGlfwKey)
             {
                 s_glfwKeyToKey[key] = i++;
             }
@@ -431,6 +507,14 @@ namespace backend {
             }
         }
 
+        if (s_glfwToGamepadAxis[GLFW_GAMEPAD_AXIS_LAST] == 0)
+        {
+            for (auto i = 0; const auto axis : s_gamepadAxisToGlfw)
+            {
+                s_glfwToGamepadAxis[axis] = i++;
+            }
+        }
+
         for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i)
         {
             if (glfwJoystickPresent(i) && glfwJoystickIsGamepad(i))
@@ -439,399 +523,952 @@ namespace backend {
             }
         }
 
-        return KAZE_TRUE;
+        clearGlfwError();
+        return true;
     }
 
-    void PlatformBackend::shutdown() noexcept
+    auto shutdown() noexcept -> void
     {
         glfwTerminate();
     }
 
-    Double PlatformBackend::getTime() noexcept
+    auto getTime(double *outTime) noexcept -> bool
     {
-        return glfwGetTime();
+        RETURN_IF_NULL(outTime);
+
+        *outTime = glfwGetTime();
+        return true;
     }
 
-    void PlatformBackend::pollEvents()
+    auto pollEvents() noexcept -> bool
     {
         glfwPollEvents();
 
-        for (int i = 0; i <= GLFW_GAMEPAD_AXIS_LAST; ++i)
+        for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i)
         {
             auto &[isConnected, states, currentState] = s_gamepads[i];
             if (isConnected)
             {
                 currentState = !currentState; // flip current state
                 glfwGetGamepadState(i, &states[currentState]);
+
+                // fire callbacks for any new buttons
+                const auto &buttons = states[currentState].buttons;
+                const auto &lastButtons = states[!currentState].buttons;
+                for (int b = 0; b < std::size(buttons); ++b)
+                {
+                    if (buttons[b] != lastButtons[b])
+                    {
+                        events.emit(GamepadButtonEvent {
+                            .type = buttons[b] ? GamepadButtonEvent::Down : GamepadButtonEvent::Up,
+                            .controllerIndex = i,
+                            .button = static_cast<GamepadBtn>(s_glfwToGamepadButton[b]),
+                        });
+                    }
+                }
+
+                const auto &axes = states[currentState].axes;
+                const auto &lastAxes = states[!currentState].axes;
+                for (int a = 0; a < std::size(axes); ++a)
+                {
+                    if (axes[a] != lastAxes[a])
+                    {
+                        events.emit(GamepadAxisEvent {
+                            .controllerIndex = i,
+                            .axis = static_cast<GamepadAxis>(s_glfwToGamepadAxis[a]),
+                            .value = axes[a]
+                        });
+                    }
+                }
             }
         }
+
+        return true;
     }
 
-    void *PlatformBackend::windowCreate(const char *title, const size_t width, const size_t height, const WindowInit::Flags initFlags)
+    auto getClipboard(const char **outText) noexcept -> bool
     {
-        glfwWindowHint(GLFW_DECORATED, !static_cast<bool>(initFlags & WindowInit::Borderless));
-        glfwWindowHint(GLFW_RESIZABLE, static_cast<bool>(initFlags & WindowInit::Resizable));
-        glfwWindowHint(GLFW_MAXIMIZED, static_cast<bool>(initFlags & WindowInit::Maximized));
-        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, static_cast<bool>(initFlags & WindowInit::Transparent));
-        glfwWindowHint(GLFW_FLOATING, static_cast<bool>(initFlags & WindowInit::Floating));
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // hide window at first until everything has been processed
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        RETURN_IF_NULL(outText);
 
-        const auto window = glfwCreateWindow(
-            static_cast<Int>(width), static_cast<Int>(height),
-            title, nullptr, nullptr);
-
-        glfwSetWindowUserPointer(window, new WindowData);
-
-        // Setup callbacks
-        glfwSetWindowCloseCallback(window, glfwWindowCloseCallback);
-        glfwSetKeyCallback(window, glfwKeyCallback);
-        glfwSetScrollCallback(window, glfwScrollCallback);
-        glfwSetMouseButtonCallback(window, glfwMouseButtonCallback);
-        glfwSetCursorPosCallback(window, glfwCursorPosCallback);
-        glfwSetCursorEnterCallback(window, glfwCursorEnterCallback);
-        glfwSetWindowPosCallback(window, glfwWindowPosCallback);
-        glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
-        glfwSetFramebufferSizeCallback(window, glfwFramebufferSize);
-        glfwSetWindowFocusCallback(window, glfwWindowFocusCallback);
-        glfwSetWindowMaximizeCallback(window, glfwWindowMaximizeCallback);
-        glfwSetWindowIconifyCallback(window, glfwWindowIconifyCallback);
-        glfwSetDropCallback(window, glfwDropCallback);
-
-        if (initFlags & WindowInit::Fullscreen)
+        const auto text = glfwGetClipboardString(nullptr);
+        if ( !text )
         {
-            windowSetNativeFullscreen(window, true);
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeError, "Failed to get clipboard string: {}", getGlfwErrorStr());
+            return false;
         }
 
-        if ( !(initFlags & WindowInit::Hidden) )
+        *outText = text;
+        return true;
+    }
+
+    auto setClipboard(const char *text) noexcept -> bool
+    {
+        RETURN_IF_NULL(text);
+
+        glfwSetClipboardString(nullptr, text); ERR_CHECK(Error::BE_RuntimeError, "set clipboard string");
+        return true;
+    }
+
+    auto window::open(const char *title, const int width, const int height, const WindowInit::Flags flags,
+                      WindowHandle *outWindow) noexcept -> bool
+    {
+        RETURN_IF_NULL(outWindow);
+        clearGlfwError(); // just in case there is any leftover error
+
+        // Set up window hints
+        glfwWindowHint(GLFW_DECORATED, !static_cast<bool>(flags & WindowInit::Borderless)); WARN_CHECK("set decoracted window hint");
+        glfwWindowHint(GLFW_RESIZABLE, static_cast<bool>(flags & WindowInit::Resizable));   WARN_CHECK("set resizable window hint");
+        glfwWindowHint(GLFW_MAXIMIZED, static_cast<bool>(flags & WindowInit::Maximized));   WARN_CHECK("set maximized window hint");
+        glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, static_cast<bool>(flags & WindowInit::Transparent)); WARN_CHECK("set transparent framebuffer window hint");
+        glfwWindowHint(GLFW_FLOATING, static_cast<bool>(flags & WindowInit::Floating));     WARN_CHECK("set floating window hint");
+        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);      WARN_CHECK("set window visible hint to false"); // hide window at first until everything has been processed
+        glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);  WARN_CHECK("set window client api to none");
+
+        const auto window = glfwCreateWindow(width, height, title, nullptr, nullptr); ERR_CHECK(Error::BE_RuntimeError, "create GLFWwindow");
+        KAZE_ASSERT(window);
+
+        // Set up window callbacks
+        glfwSetWindowCloseCallback    ( window, glfwWindowCloseCallback ); WARN_CHECK("set window close callback");
+        glfwSetKeyCallback            ( window, glfwKeyCallback );         WARN_CHECK("set window key callback");
+        glfwSetScrollCallback         ( window, glfwScrollCallback );      WARN_CHECK("set window scroll callback");
+        glfwSetMouseButtonCallback    ( window, glfwMouseButtonCallback ); WARN_CHECK("set window mouse button callback");
+        glfwSetCursorPosCallback      ( window, glfwCursorPosCallback );   WARN_CHECK("set window cursor pos callback");
+        glfwSetCursorEnterCallback    ( window, glfwCursorEnterCallback ); WARN_CHECK("set window cursor enter callback");
+        glfwSetWindowPosCallback      ( window, glfwWindowPosCallback );   WARN_CHECK("set window pos callback");
+        glfwSetWindowSizeCallback     ( window, glfwWindowSizeCallback );  WARN_CHECK("set window size callback");
+        glfwSetFramebufferSizeCallback( window, glfwFramebufferSize );     WARN_CHECK("set window framebuffer size callback");
+        glfwSetWindowFocusCallback    ( window, glfwWindowFocusCallback ); WARN_CHECK("set window focus callback");
+        glfwSetWindowMaximizeCallback ( window, glfwWindowMaximizeCallback ); WARN_CHECK("set window maximize callback");
+        glfwSetWindowIconifyCallback  ( window, glfwWindowIconifyCallback ); WARN_CHECK("set window iconify/minimize callback");
+        glfwSetDropCallback           ( window, glfwDropCallback );        WARN_CHECK("set window drop callback");
+
+
+        if (flags & WindowInit::Fullscreen)
         {
-            glfwShowWindow(window);
-        }
-
-
-        return window;
-    }
-
-    void PlatformBackend::windowDestroy(void *window)
-    {
-        const auto glfwWindow = WIN_CAST(window);
-        const auto data = static_cast<WindowData *>(glfwGetWindowUserPointer(glfwWindow));
-
-        glfwDestroyWindow(glfwWindow);
-        delete data;
-    }
-
-    bool PlatformBackend::windowIsOpen(void* window)
-    {
-        glfwWindowShouldClose(WIN_CAST(window));
-        return glfwGetError(nullptr) == GLFW_NO_ERROR;
-    }
-
-    void PlatformBackend::windowSetUserData(void *window, void* data)
-    {
-        const auto windata = WINDATA_CAST(window);
-        windata->userdata = data;
-    }
-
-    void *PlatformBackend::windowGetUserData(void *window)
-    {
-        const auto windata = WINDATA_CAST(window);
-        return windata->userdata;
-    }
-
-    void PlatformBackend::windowSetTitle(void *window, const Cstring title)
-    {
-        glfwSetWindowTitle(WIN_CAST(window), title);
-    }
-
-    const char* PlatformBackend::windowGetTitle(void* window) noexcept
-    {
-        return glfwGetWindowTitle(WIN_CAST(window));
-    }
-
-    void PlatformBackend::windowGetDisplaySize(void *window, int *x, int *y) noexcept
-    {
-        glfwGetFramebufferSize(WIN_CAST(window), x, y);
-    }
-
-    void PlatformBackend::windowSetSize(void *window, const int x, const int y)
-    {
-        glfwSetWindowSize(WIN_CAST(window), x, y);
-    }
-
-    void PlatformBackend::windowGetSize(void *window, int *x, int *y) noexcept
-    {
-        glfwGetWindowSize(WIN_CAST(window), x, y);
-    }
-
-    bool PlatformBackend::windowIsNativeFullscreen(void *window) noexcept
-    {
-    #if KAZE_TARGET_MACOS
-        return getWindowCocoaFullScreen(WIN_CAST(window));
-    #else
-        return static_cast<bool>(glfwGetWindowMonitor(WINCAST(window)));
-    #endif
-    }
-
-    void PlatformBackend::windowSetNativeFullscreen(void *window, const Bool value)
-    {
-        if (windowIsNativeFullscreen(window) == value) return;
-
-        auto glfwWindow = WIN_CAST(window);
-        auto data = static_cast<WindowData *>(glfwGetWindowUserPointer(glfwWindow));
-    #if KAZE_TARGET_MACOS
-
-        if (data->isDesktopFullscreen)
-            windowSetDesktopFullscreen(window, false);
-        setWindowCocoaFullScreen(glfwWindow, value);
-    #else
-
-        if (value)
-        {
-            auto monitor = glfwGetPrimaryMonitor();
-            auto mode = glfwGetVideoMode(monitor);
-
-            if (!data->isDesktopFullscreen) // only update last state if non-fullscreen
+            if (!setFullscreen(window, true))
             {
-                windowGetPosition(glfwWindow, &data->last.rect.x, &data->last.rect.y);
-                windowGetSize(glfwWindow, &data->last.rect.w, &data->last.rect.h);
+                KAZE_CORE_WARN("Failed to set fullscreen mode: {}", getError().message);
             }
-            else
-            {
-                windowSetDesktopFullscreen(window, false);
-            }
+        }
 
-            glfwSetWindowMonitor(glfwWindow, monitor,
+        if ( !(flags & WindowInit::Hidden) )
+        {
+            glfwShowWindow(window); WARN_CHECK("show window");
+        }
+
+        if ( !s_windows.emplace(window, {}) )
+        {
+            glfwDestroyWindow(window); ERR_CHECK(Error::BE_RuntimeError, "clean up window after failed data emplacement");
+            return false;
+        }
+
+        *outWindow = window;
+
+        clearGlfwError();
+        return true;
+    }
+
+    auto window::close(const WindowHandle window) noexcept -> bool
+    {
+        if ( !window )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_InvalidWindowHandle, "WindowHandle was null");
+            return false;
+        }
+
+        bool wasErased;
+        if ( !s_windows.erase(window, &wasErased) )
+            return false;
+
+        if ( !wasErased )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_InvalidWindowHandle, "WindowHandle was invalid");
+            return false;
+        }
+
+        glfwDestroyWindow(WIN_CAST(window)); ERR_CHECK(Error::BE_RuntimeError, "destroy window");
+
+        return true;
+    }
+
+    auto window::isOpen(const WindowHandle window, bool *outIsOpen) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        return s_windows.contains(window, outIsOpen);
+    }
+
+    auto window::setUserData(WindowHandle window, void *userdata) noexcept -> bool
+    {
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        data->userdata = userdata;
+        return true;
+    }
+
+    auto window::getUserData(const WindowHandle window, void **outUserdata) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outUserdata);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        *outUserdata = data->userdata;
+        return true;
+    }
+
+    auto window::setTitle(const WindowHandle window, const char *title) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(title);
+        glfwSetWindowTitle(WIN_CAST(window), title); ERR_CHECK(Error::BE_RuntimeError, "set the window title");
+
+        return true;
+    }
+
+    auto window::getTitle(const WindowHandle window, const char **outTitle) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outTitle);
+
+        const auto title = glfwGetWindowTitle(WIN_CAST(window));
+        if ( !title )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeError, "Failed to get window title: {}", getGlfwErrorStr());
+            return false;
+        }
+
+        *outTitle = title;
+        return true;
+    }
+
+    auto window::getFramebufferSize(const WindowHandle window, int *outWidth, int *outHeight) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        glfwGetFramebufferSize(WIN_CAST(window), outWidth, outHeight); ERR_CHECK(Error::BE_RuntimeError, "get framebuffer size");
+
+        return true;
+    }
+
+    auto window::setSize(const WindowHandle window, const int width, const int height) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        glfwSetWindowSize(WIN_CAST(window), width, height);
+        ERR_CHECK(Error::BE_RuntimeError, "set logical window size");
+
+        return true;
+    }
+
+    auto window::getSize(const WindowHandle window, int *outWidth, int *outHeight) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        glfwGetWindowSize(WIN_CAST(window), outWidth, outHeight);
+        ERR_CHECK(Error::BE_RuntimeError, "get logical window size");
+
+        return true;
+    }
+
+    static auto windowIsNativeFullscreen(const WindowHandle window, bool *outFullscreen) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFullscreen);
+
+#if KAZE_TARGET_MACOS
+        if ( !getWindowCocoaFullScreen(WIN_CAST(window), outFullscreen) )
+            return false;
+#else
+        const auto tempFullscreen = static_cast<bool>(glfwGetWindowMonitor(WINCAST(window)));
+        ERR_CHECK(Error::BE_RuntimeError, "get fullscreen monitor");
+
+        *outFullscreen = tempFullscreen;
+#endif
+
+        return true;
+    }
+
+    static auto windowIsDesktopFullscreen(const WindowHandle window, bool *outFullscreen) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFullscreen);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        *outFullscreen = data->isDesktopFullscreen;
+        return true;
+    }
+
+    auto window::isFullscreen(const WindowHandle window, bool *outFullscreen) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFullscreen);
+
+        bool desktopFullscreen{}, nativeFullscreen{};
+        if ( !windowIsDesktopFullscreen(window, &desktopFullscreen) ||
+            !windowIsNativeFullscreen(window, &nativeFullscreen) )
+        {
+            return false;
+        }
+
+        *outFullscreen = desktopFullscreen || nativeFullscreen;
+        return true;
+    }
+
+    static auto setFullscreenNative(const WindowHandle window, bool fullscreen) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+#if KAZE_TARGET_MACOS
+        return setWindowCocoaFullScreen(WIN_CAST(window), fullscreen);
+#else
+        WindowData *data;
+        if ( !getWindowData(window, &data))
+            return false;
+
+        bool curFullscreen;
+        if ( !backend::window::isFullscreen(window, &curFullscreen) )
+            return false;
+
+        if (fullscreen)
+        {
+            auto monitor = glfwGetPrimaryMonitor(); ERR_CHECK(Error::BE_RuntimeError, "get primary monitor");
+            KAZE_ASSERT(monitor);
+
+            auto mode = glfwGetVideoMode(monitor); ERR_CHECK(Error::BE_RuntimeError, "get video mode");
+
+
+            window::getPosition(window, &data->last.rect.x, &data->last.rect.y);
+            window::getSize(window, &data->last.rect.w, &data->last.rect.h);
+
+            glfwSetWindowMonitor(WIN_CAST(window), monitor,
                 0, 0, mode->width, mode->height, mode->refreshRate);
         }
         else
         {
-            glfwSetWindowMonitor(WINCAST(window), nullptr,
-                data-last.rect.x, data->last.rect.y,
+            glfwSetWindowMonitor(WIN_CAST(window), nullptr,
+                data->last.rect.x, data->last.rect.y,
                 data->last.rect.w, data->last.rect.h,
                 GLFW_DONT_CARE);
         }
-    #endif
+#endif
     }
 
-    bool PlatformBackend::windowIsDesktopFullscreen(void *window) noexcept
+    static auto setFullscreenDesktop(const WindowHandle window, bool fullscreen) noexcept -> bool
     {
-        const auto data = WINDATA_CAST(window);
-        KAZE_ASSERT(data != nullptr);
+        KAZE_ASSERT(window);
 
-        return data->isDesktopFullscreen;
-    }
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
 
-    void PlatformBackend::windowSetDesktopFullscreen(void *window, const bool value)
-    {
-        if (value == windowIsDesktopFullscreen(window)) return;
-
-        const auto data = WINDATA_CAST(window);
-        KAZE_ASSERT(data != nullptr);
-
-        if (value)
+        if (fullscreen)
         {
-            const auto monitor = glfwGetPrimaryMonitor();
-            const auto mode = glfwGetVideoMode(monitor);
+            const auto monitor = glfwGetPrimaryMonitor(); ERR_CHECK(Error::BE_RuntimeError, "get primary monitor");
+            const auto mode = glfwGetVideoMode(monitor);  ERR_CHECK(Error::BE_RuntimeError, "get video mode for monitor");
 
-            if (windowIsNativeFullscreen(window))
-                windowSetNativeFullscreen(window, false);
+            if ( !window::getPosition(window, &data->last.rect.x, &data->last.rect.y) )
+                return false;
+            if ( !window::getSize(window, &data->last.rect.w, &data->last.rect.h) )
+                return false;
+            bool bordered;
+            if ( !window::isBordered(window, &bordered) )
+                return false;
 
-            windowGetPosition(window, &data->last.rect.x, &data->last.rect.y);
-            windowGetSize(window, &data->last.rect.w, &data->last.rect.h);
-            data->last.decorated = !windowIsBorderless(window);
+            if ( !window::setBordered(window, false) )
+                return false;
 
-
-            windowSetBorderless(window, true);
             glfwSetWindowMonitor(WIN_CAST(window), nullptr,
                 0, 0, mode->width, mode->height, GLFW_DONT_CARE);
+            ERR_CHECK(Error::BE_RuntimeError, "set window monitor to null");
+
+            data->last.decorated = bordered;
             data->isDesktopFullscreen = true;
         }
         else
         {
             glfwSetWindowMonitor(WIN_CAST(window), nullptr,
                 data->last.rect.x, data->last.rect.y, data->last.rect.w, data->last.rect.h, GLFW_DONT_CARE);
-            windowSetBorderless(window, !data->last.decorated);
+            window::setBordered(window, data->last.decorated);
             data->isDesktopFullscreen = false;
         }
 
+        return true;
     }
 
-    bool PlatformBackend::windowIsBorderless(void *window) noexcept
+    auto window::setFullscreen(const WindowHandle window, const bool value) noexcept -> bool
     {
-        return !static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_DECORATED));
+        bool curFullscreen;
+        if ( !window::isFullscreen(window, &curFullscreen) )
+            return false;
+
+        if (curFullscreen == value) return true; // no need to adjust screen if its the same as current state
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        if (data->fullscreenMode == FullscreenMode::Desktop)
+        {
+            setFullscreenDesktop(window, value);
+        }
+        else if (data->fullscreenMode == FullscreenMode::Native)
+        {
+            setFullscreenNative(window, value);
+        }
+        else
+        {
+            // this probably shouldn't ever occur
+            KAZE_CORE_ERRCODE(Error::BE_LogicError, "window data fullscreen mode value is invalid");
+            return false;
+        }
+
+        return true;
     }
 
-    void PlatformBackend::windowSetBorderless(void *window, const bool value)
+    auto window::setFullscreenMode(const WindowHandle window, const FullscreenMode mode) noexcept -> bool
     {
-        glfwSetWindowAttrib(WIN_CAST(window), GLFW_DECORATED, !value);
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        const auto curMode = data->fullscreenMode;
+        if (curMode == mode) // no need to change mode if it's already the same as the target mode
+            return true;
+
+        if (curMode == FullscreenMode::Desktop)
+        {
+            if (data->isDesktopFullscreen)
+            {
+                if ( !setFullscreen(window, false) )
+                    return false;
+
+                data->fullscreenMode = mode;
+
+                if ( !setFullscreen(window, true) )
+                {
+                    data->fullscreenMode = curMode; // revert back to original mode
+                    setFullscreen(window, true);    // try to revert back to original
+                    return false;
+                }
+            }
+            else
+            {
+                data->fullscreenMode = mode;
+            }
+        }
+        else if (curMode == FullscreenMode::Native)
+        {
+            bool isNativeFullscreen;
+            if ( !isFullscreen(window, &isNativeFullscreen) )
+                return false;
+
+            if (isNativeFullscreen)
+            {
+                if ( !setFullscreen(window, false) )
+                    return false;
+
+                data->fullscreenMode = mode;
+
+                if ( !setFullscreen(window, true) )
+                {
+                    data->fullscreenMode = curMode;
+                    setFullscreen(window, true);   // try to revert back to original
+                    return false;
+                }
+            }
+            else
+            {
+                data->fullscreenMode = mode;
+            }
+        }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsMinimized(void *window) noexcept
+    auto window::getFullscreenMode(WindowHandle window, FullscreenMode *outMode) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_ICONIFIED));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outMode);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        *outMode = data->fullscreenMode;
+        return true;
     }
 
-    void PlatformBackend::windowMinimize(void *window)
+    auto window::isBordered(const WindowHandle window, bool *outBordered) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outBordered);
+
+        const auto bordered = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_DECORATED));
+        ERR_CHECK(Error::BE_RuntimeError, "check if window is decorated");
+
+        *outBordered = bordered;
+        return true;
+    }
+
+    auto window::setBordered(const WindowHandle window, const bool bordered) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        glfwSetWindowAttrib(WIN_CAST(window), GLFW_DECORATED, bordered);
+        ERR_CHECK(Error::BE_RuntimeError, "set window decorated attribute");
+
+        return true;
+    }
+
+    auto window::isMinimized(const WindowHandle window, bool *outMinimized) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outMinimized);
+
+        const auto minimized = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_ICONIFIED));
+        ERR_CHECK(Error::BE_RuntimeError, "get iconified/minimized attribute");
+
+        *outMinimized = minimized;
+        return true;
+    }
+
+    auto window::minimize(const WindowHandle window) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
         glfwIconifyWindow(WIN_CAST(window));
+        ERR_CHECK(Error::BE_RuntimeError, "iconify/minimize window");
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsMaximized(void *window) noexcept
+    auto window::isMaximized(const WindowHandle window, bool *outMaximized) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_MAXIMIZED));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outMaximized);
+
+        const auto maximized = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_MAXIMIZED));
+        ERR_CHECK(Error::BE_RuntimeError, "check if window is maximized");
+
+        *outMaximized = maximized;
+        return true;
     }
 
-    void PlatformBackend::windowMaximize(void *window)
+    auto window::maximize(const WindowHandle window) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
         glfwMaximizeWindow(WIN_CAST(window));
+        ERR_CHECK(Error::BE_RuntimeError, "maximize window");
+
+        return true;
     }
 
-    void PlatformBackend::windowRestore(void *window)
+    auto window::restore(const WindowHandle window) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
         glfwRestoreWindow(WIN_CAST(window));
+        ERR_CHECK(Error::BE_RuntimeError, "restore window");
+
+        return true;
     }
 
-    void PlatformBackend::windowGetPosition(void *window, int *x, int *y) noexcept
+    auto window::getPosition(const WindowHandle window, int *x, int *y) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
         glfwGetWindowPos(WIN_CAST(window), x, y);
+        ERR_CHECK(Error::BE_RuntimeError, "get window position");
+
+        return true;
     }
 
-    void PlatformBackend::windowSetPosition(void *window, const int x, const int y) noexcept
+    auto window::setPosition(const WindowHandle window, const int x, const int y) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
         glfwSetWindowPos(WIN_CAST(window), x, y);
+        ERR_CHECK(Error::BE_RuntimeError, "set window position");
+
+        return true;
     }
 
-    bool PlatformBackend::windowGetResizable(void *window) noexcept
+    auto window::getResizable(const WindowHandle window, bool *outResizable) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_RESIZABLE));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outResizable);
+
+        const auto resizable = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_RESIZABLE));
+        ERR_CHECK(Error::BE_RuntimeError, "get window resizable attribute");
+
+        *outResizable = resizable;
+        return true;
     }
 
-    void PlatformBackend::windowSetResizable(void *window, const bool value)
+    auto window::setResizable(const WindowHandle window, const bool resizable) noexcept -> bool
     {
-        glfwSetWindowAttrib(WIN_CAST(window), GLFW_RESIZABLE, value);
+        RETURN_IF_NULL(window);
+
+        glfwSetWindowAttrib(WIN_CAST(window), GLFW_RESIZABLE, resizable);
+        ERR_CHECK(Error::BE_RuntimeError, "set window resizable attribute");
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsHidden(void* window) noexcept
+    auto window::isHidden(const WindowHandle window, bool *outHidden) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_VISIBLE));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outHidden);
+
+        const auto visible = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_VISIBLE));
+        ERR_CHECK(Error::BE_RuntimeError, "get window visible attribute");
+
+        *outHidden = !visible;
+        return true;
     }
 
-    void PlatformBackend::windowSetHidden(void* window, const bool value)
+    auto window::setHidden(const WindowHandle window, const bool hidden) noexcept -> bool
     {
-        if (value)
+        RETURN_IF_NULL(window);
+
+        if (hidden)
         {
             glfwHideWindow(WIN_CAST(window));
+            ERR_CHECK(Error::BE_RuntimeError, "hide window");
         }
         else
         {
             glfwShowWindow(WIN_CAST(window));
+            ERR_CHECK(Error::BE_RuntimeError, "show window");
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsHovered(void *window) noexcept
+    auto window::isHovered(const WindowHandle window, bool *outHovered) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_HOVERED));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outHovered);
+
+        const auto hovered = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_HOVERED));
+        ERR_CHECK(Error::BE_RuntimeError, "get window hovered attribute");
+
+        *outHovered = hovered;
+        return true;
     }
 
-    bool PlatformBackend::windowIsFloating(void *window) noexcept
+    auto window::isFloating(const WindowHandle window, bool *outFloating) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_FLOATING));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFloating);
+
+        const auto floating = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_FLOATING));
+        ERR_CHECK(Error::BE_RuntimeError, "get window floating attribute");
+
+        *outFloating = floating;
+        return true;
     }
 
-    void PlatformBackend::windowSetFloating(void *window, const bool value)
+    auto window::setFloating(const WindowHandle window, const bool floating) noexcept -> bool
     {
-        glfwSetWindowAttrib(WIN_CAST(window), GLFW_FLOATING, static_cast<int>(value));
+        RETURN_IF_NULL(window);
+
+        glfwSetWindowAttrib(WIN_CAST(window), GLFW_FLOATING, floating);
+        ERR_CHECK(Error::BE_RuntimeError, "set window floating attribute");
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsTransparent(void *window) noexcept
+    auto window::isTransparent(const WindowHandle window, bool *outTransparent) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_TRANSPARENT_FRAMEBUFFER));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outTransparent);
+
+        const auto transparent = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_TRANSPARENT_FRAMEBUFFER));
+        ERR_CHECK(Error::BE_RuntimeError, "get window transparent framebuffer attribute");
+
+        *outTransparent = transparent;
+        return true;
     }
 
-    void PlatformBackend::windowSetTransparent(void *window, const bool value)
+    auto window::setTransparent(const WindowHandle window, const bool transparent) noexcept -> bool
     {
-        glfwSetWindowAttrib(WIN_CAST(window), GLFW_TRANSPARENT_FRAMEBUFFER, static_cast<int>(value));
+        RETURN_IF_NULL(window);
+
+        glfwSetWindowAttrib(WIN_CAST(window), GLFW_TRANSPARENT_FRAMEBUFFER, transparent);
+        ERR_CHECK(Error::BE_RuntimeError, "set window transparent framebuffer attribute");
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsFocused(void *window) noexcept
+    auto window::isFocused(const WindowHandle window, bool *outFocused) noexcept -> bool
     {
-        return static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_FOCUSED));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFocused);
+
+        const auto focused = static_cast<bool>(glfwGetWindowAttrib(WIN_CAST(window), GLFW_FOCUSED));
+        ERR_CHECK(Error::BE_RuntimeError, "get window focused attribute");
+
+        *outFocused = focused;
+        return true;
     }
 
-    void PlatformBackend::windowFocus(void *window)
+    auto window::focus(const WindowHandle window) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
         glfwFocusWindow(WIN_CAST(window));
+        ERR_CHECK(Error::BE_RuntimeError, "focus window");
+
+        return true;
     }
 
-    void PlatformBackend::windowSetMinimumSize(void *window, const int minWidth, const int minHeight)
+    auto window::setMinSize(const WindowHandle window, const int minWidth, const int minHeight) noexcept -> bool
     {
-        const auto data = WINDATA_CAST(window);
+        RETURN_IF_NULL(window);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
         glfwSetWindowSizeLimits(WIN_CAST(window),
             minWidth, minHeight, data->last.maxSize.x, data->last.maxSize.y);
+        ERR_CHECK(Error::BE_RuntimeError, "set window size limits");
+
         data->last.minSize = { minWidth, minHeight };
+        return true;
     }
 
-    void PlatformBackend::windowSetMaximumSize(void *window, const int maxWidth, const int maxHeight)
+    auto window::setMaxSize(const WindowHandle window, const int maxWidth, const int maxHeight) noexcept -> bool
     {
-        const auto data = WINDATA_CAST(window);
+        RETURN_IF_NULL(window);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
         glfwSetWindowSizeLimits(WIN_CAST(window),
             data->last.minSize.x, data->last.minSize.y, maxWidth, maxHeight);
+        ERR_CHECK(Error::BE_RuntimeError, "set window size limits");
+
         data->last.maxSize = { maxWidth, maxHeight };
+        return true;
     }
 
-    void PlatformBackend::windowGetMinimumSize(void *window, int *minWidth, int *minHeight)
+    auto window::getMinSize(const WindowHandle window, int *outMinWidth, int *outMinHeight) noexcept -> bool
     {
-        const auto data = WINDATA_CAST(window);
-        if (minWidth)
-            *minWidth = data->last.minSize.x;
-        if (minHeight)
-            *minHeight = data->last.minSize.y;
+        RETURN_IF_NULL(window);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        if (outMinWidth)
+            *outMinWidth = data->last.minSize.x;
+        if (outMinHeight)
+            *outMinHeight = data->last.minSize.y;
+        return true;
     }
 
-    void PlatformBackend::windowGetMaximumSize(void *window, int *maxWidth, int *maxHeight)
+    auto window::getMaxSize(const WindowHandle window, int *outMaxWidth, int *outMaxHeight) noexcept -> bool
     {
-        const auto data = WINDATA_CAST(window);
-        if (maxWidth)
-            *maxWidth = data->last.maxSize.x;
-        if (maxHeight)
-            *maxHeight = data->last.maxSize.y;
+        RETURN_IF_NULL(window);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        if (outMaxWidth)
+            *outMaxWidth = data->last.maxSize.x;
+        if (outMaxHeight)
+            *outMaxHeight = data->last.maxSize.y;
+        return true;
     }
 
-    bool PlatformBackend::gamepadIsConnected(const int index) noexcept
+    auto window::setShowCursorMode(const WindowHandle window, const bool show) noexcept -> bool
     {
-        return glfwJoystickPresent(index) && glfwJoystickIsGamepad(index);
+        RETURN_IF_NULL(window);
+
+        glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR_HIDDEN, !show);
+        ERR_CHECK(Error::BE_RuntimeError, "set cursor hidden mode");
+
+        return true;
     }
 
-    bool PlatformBackend::gamepadIsButtonDown(const int index, const GamepadBtn button)
+    auto window::getShowCursorMode(const WindowHandle window, bool *outShow) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outShow);
 
-        return s_gamepads[index].getCurrentState().buttons[ s_gamepadButtonToGlfw[static_cast<int>(button)] ];
+        const auto showCursor = !static_cast<bool>(glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR_HIDDEN));
+        ERR_CHECK(Error::BE_RuntimeError, "get cursor hidden mode");
+
+        *outShow = showCursor;
+        return true;
     }
 
-    bool PlatformBackend::gamepadIsButtonJustDown(const int index, const GamepadBtn button)
+    auto window::setCaptureCursorMode(const WindowHandle window, const bool capture) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
+        glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR_CAPTURED, capture);
+        ERR_CHECK(Error::BE_RuntimeError, "set cursor captured mode");
+
+        return true;
+    }
+
+    auto window::getCaptureCursorMode(const WindowHandle window, bool *outCapture) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outCapture);
+
+        const auto capture = static_cast<bool>(glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR_CAPTURED));
+        ERR_CHECK(Error::BE_RuntimeError, "get cursor captured mode");
+
+        *outCapture = capture;
+        return true;
+    }
+
+    auto keyboard::isDown(Key key, bool *outDown) noexcept -> bool
+    {
+        RETURN_IF_NULL(outDown);
+
+        const auto window = glfwGetCurrentContext();
+        if ( !window )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeError, "failed to get current window context, no window was open");
+            return false;
+        }
+
+        const auto down = glfwGetKey(window, s_keyToGlfwKey[ static_cast<Int>(key) ]) == GLFW_PRESS;
+        ERR_CHECK(Error::BE_RuntimeError, "get key down");
+
+        *outDown = down;
+        return true;
+    }
+
+    auto mouse::getRelativePosition(const WindowHandle window, float *outX, float *outY) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        double tempX=0, tempY=0;
+        glfwGetCursorPos(WIN_CAST(window), &tempX, &tempY);
+        ERR_CHECK(Error::BE_RuntimeError, "get cursor position");
+
+        if (outX)
+            *outX = static_cast<float>(tempX);
+        if (outY)
+            *outY = static_cast<float>(tempY);
+
+        return true;
+    }
+
+    auto mouse::getGlobalPosition(float *outX, float *outY) noexcept -> bool
+    {
+        double tempX=0, tempY=0;
+        if (const auto window = glfwGetCurrentContext())
+        {
+            glfwGetCursorPos(window, &tempX, &tempY); ERR_CHECK(Error::BE_RuntimeError, "get cursor position");
+
+            int winX=0, winY=0;
+            glfwGetWindowPos(window, &winX, &winY);   ERR_CHECK(Error::BE_RuntimeError, "get window position");
+
+            tempX += static_cast<double>(winX);
+            tempY += static_cast<double>(winY);
+        }
+        else
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeError, "Failed to get current context: {}", getGlfwErrorStr());
+            return false;
+        }
+
+        if (outX)
+            *outX = static_cast<float>(tempX);
+        if (outY)
+            *outY = static_cast<float>(tempY);
+
+        return true;
+    }
+
+#define GP_INDEX_IN_RANGE(index) \
+    do { if ( !((index) >= 0 && (index) < MaxGamepadSlots) ) { \
+        KAZE_CORE_ERRCODE(Error::OutOfRange, "gamepad index `{}` is out of range", (index)); \
+        return false; \
+    } } while(0)
+
+    auto gamepad::isConnected(const int index, bool *outConnected) noexcept -> bool
+    {
+        GP_INDEX_IN_RANGE(index);
+        RETURN_IF_NULL(outConnected);
+
+        bool connected = glfwJoystickPresent(index); ERR_CHECK(Error::BE_RuntimeError, "check joystick is present");
+        if ( !connected )
+        {
+            *outConnected = false;
+            return true;
+        }
+
+        connected = glfwJoystickIsGamepad(index);   ERR_CHECK(Error::BE_RuntimeError, "check if joystick is gamepad");
+
+        *outConnected = connected;
+        return true;
+    }
+
+    auto gamepad::isDown(const int index, const GamepadBtn button, bool *outDown) noexcept -> bool
+    {
+        GP_INDEX_IN_RANGE(index);
+        RETURN_IF_NULL(outDown);
+
+        *outDown = s_gamepads[index].getCurrentState().buttons[ s_gamepadButtonToGlfw[static_cast<int>(button)] ];
+        return true;
+    }
+
+    auto gamepad::isJustDown(const int index, const GamepadBtn button, bool *outJustDown) noexcept -> bool
+    {
+        GP_INDEX_IN_RANGE(index);
+        RETURN_IF_NULL(outJustDown);
+
         const auto glfwButton = s_gamepadButtonToGlfw[static_cast<int>(button)];
         const auto &gamepad = s_gamepads[index];
-        return gamepad.getCurrentState().buttons[glfwButton] &&
+        *outJustDown = gamepad.getCurrentState().buttons[glfwButton] &&
             !gamepad.getLastState().buttons[glfwButton];
+        return true;
     }
 
-    bool PlatformBackend::gamepadIsButtonJustUp(const int index, const GamepadBtn button)
+    auto gamepad::isJustUp(const int index, const GamepadBtn button, bool *outJustUp) noexcept -> bool
     {
+        GP_INDEX_IN_RANGE(index);
+        RETURN_IF_NULL(outJustUp);
+
         const auto glfwButton = s_gamepadButtonToGlfw[static_cast<int>(button)];
         const auto &gamepad = s_gamepads[index];
-        return !gamepad.getCurrentState().buttons[glfwButton] &&
+        *outJustUp = !gamepad.getCurrentState().buttons[glfwButton] &&
             gamepad.getLastState().buttons[glfwButton];
+        return true;
     }
 
-    float PlatformBackend::gamepadGetAxis(const int index, const GamepadAxis axis)
+    auto gamepad::getAxis(const int index, const GamepadAxis axis, float *outValue) noexcept -> bool
     {
-        return s_gamepads[index].getCurrentState().axes[ s_gamepadAxisToGlfw[static_cast<Uint8>(axis)] ];
+        GP_INDEX_IN_RANGE(index);
+        RETURN_IF_NULL(outValue);
+
+        *outValue = s_gamepads[index].getCurrentState().axes[ s_gamepadAxisToGlfw[static_cast<Uint8>(axis)] ];
+        return true;
     }
 
-    bool PlatformBackend::gamepadDidAxisMove(const int index, const GamepadAxis axis, const float deadzone)
+    auto gamepad::getAxisMoved(const int index, const GamepadAxis axis, const float deadzone, bool *outMoved) noexcept -> bool
     {
+        GP_INDEX_IN_RANGE(index);
+        RETURN_IF_NULL(outMoved);
+
         const auto glfwAxis = s_gamepadAxisToGlfw[static_cast<Uint8>(axis)];
         auto value = s_gamepads[index].getCurrentState().axes[glfwAxis];
         auto lastValue = s_gamepads[index].getLastState().axes[glfwAxis];
@@ -842,11 +1479,15 @@ namespace backend {
         if (mathf::abs(lastValue) <= deadzone)
             lastValue = 0;
 
-        return value != lastValue;
+        *outMoved = value != lastValue;
+        return true;
     }
 
-    bool PlatformBackend::gamepadDidAxesMove(const int index, const GamepadAxis axisX, const GamepadAxis axisY, const float deadzone)
+    auto gamepad::getAxesMoved(const int index, const GamepadAxis axisX, const GamepadAxis axisY, const float deadzone, bool *outMoved) noexcept -> bool
     {
+        GP_INDEX_IN_RANGE(index);
+        RETURN_IF_NULL(outMoved);
+
         const auto glfwAxisX = s_gamepadAxisToGlfw[static_cast<Uint8>(axisX)];
         const auto glfwAxisY = s_gamepadAxisToGlfw[static_cast<Uint8>(axisY)];
 
@@ -867,17 +1508,8 @@ namespace backend {
             valueLastY = 0;
         }
 
-        return valueX != valueLastX || valueY != valueLastY;
-    }
-
-    const char *PlatformBackend::getClipboard()
-    {
-        return glfwGetClipboardString(nullptr);
-    }
-
-    void PlatformBackend::setClipboard(const char *text)
-    {
-        glfwSetClipboardString(nullptr, text);
+        *outMoved = valueX != valueLastX || valueY != valueLastY;
+        return true;
     }
 
 }

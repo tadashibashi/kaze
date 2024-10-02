@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 #include <variant>
 
@@ -59,11 +60,14 @@ template <typename K, typename V, typename Hash = std::hash<K>, typename Pred = 
           typename Alloc = std::allocator<std::pair<const K, V> >>
 using Dictionary = std::unordered_map<K, V>;
 
+template <typename T, typename Hash = std::hash<T>, typename Pred = std::equal_to<T>, typename Alloc = std::allocator<T>>
+using HashSet = std::unordered_set<T, Hash, Pred, Alloc>;
+
 template <typename T, typename Allocator = std::allocator<T>>
-using Array = std::vector<T, Allocator>;
+using List = std::vector<T, Allocator>;
 
 template <typename T, Uint Size>
-using FixedArray = std::array<T, Size>;
+using Array = std::array<T, Size>;
 
 using String = std::string;
 using StringView = std::string_view;

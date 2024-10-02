@@ -26,7 +26,7 @@ constexpr ModKey &operator |=(ModKey &a, const ModKey b) noexcept
 }
 
 enum class Key {
-    Unknown = 0,
+    Unknown = -1,
     Escape,
     Return,
     Tab,
@@ -138,6 +138,7 @@ enum class Key {
     Count
 };
 
+Cstring toCstring(Key key);
 
 KAZE_NAMESPACE_END
 

@@ -4,6 +4,8 @@
 
 #include <kaze/kaze.h>
 #include <kaze/math/Rect.h>
+#include <kaze/platform/Window.h>
+
 #include <GLFW/glfw3.h>
 
 #define WIN_CAST(window) static_cast<GLFWwindow*>(window)
@@ -12,12 +14,13 @@
 KAZE_NAMESPACE_BEGIN
 
 #if KAZE_TARGET_MACOS
-void setWindowCocoaFullScreen(GLFWwindow *window, bool value);
-bool getWindowCocoaFullScreen(GLFWwindow *window);
+auto setWindowCocoaFullScreen(GLFWwindow *window, bool fullscreen) -> bool;
+auto getWindowCocoaFullScreen(GLFWwindow *window, bool *outFullscreen) -> bool;
 #endif
 
 struct WindowData {
     void *userdata{};
+    FullscreenMode fullscreenMode{FullscreenMode::Native};
     struct LastWindowState {
         bool decorated{};
         Recti rect{};

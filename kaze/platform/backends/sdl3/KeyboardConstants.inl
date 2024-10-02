@@ -8,7 +8,7 @@
 
 KAZE_NAMESPACE_BEGIN
 
-static constexpr FixedArray<Uint16, static_cast<Size>(Key::Count)> s_keyToSdlKey = {
+static constexpr Array<Uint16, static_cast<Size>(Key::Count)> s_keyToSdlKey = {
     SDL_SCANCODE_ESCAPE,
     SDL_SCANCODE_RETURN,
     SDL_SCANCODE_TAB,
@@ -118,7 +118,7 @@ static constexpr FixedArray<Uint16, static_cast<Size>(Key::Count)> s_keyToSdlKey
     SDL_SCANCODE_Z,
 };
 
-static FixedArray<Uint16, SDL_SCANCODE_COUNT> s_sdlKeyToKey = {0};
+static Array<Uint16, SDL_SCANCODE_COUNT> s_sdlKeyToKey = {0};
 
 KAZE_NAMESPACE_END
 

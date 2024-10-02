@@ -2,9 +2,10 @@
 
 #include <kaze/debug.h>
 
-KAZE_NAMESPACE_BEGIN
+#include "GamepadConstants.h"
 
-namespace backend::sdl3 {
+KAZE_NAMESPACE_BEGIN
+    namespace backend::sdl3 {
 
     int GamepadMgr::connect(const SDL_JoystickID id)
     {
@@ -189,10 +190,11 @@ namespace backend::sdl3 {
         const auto data = new GamepadData();
         data->controllerIndex = controllerIndex;
         data->joystickID = id;
+        data->gamepad = gamepad;
 
-        auto result = SDL_SetPointerPropertyWithCleanup(props, GamepadMgr::DataKey, data, [](void *userdata, void *value)
-        {
-            delete static_cast<GamepadData *>(value);
+        const auto result = SDL_SetPointerPropertyWithCleanup(props, GamepadMgr::DataKey, data,
+            [](void *userdata, void *value) {
+                delete static_cast<GamepadData *>(value);
         }, nullptr);
 
         if ( !result )
@@ -230,8 +232,17 @@ namespace backend::sdl3 {
             auto &button = buttons[i];
             if (button.interactions > 0)
             {
-                button.isDown[currentIndex] = !button.isDown[!currentIndex];
                 --button.interactions;
+                if (button.interactions == 0)
+                {
+                    button.isDown[currentIndex] = SDL_GetGamepadButton(gamepad,
+                        gamepadButtonToSdl(static_cast<GamepadBtn>(i)));
+                }
+                else
+                {
+                    button.isDown[currentIndex] = !button.isDown[!currentIndex];
+                }
+
             }
             else
             {

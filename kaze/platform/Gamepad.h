@@ -6,7 +6,8 @@
 #include <kaze/math/Vec/Vec2.h>
 
 KAZE_NAMESPACE_BEGIN
-    /// Clickable button on a game controller
+
+/// Clickable button on a game controller
 enum class GamepadBtn : Uint {
     A = 0,       ///< Bottom of ABXY buttons
     B,           ///< Right of ABXY buttons
@@ -51,7 +52,7 @@ public:
     /// Check if 1D axis changed values since last frame
     /// @param axis axis to check
     /// @param deadzone deadzone
-    [[nodiscard]] Bool didAxisMove(GamepadAxis axis, Float deadzone = 0) const noexcept;
+    [[nodiscard]] Bool getAxisMoved(GamepadAxis axis, Float deadzone = 0) const noexcept;
 
     /// Whether physical game controller is connected for this controller id
     [[nodiscard]] Bool isConnected() const noexcept;
@@ -62,7 +63,7 @@ public:
     /// @param deadzone measured against resultant length of the provided X and Y axes;
     ///                 any length at or beneath this value is clipped to 0.
     [[nodiscard]] Vec2f getAxes(GamepadAxis axisX, GamepadAxis axisY, Float deadzone = 0) const noexcept;
-    [[nodiscard]] Bool didAxesMove(GamepadAxis axisX, GamepadAxis axisY, Float deadzone = 0) const noexcept;
+    [[nodiscard]] Bool getAxesMoved(GamepadAxis axisX, GamepadAxis axisY, Float deadzone = 0) const noexcept;
 
     [[nodiscard]] Int id() const { return m_id; }
 private:

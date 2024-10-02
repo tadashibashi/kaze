@@ -8,11 +8,11 @@
 
 KAZE_NAMESPACE_BEGIN
 
-static FixedArray<Uint8, static_cast<Size>(GamepadBtn::Count)> s_gamepadButtonToSDL = {
-    SDL_GAMEPAD_BUTTON_LABEL_A,
-    SDL_GAMEPAD_BUTTON_LABEL_B,
-    SDL_GAMEPAD_BUTTON_LABEL_X,
-    SDL_GAMEPAD_BUTTON_LABEL_Y,
+static Array<Uint8, static_cast<Size>(GamepadBtn::Count)> s_gamepadButtonToSDL = {
+    SDL_GAMEPAD_BUTTON_SOUTH,
+    SDL_GAMEPAD_BUTTON_EAST,
+    SDL_GAMEPAD_BUTTON_WEST,
+    SDL_GAMEPAD_BUTTON_NORTH,
     SDL_GAMEPAD_BUTTON_LEFT_SHOULDER,
     SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER,
     SDL_GAMEPAD_BUTTON_LEFT_STICK,
@@ -26,7 +26,7 @@ static FixedArray<Uint8, static_cast<Size>(GamepadBtn::Count)> s_gamepadButtonTo
     SDL_GAMEPAD_BUTTON_DPAD_DOWN,
 };
 
-static FixedArray<Uint8, static_cast<Size>(GamepadAxis::Count)> s_gamepadAxisToSDL = {
+static Array<Uint8, static_cast<Size>(GamepadAxis::Count)> s_gamepadAxisToSDL = {
     SDL_GAMEPAD_AXIS_LEFTX,
     SDL_GAMEPAD_AXIS_LEFTY,
     SDL_GAMEPAD_AXIS_RIGHTX,
@@ -35,8 +35,8 @@ static FixedArray<Uint8, static_cast<Size>(GamepadAxis::Count)> s_gamepadAxisToS
     SDL_GAMEPAD_AXIS_RIGHT_TRIGGER,
 };
 
-static FixedArray<Uint8, SDL_GAMEPAD_BUTTON_COUNT> s_sdlToGamepadButton = {};
-static FixedArray<Uint8, SDL_GAMEPAD_AXIS_COUNT> s_sdlToGamepadAxis = {};
+static Array<Uint8, SDL_GAMEPAD_BUTTON_COUNT> s_sdlToGamepadButton = {};
+static Array<Uint8, SDL_GAMEPAD_AXIS_COUNT> s_sdlToGamepadAxis = {};
 
 KAZE_NAMESPACE_END
 

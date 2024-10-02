@@ -37,25 +37,6 @@ namespace debug {
     }
 }
 
-const String &getError() noexcept
-{
-    return s_curError;
-}
-
-void setError(const StringView message) noexcept
-{
-    s_curError = message;
-}
-
-void clearError() noexcept
-{
-    s_curError.clear();
-}
-
-bool hasError() noexcept
-{
-    return !s_curError.empty();
-}
 
 KAZE_NAMESPACE_END
 

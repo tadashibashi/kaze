@@ -1,5 +1,5 @@
 #pragma once
-#include "kaze/platform/Gamepad.h"
+
 #ifndef kaze_platform_platformevent_h_
 #define kaze_platform_platformevent_h_
 
@@ -7,6 +7,7 @@
 #include <kaze/traits.h>
 #include <kaze/math/Vec/Vec2.h>
 
+#include "Gamepad.h"
 #include "Key.h"
 #include "Mouse.h"
 
@@ -30,8 +31,9 @@ struct WindowEvent
 
         Count
     } type;
-    void *window;
+
     Int data0, data1;
+    void *window;
 };
 
 struct FileDropEvent
@@ -61,9 +63,9 @@ struct MouseButtonEvent
         Up,
         Down
     } type;
-    void *window;
 
     MouseBtn button;
+    void *window;
 };
 
 /// Describes scroll

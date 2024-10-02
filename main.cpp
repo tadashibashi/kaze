@@ -7,8 +7,6 @@
 
 USING_KAZE_NAMESPACE;
 
-using backend::PlatformBackend;
-
 struct AppData
 {
     bool isRunning{};
@@ -19,13 +17,13 @@ struct AppData
 int main(int argc, const char *argv[])
 {
     AppData app;
-    if (!PlatformBackend::init())
+    if (!backend::init())
     {
         KAZE_ERR("Failed to init backend");
         return -1;
     }
 
-    PlatformBackend::setCallbacks({
+    backend::setCallbacks({
         .userptr = &app,
         .keyCallback = [](const KeyboardEvent &e, Double timestamp, void *userptr) {
             const auto app = static_cast<AppData *>(userptr);
@@ -36,13 +34,15 @@ int main(int argc, const char *argv[])
                 switch(e.key)
                 {
                     case Key::B:
-                        app->window.setBorderless(!app->window.isBorderless());
+                        app->window.setBordered(!app->window.isBordered());
                         break;
-                    case Key::F:
+                case Key::F:
+                        app->window.setFullscreenMode(FullscreenMode::Native);
                         app->window.setFullscreen(!app->window.isFullscreen());
                         break;
-                    case Key::D:
-                        app->window.setDesktopFullscreen(!app->window.isDesktopFullscreen());
+                case Key::D:
+                        app->window.setFullscreenMode(FullscreenMode::Desktop);
+                        app->window.setFullscreen(!app->window.isFullscreen());
                         break;
                     case Key::M:
                         if (app->window.isMinimized())
@@ -155,6 +155,12 @@ int main(int argc, const char *argv[])
                 KAZE_LOG("Gamepad disconnected: {}", e.id);
             }
         },
+        .gamepadAxisCallback = [](const GamepadAxisEvent &e, Double timestamp, void *userptr) {
+            KAZE_LOG("Controller {}, axis {} moved: {}", e.controllerIndex, (int)e.axis, e.value);
+        },
+        .gamepadButtonCallback = [](const GamepadButtonEvent &e, Double timestamp, void *userptr) {
+            KAZE_LOG("Controller button {} was {}", (int)e.button, e.type == GamepadButtonEvent::Down ? "pressed" : "released");
+        },
         .fileDropCallback = [](const FileDropEvent &e, Double timestamp, void *userptr) {
             KAZE_LOG("File dropped: \"{}\", at: {}, {}", e.path, e.position.x, e.position.y);
         },
@@ -183,17 +189,17 @@ int main(int argc, const char *argv[])
                 KAZE_LOG("Pressed A!");
             }
 
-            if (gamepad.didAxesMove(GamepadAxis::LeftX, GamepadAxis::LeftY, .2f))
+            if (gamepad.getAxesMoved(GamepadAxis::LeftX, GamepadAxis::LeftY, .2f))
             {
                 const auto axes = gamepad.getAxes(GamepadAxis::LeftX, GamepadAxis::LeftY, .2f);
                 KAZE_LOG("Left Stick moved to: {}, {}", axes.x, axes.y);
             }
         }
 
-        PlatformBackend::pollEvents();
+        backend::pollEvents();
     }
 
     app.window.close();
-    PlatformBackend::shutdown();
+    backend::shutdown();
     return 0;
 }

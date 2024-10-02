@@ -3,138 +3,155 @@
 
 KAZE_NAMESPACE_BEGIN
 
-using backend::PlatformBackend;
-
-Window::Window() : m_window()
+Window::Window() noexcept : m_window()
 {
 
 }
 
-Window::~Window()
+Window::~Window() noexcept
 {
     close();
 }
 
-Bool Window::open(const Cstring title, const Size width, const Size height, const WindowInit::Flags initFlags)
+Bool Window::open(const Cstring title, const Size width, const Size height, const WindowInit::Flags initFlags) noexcept
 {
-    const auto platformWindow = PlatformBackend::windowCreate(title, width, height, initFlags);
-    if (!platformWindow)
-    {
-        return KAZE_FALSE;
-    }
+    backend::WindowHandle window;
+    if ( !backend::window::open(title, width, height, initFlags, &window))
+        return false;
 
     close();
-    m_window = platformWindow;
+    m_window = window;
 
     return KAZE_TRUE;
 }
 
 Bool Window::isOpen() const noexcept
 {
-    return m_window && PlatformBackend::windowIsOpen(m_window);
+    if ( !m_window )
+        return KAZE_FALSE;
+
+    bool open;
+    if ( !backend::window::isOpen(m_window, &open) )
+        return KAZE_FALSE;
+    return open;
 }
 
-void Window::close()
+Bool Window::close() noexcept
 {
     if (m_window)
     {
-        PlatformBackend::windowDestroy(m_window);
+        const auto result = backend::window::close(m_window);
         m_window = nullptr;
+
+        return result;
     }
+
+    return KAZE_FALSE;
 }
 
 Window &Window::setTitle(const Cstring title) noexcept
 {
-    PlatformBackend::windowSetTitle(m_window, title);
+    backend::window::setTitle(m_window, title);
     return *this;
 }
 
 Window& Window::setTitle(const String &title) noexcept
 {
-    PlatformBackend::windowSetTitle(m_window, title.c_str());
+    backend::window::setTitle(m_window, title.c_str());
     return *this;
 }
 
 Cstring Window::getTitle() const noexcept
 {
-    return PlatformBackend::windowGetTitle(m_window);
+    Cstring title;
+    if ( !backend::window::getTitle(m_window, &title) || !title )
+        return "";
+    return title;
 }
 
 Vec2i Window::getDisplaySize() const noexcept
 {
     Vec2i size;
-    PlatformBackend::windowGetDisplaySize(m_window, &size.x, &size.y);
+    backend::window::getFramebufferSize(m_window, &size.x, &size.y);
     return size;
 }
 
-Window &Window::setSize(Vec2i size)
+Window &Window::setSize(Vec2i size) noexcept
 {
-    PlatformBackend::windowSetSize(m_window, size.x, size.y);
+    backend::window::setSize(m_window, size.x, size.y);
     return *this;
 }
 
-Window &Window::setSize(int width, int height)
+Window &Window::setSize(const Int width, const Int height) noexcept
 {
-    PlatformBackend::windowSetSize(m_window, width, height);
+    backend::window::setSize(m_window, width, height);
     return *this;
 }
 
 Vec2i Window::getSize() const noexcept
 {
     Vec2i size;
-    PlatformBackend::windowGetSize(m_window, &size.x, &size.y);
+    backend::window::getSize(m_window, &size.x, &size.y);
     return size;
 }
 
 Float Window::getDPIScale() const noexcept
 {
     int width, virtWidth;
-    PlatformBackend::windowGetDisplaySize(m_window, &width, nullptr);
-    PlatformBackend::windowGetSize(m_window, &virtWidth, nullptr);
+    backend::window::getFramebufferSize(m_window, &width, nullptr);
+    backend::window::getSize(m_window, &virtWidth, nullptr);
 
     return static_cast<Float>(width) / static_cast<Float>(virtWidth);
 }
 
-Bool Window::isBorderless() const noexcept
+Bool Window::isBordered() const noexcept
 {
-    return PlatformBackend::windowIsBorderless(m_window);
+    bool bordered;
+    if ( !backend::window::isBordered(m_window, &bordered) )
+        return KAZE_FALSE;
+    return bordered;
 }
 
-Window &Window::setBorderless(const Bool value)
+Window &Window::setBordered(const Bool value) noexcept
 {
-    PlatformBackend::windowSetBorderless(m_window, value);
+    backend::window::setBordered(m_window, value);
     return *this;
 }
 
 Bool Window::isFullscreen() const noexcept
 {
-    return PlatformBackend::windowIsNativeFullscreen(m_window);
+    bool fullscreen;
+    if ( !backend::window::isFullscreen(m_window, &fullscreen) )
+        return KAZE_FALSE;
+    return fullscreen;
 }
 
-Window &Window::setFullscreen(const Bool value)
+Window &Window::setFullscreen(const Bool value) noexcept
 {
     if (isFullscreen() == value) return *this;
 
-    PlatformBackend::windowSetNativeFullscreen(m_window, value);
-
+    backend::window::setFullscreen(m_window, value);
     return *this;
 }
 
-Bool Window::isDesktopFullscreen() const noexcept
+FullscreenMode Window::getFullscreenMode() const noexcept
 {
-    return PlatformBackend::windowIsDesktopFullscreen(m_window);
+    FullscreenMode mode;
+    if ( !backend::window::getFullscreenMode(m_window, &mode) )
+        return FullscreenMode::Unknown;
+    return mode;
 }
 
-Window &Window::setDesktopFullscreen(const Bool value)
+Window & Window::setFullscreenMode(FullscreenMode mode) noexcept
 {
-    PlatformBackend::windowSetDesktopFullscreen(m_window, value);
+    backend::window::setFullscreenMode(m_window, mode);
     return *this;
 }
 
 Vec2i Window::getPosition() const noexcept
 {
     Vec2i result;
-    PlatformBackend::windowGetPosition(m_window, &result.x, &result.y);
+    backend::window::getPosition(m_window, &result.x, &result.y);
 
     return result;
 }
@@ -142,82 +159,100 @@ Vec2i Window::getPosition() const noexcept
 Recti Window::getDisplayRect() const noexcept
 {
     Recti result;
-    PlatformBackend::windowGetPosition(m_window, &result.x, &result.y);
-    PlatformBackend::windowGetDisplaySize(m_window, &result.w, &result.h);
+    backend::window::getPosition(m_window, &result.x, &result.y);
+    backend::window::getFramebufferSize(m_window, &result.w, &result.h);
 
     return result;
 }
 
-Window &Window::maximize()
+Window &Window::maximize() noexcept
 {
-    PlatformBackend::windowMaximize(m_window);
+    backend::window::maximize(m_window);
     return *this;
 }
 
 Bool Window::isMaximized() const noexcept
 {
-    return PlatformBackend::windowIsMaximized(m_window);
+    bool maximized;
+    if ( !backend::window::isMaximized(m_window, &maximized) )
+        return false;
+    return maximized;
 }
 
-Window &Window::minimize()
+Window &Window::minimize() noexcept
 {
-    PlatformBackend::windowMinimize(m_window);
+    backend::window::minimize(m_window);
     return *this;
 }
 
 Bool Window::isMinimized() const noexcept
 {
-    return PlatformBackend::windowIsMinimized(m_window);
+    bool minimized;
+    if ( !backend::window::isMinimized(m_window, &minimized) )
+        return KAZE_FALSE;
+    return minimized;
 }
 
-Window &Window::restore()
+Window &Window::restore() noexcept
 {
-    PlatformBackend::windowRestore(m_window);
+    backend::window::restore(m_window);
     return *this;
 }
 
-Window &Window::setHidden(const Bool value)
+Window &Window::setHidden(const Bool value) noexcept
 {
-    PlatformBackend::windowSetHidden(m_window, value);
+    backend::window::setHidden(m_window, value);
     return *this;
 }
 
 Bool Window::isHidden() const noexcept
 {
-    return PlatformBackend::windowIsHidden(m_window);
+    bool hidden;
+    if (!backend::window::isHidden(m_window, &hidden) )
+        return false;
+    return hidden;
 }
 
-Window& Window::setFloating(const Bool value)
+Window& Window::setFloating(const Bool value) noexcept
 {
-    PlatformBackend::windowSetFloating(m_window, value);
+    backend::window::setFloating(m_window, value);
     return *this;
 }
 
 Bool Window::isFloating() const noexcept
 {
-    return PlatformBackend::windowIsFloating(m_window);
+    bool floating;
+    if ( !backend::window::isFloating(m_window, &floating) )
+        return KAZE_FALSE;
+    return floating;
 }
 
-Window &Window::setTransparent(Bool value)
+Window &Window::setTransparent(const Bool value) noexcept
 {
-    PlatformBackend::windowSetTransparent(m_window, value);
+    backend::window::setTransparent(m_window, value);
     return *this;
 }
 
 Bool Window::isTransparent() const noexcept
 {
-    return PlatformBackend::windowIsTransparent(m_window);
+    bool transparent;
+    if ( !backend::window::isTransparent(m_window, &transparent) )
+        return KAZE_FALSE;
+    return transparent;
 }
 
-Window &Window::focus()
+Window &Window::focus() noexcept
 {
-    PlatformBackend::windowFocus(m_window);
+    backend::window::focus(m_window);
     return *this;
 }
 
 Bool Window::isFocused() const noexcept
 {
-    return PlatformBackend::windowIsFocused(m_window);
+    bool focused;
+    if ( !backend::window::isFocused(m_window, &focused) )
+        return KAZE_FALSE;
+    return focused;
 }
 
 

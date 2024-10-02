@@ -2,6 +2,6 @@
 
 KAZE_NAMESPACE_BEGIN
 
-PlatformCallbacks backend::PlatformBackend::events{};
+PlatformCallbacks backend::events{};
 
 KAZE_NAMESPACE_END

@@ -13,14 +13,21 @@ struct WindowInit {
     enum Flags : Uint
     {
         None = 0,
-        Resizable = 1u << 0,
-        Borderless = 1u << 1,
-        Fullscreen = 1u << 2,
-        Floating = 1u << 3,
-        Transparent = 1u << 4,
-        Hidden = 1u << 5,
-        Maximized = 1u << 6,
+        Resizable = 1u << 0,   ///< user can drag corners to adjust the window size
+        Borderless = 1u << 1,  ///< has no border, title bar, or window control buttons
+        Fullscreen = 1u << 2,  ///< starts off native fullscreen
+        Floating = 1u << 3,    ///< exhibits always on-top behavior
+        Transparent = 1u << 4, ///< framebuffer is see-through
+        Hidden = 1u << 5,      ///< starts off hidden
+        Maximized = 1u << 6,   ///< starts off maximized
     };
+};
+
+enum struct FullscreenMode
+{
+    Native,  ///< uses the platform's native windowing API for fullscreen
+    Desktop, ///< on fullscreen, window becomes borderless, positioned at the top-left, with full screen size
+    Unknown,
 };
 
 constexpr WindowInit::Flags operator |(const WindowInit::Flags a, const WindowInit::Flags b)
@@ -30,15 +37,17 @@ constexpr WindowInit::Flags operator |(const WindowInit::Flags a, const WindowIn
 
 class Window {
 public:
-    Window();
-    ~Window();
+    Window() noexcept;
+    ~Window() noexcept;
 
     /// Open a window, or re-open it with the new settings if it is already open
-    Bool open(Cstring title, Size width, Size height, WindowInit::Flags initFlags = WindowInit::None);
+    Bool open(Cstring title, Size width, Size height, WindowInit::Flags initFlags = WindowInit::None) noexcept;
     /// Checks if the window is currently open
     [[nodiscard]] Bool isOpen() const noexcept;
-    /// Closes a window if it's currently opened (a no-op otherwise)
-    void close();
+    /// Closes a window if it's currently opened
+    /// @returns whether window successfully closed, even on false, internal window is reset, this value is just to
+    ///          explicitly report issues.
+    Bool close() noexcept;
 
     /// Set the window's title bar text
     Window &setTitle(Cstring title) noexcept;
@@ -51,9 +60,9 @@ public:
     [[nodiscard]] Vec2i getDisplaySize() const noexcept;
 
     /// Set the size of the window in logical (virtual) units
-    Window &setSize(Vec2i size);
+    Window &setSize(Vec2i size) noexcept;
     /// Set the size of the window in logical (virtual) units
-    Window &setSize(int width, int height);
+    Window &setSize(int width, int height) noexcept;
     /// Get the size of the window in logical (virtual) units
     [[nodiscard]] Vec2i getSize() const noexcept;
 
@@ -61,35 +70,35 @@ public:
     /// In systems that support high DPI, this usually is a factor > 1
     [[nodiscard]] Float getDPIScale() const noexcept;
 
-    [[nodiscard]] Bool isBorderless() const noexcept;
-    Window &setBorderless(Bool value);
+    [[nodiscard]] Bool isBordered() const noexcept;
+    Window &setBordered(Bool value) noexcept;
 
     [[nodiscard]] Bool isFullscreen() const noexcept;
-    Window &setFullscreen(Bool value);
+    Window &setFullscreen(Bool value) noexcept;
 
-    [[nodiscard]] Bool isDesktopFullscreen() const noexcept;
-    Window &setDesktopFullscreen(Bool value);
+    [[nodiscard]] FullscreenMode getFullscreenMode() const noexcept;
+    Window &setFullscreenMode(FullscreenMode mode) noexcept;
 
     [[nodiscard]] Vec2i getPosition() const noexcept;
     [[nodiscard]] Recti getDisplayRect() const noexcept;
 
-    Window &maximize();
+    Window &maximize() noexcept;
     [[nodiscard]] Bool isMaximized() const noexcept;
-    Window &minimize();
+    Window &minimize() noexcept;
     [[nodiscard]] Bool isMinimized() const noexcept;
-    Window &restore();
+    Window &restore() noexcept;
 
-    Window &setHidden(Bool value);
+    Window &setHidden(Bool value) noexcept;
     [[nodiscard]] Bool isHidden() const noexcept;
 
-    Window &setFloating(Bool value);
+    Window &setFloating(Bool value) noexcept;
     [[nodiscard]] Bool isFloating() const noexcept;
 
     /// @note Not all platforms support this feature
-    Window &setTransparent(Bool value);
+    Window &setTransparent(Bool value) noexcept;
     [[nodiscard]] Bool isTransparent() const noexcept;
 
-    Window &focus();
+    Window &focus() noexcept;
     [[nodiscard]] Bool isFocused() const noexcept;
 
 private:

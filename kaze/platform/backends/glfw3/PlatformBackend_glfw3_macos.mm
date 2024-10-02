@@ -8,21 +8,55 @@
 #include <GLFW/glfw3native.h>
 
 #include <kaze/kaze.h>
+#include <kaze/debug.h>
 
 KAZE_NAMESPACE_BEGIN
 
-bool getWindowCocoaFullScreen(GLFWwindow *window)
+auto getWindowCocoaFullScreen(GLFWwindow *window, bool *outFullscreen) -> bool
 {
+    if (outFullscreen == nullptr)
+    {
+        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required argument outFullscreen was null");
+        return false;
+    }
+
+    if (window == nullptr)
+    {
+        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required argument window was null");
+        return false;
+    }
+
     NSWindow *nswindow = static_cast<NSWindow *>(glfwGetCocoaWindow(window));
-    return static_cast<bool>([nswindow styleMask] & NSWindowStyleMaskFullScreen);
+    if ( !nswindow )
+    {
+        const char *errMessage;
+        glfwGetError(&errMessage);
+        KAZE_CORE_ERRCODE(Error::BE_RuntimeError, "Failed to get Cocoa window: {}", errMessage);
+        return false;
+    }
+
+     *outFullscreen = static_cast<bool>([nswindow styleMask] & NSWindowStyleMaskFullScreen);
+     return true;
 }
 
-void setWindowCocoaFullScreen(GLFWwindow *window, bool value)
+auto setWindowCocoaFullScreen(GLFWwindow *window, bool value) -> bool
 {
-    if (getWindowCocoaFullScreen(window) == value) return;
+    bool curFullscreen;
+    if ( !getWindowCocoaFullScreen(window, &curFullscreen) || curFullscreen == value)
+      return false;
 
     NSWindow *nswindow = static_cast<NSWindow *>(glfwGetCocoaWindow(window));
+    if ( !nswindow )
+    {
+        const char *errMessage;
+        glfwGetError(&errMessage);
+        KAZE_CORE_ERRCODE(Error::BE_RuntimeError, "Failed to get Cocoa window: {}", errMessage);
+
+        return false;
+    }
+
     [nswindow toggleFullScreen:nil];
+    return true;
 }
 
 KAZE_NAMESPACE_END

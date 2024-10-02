@@ -28,13 +28,14 @@ namespace backend::sdl3
 
     struct GamepadData
     {
-        FixedArray<ButtonData, SDL_GAMEPAD_BUTTON_COUNT> buttons{};
-        FixedArray<AxisData, SDL_GAMEPAD_AXIS_COUNT> axes{};
+        Array<ButtonData, SDL_GAMEPAD_BUTTON_COUNT> buttons{};
+        Array<AxisData, SDL_GAMEPAD_AXIS_COUNT> axes{};
 
         int currentIndex{0};     ///< current data set current, nullified is last
         int controllerIndex{-1}; ///< controller slot connected to (0-15)
 
         SDL_JoystickID joystickID {};
+        SDL_Gamepad *gamepad{};
 
         void reset();
 
@@ -75,7 +76,7 @@ namespace backend::sdl3
     private:
 
         static bool emplaceNew(SDL_Gamepad *gamepad, int controllerIndex);
-        FixedArray<SDL_Gamepad *, 16> m_gamepads{};
+        Array<SDL_Gamepad *, 16> m_gamepads{};
     };
 }
 

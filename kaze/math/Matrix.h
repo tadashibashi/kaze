@@ -332,7 +332,7 @@ struct alignas(16) Matrix {
 private:
     union
     {
-        FixedArray< Vec<T, Rows>, Cols > m_cols{};
+        Array< Vec<T, Rows>, Cols > m_cols{};
         glm::mat<Cols, Rows, T> m_mat;
     };
 

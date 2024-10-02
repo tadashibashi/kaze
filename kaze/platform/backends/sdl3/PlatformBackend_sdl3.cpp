@@ -1,3 +1,4 @@
+#include "SDL3/SDL_error.h"
 #include <kaze/platform/backends/sdl3/Gamepad_sdl3.h>
 #include <kaze/platform/PlatformBackend.h>
 #include <kaze/platform/PlatformEvent.h>
@@ -10,6 +11,7 @@
 #include <SDL3/SDL_metal.h>
 #endif
 
+#include "GamepadConstants.h"
 #include "GamepadConstants.inl"
 #include "KeyboardConstants.inl"
 
@@ -17,26 +19,55 @@ KAZE_NAMESPACE_BEGIN
 
 namespace backend {
 
-    #define WIN_CAST(window) static_cast<SDL_Window *>(window)
+#define WIN_CAST(window) static_cast<SDL_Window *>(window)
+
+#define RETURN_IF_NULL(obj) do { if ( !(obj) ) { \
+    KAZE_CORE_ERRCODE(Error::NullArgErr, "required argument `{}` was null", #obj); \
+    return false; \
+} } while(0)
 
     static sdl3::GamepadMgr s_gamepads{};
 
     struct WindowData
     {
         bool isHovered{false};
+        bool cursorVisibleMode{false};
     };
 
-    static WindowData *getWindowData(void *window)
+    GamepadBtn sdlToGamepadButton(const Uint8 sdlButton)
     {
+        return static_cast<GamepadBtn>(s_sdlToGamepadButton[sdlButton]);
+    }
+
+    SDL_GamepadButton gamepadButtonToSdl(const GamepadBtn button)
+    {
+        return static_cast<SDL_GamepadButton>(s_gamepadButtonToSDL[ static_cast<Uint8>(button) ]);
+    }
+
+    static bool getWindowData(const WindowHandle window, WindowData **outData)
+    {
+        KAZE_ASSERT(window);
+        KAZE_ASSERT(outData);
+
         const auto props = SDL_GetWindowProperties(WIN_CAST(window));
         if (!props)
         {
-            KAZE_CORE_ERR("Failed to get window properties: {}", SDL_GetError());
-            return nullptr;
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr,
+                "Failed to get window properties: {}", SDL_GetError());
+            return false;
         }
 
-        return static_cast<WindowData *>(
+        const auto data = static_cast<WindowData *>(
             SDL_GetPointerProperty(props, "WindowData", nullptr));
+        if ( !data )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_LogicError,
+                "Missing WindowData on SDL_Window");
+            return false;
+        }
+
+        *outData = data;
+        return true;
     }
 
     static bool sdlEventFilter(void *userdata, SDL_Event *event)
@@ -46,7 +77,7 @@ namespace backend {
         {
         case SDL_EVENT_WINDOW_RESIZED:
             {
-                PlatformBackend::events.emit(WindowEvent {
+                events.emit(WindowEvent {
                     .type = WindowEvent::Resized,
                     .data0 = event->window.data1,
                     .data1 = event->window.data2,
@@ -56,7 +87,7 @@ namespace backend {
 
         case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
             {
-                PlatformBackend::events.emit(WindowEvent {
+                events.emit(WindowEvent {
                     .type = WindowEvent::ResizedFramebuffer,
                     .data0 = event->window.data1,
                     .data1 = event->window.data2,
@@ -66,25 +97,25 @@ namespace backend {
         case SDL_EVENT_WINDOW_MOVED:
             {
                 const auto window = SDL_GetWindowFromID(e.window.windowID);
-                PlatformBackend::events.emit(WindowEvent {
+                events.emit(WindowEvent {
                     .type = WindowEvent::Moved,
                     .data0 = e.window.data1,
                     .data1 = e.window.data2,
                     .window = window,
                 });
-            } break;
+            } return false;
         default:
             return true;
         }
     }
 
-    NativePlatformData PlatformBackend::windowGetNativeInfo(void *window)
+    NativePlatformData window::getNativeInfo(WindowHandle window) noexcept
     {
         NativePlatformData result{};
         auto props = SDL_GetWindowProperties(WIN_CAST(window));
         if (props == 0)
         {
-            KAZE_CORE_ERR("Failed to retrieve SDL_Window properties: {}", SDL_GetError());
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to retrieve SDL_Window properties: {}", SDL_GetError());
             return {};
         }
 
@@ -129,11 +160,11 @@ namespace backend {
         return result;
     }
 
-    bool PlatformBackend::init() noexcept
+    auto init() noexcept -> bool
     {
         if ( !SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) )
         {
-            KAZE_CORE_ERR("Failed to initialize SDL3: {}", SDL_GetError());
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to initialize SDL3: {}", SDL_GetError());
             return KAZE_FALSE;
         }
 
@@ -169,17 +200,56 @@ namespace backend {
         return KAZE_TRUE;
     }
 
-    void PlatformBackend::shutdown() noexcept
+    auto shutdown() noexcept -> void
     {
         SDL_Quit();
     }
 
-    double PlatformBackend::getTime() noexcept
+    auto getTime(double *outTime) noexcept -> bool
     {
-        return static_cast<Double>(SDL_GetTicksNS()) * 1e-9;
+        RETURN_IF_NULL(outTime);
+
+        *outTime = static_cast<double>(SDL_GetTicksNS()) * 1e-9;
+        return true;
     }
 
-    void PlatformBackend::pollEvents()
+    auto getClipboard(const char **outText) noexcept -> bool
+    {
+        RETURN_IF_NULL(outText);
+
+        static String text;
+        if (SDL_HasClipboardText())
+        {
+            const auto cstr = SDL_GetClipboardText();
+            if ( !cstr || *cstr == '\0') // failed to get text
+            {
+                SDL_free(cstr);
+                KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get clipboard text: {}", SDL_GetError());
+                return false;
+            }
+
+            text.assign(cstr);
+            *outText = text.c_str();
+            return true;
+        }
+
+        *outText = "";
+        return true;
+    }
+
+    auto setClipboard(const char *text) noexcept -> bool
+    {
+        if ( !SDL_SetClipboardText(text) )
+        {
+            KAZE_CORE_ERR("Failed to set clipboard text to \"{}\": {}",
+                (text ? text : ""), SDL_GetError());
+            return false;
+        }
+
+        return true;
+    }
+
+    auto pollEvents() noexcept -> bool
     {
         s_gamepads.preProcessEvents();
 
@@ -256,9 +326,19 @@ namespace backend {
                         .window = window
                     });
 
-                    const auto data = getWindowData(window);
-                    KAZE_ASSERT(data);
+                    WindowData *data;
+                    if ( !getWindowData(window, &data) )
+                        break;
                     data->isHovered = true;
+
+                    if (data->cursorVisibleMode)
+                    {
+                        SDL_ShowCursor();
+                    }
+                    else
+                    {
+                        SDL_HideCursor();
+                    }
                 } break;
 
             case SDL_EVENT_WINDOW_MOUSE_LEAVE:
@@ -269,8 +349,9 @@ namespace backend {
                         .window = window
                     });
 
-                    const auto data = getWindowData(window);
-                    KAZE_ASSERT(data);
+                    WindowData *data;
+                    if ( !getWindowData(window, &data) )
+                        break;
                     data->isHovered = false;
                 } break;
 
@@ -307,8 +388,8 @@ namespace backend {
                     if (index >= 0)
                     {
                         events.emit(GamepadConnectEvent {
-                            .id = index,
                             .type = GamepadConnectEvent::Connected,
+                            .id = index,
                         });
                     }
                 } break;
@@ -319,8 +400,8 @@ namespace backend {
                     if (index >= 0)
                     {
                         events.emit(GamepadConnectEvent {
-                            .id = index,
                             .type = GamepadConnectEvent::Disconnected,
+                            .id = index,
                         });
                     }
                 } break;
@@ -396,8 +477,8 @@ namespace backend {
                     const auto window = SDL_GetWindowFromID(e.drop.windowID);
                     events.emit(FileDropEvent {
                         .path = e.drop.data,
-                        .position = { e.drop.x, e.drop.y },
                         .window = window,
+                        .position = { e.drop.x, e.drop.y },
                     });
                 } break;
             default:
@@ -406,54 +487,56 @@ namespace backend {
         }
 
         s_gamepads.postProcessEvents();
+        return KAZE_TRUE;
     }
 
-    static void sdlWindowDataCleanUp(void *userptr, void *value)
+    static void sdlWindowDataCleanUp(void *userptr, void *value) noexcept
     {
         delete static_cast<WindowData *>(value);
     }
 
-    void *PlatformBackend::windowCreate(const Cstring title, const Size width, const Size height, const WindowInit::Flags initFlags)
+    auto window::open(const char *title, const int width, const int height, const WindowInit::Flags flags,
+        WindowHandle *outWindow) noexcept -> bool
     {
-        Uint sdlFlags = SDL_WINDOW_HIDDEN;
+        Uint sdl3Flags = SDL_WINDOW_HIDDEN;
     #ifdef KAZE_TARGET_APPLE
-        sdlFlags |= SDL_WINDOW_METAL;
+        sdl3Flags |= SDL_WINDOW_METAL;
     #endif
-        if (initFlags & WindowInit::Resizable)
-            sdlFlags |= SDL_WINDOW_RESIZABLE;
-        if (initFlags & WindowInit::Borderless)
-            sdlFlags |= SDL_WINDOW_BORDERLESS;
-        if (initFlags & WindowInit::Fullscreen)
-            sdlFlags |= SDL_WINDOW_FULLSCREEN;
-        if (initFlags & WindowInit::Floating)
-            sdlFlags |= SDL_WINDOW_ALWAYS_ON_TOP;
-        if (initFlags & WindowInit::Maximized)
-            sdlFlags |= SDL_WINDOW_MAXIMIZED;
-        if (initFlags & WindowInit::Transparent)
-            sdlFlags |= SDL_WINDOW_TRANSPARENT;
+        if (flags & WindowInit::Resizable)
+            sdl3Flags |= SDL_WINDOW_RESIZABLE;
+        if (flags & WindowInit::Borderless)
+            sdl3Flags |= SDL_WINDOW_BORDERLESS;
+        if (flags & WindowInit::Fullscreen)
+            sdl3Flags |= SDL_WINDOW_FULLSCREEN;
+        if (flags & WindowInit::Floating)
+            sdl3Flags |= SDL_WINDOW_ALWAYS_ON_TOP;
+        if (flags & WindowInit::Maximized)
+            sdl3Flags |= SDL_WINDOW_MAXIMIZED;
+        if (flags & WindowInit::Transparent)
+            sdl3Flags |= SDL_WINDOW_TRANSPARENT;
 
-        const auto window = SDL_CreateWindow(title, static_cast<Int>(width), static_cast<Int>(height), sdlFlags);
+        const auto window = SDL_CreateWindow(title, width, height, sdl3Flags);
         if (!window)
         {
-            KAZE_CORE_ERR("Failed to create SDL3 Window: {}", SDL_GetError());
-            return nullptr;
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create SDL3 Window: {}", SDL_GetError());
+            return KAZE_FALSE;
         }
 
         const auto props = SDL_GetWindowProperties(window);
         if (!props)
         {
-            KAZE_CORE_ERR("Failed to get window properties: {}", SDL_GetError());
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
             SDL_DestroyWindow(window);
-            return nullptr;
+            return KAZE_FALSE;
         }
 
-        auto windowData = new WindowData();
+        const auto windowData = new WindowData();
         if (!SDL_SetPointerPropertyWithCleanup(props, "WindowData", windowData, sdlWindowDataCleanUp, nullptr))
         {
             KAZE_CORE_ERR("Failed to set WindowData to SDL_Window properties: {}", SDL_GetError());
             SDL_DestroyWindow(window);
             delete windowData;
-            return nullptr;
+            return KAZE_FALSE;
         }
 
         // Check if mouse is inside the window
@@ -462,13 +545,13 @@ namespace backend {
             SDL_GetGlobalMouseState(&mouseX, &mouseY);
 
             int winX = 0, winY = 0;
-            if (!SDL_GetWindowPosition(window, &winX, &winY))
+            if ( !SDL_GetWindowPosition(window, &winX, &winY) )
             {
                 KAZE_CORE_WARN("Failed to get window position: {}", SDL_GetError());
             }
 
             int winW = 0, winH = 0;
-            if (!SDL_GetWindowSize(window, &winW, &winH))
+            if ( !SDL_GetWindowSize(window, &winW, &winH) )
             {
                 KAZE_CORE_WARN("Failed to get window size: {}", SDL_GetError());
             }
@@ -480,7 +563,7 @@ namespace backend {
             }
         }
 
-        if ( !(initFlags & WindowInit::Hidden) ) // keep window hidden if hidden flag was set
+        if ( !(flags & WindowInit::Hidden) ) // keep window hidden if hidden flag was set
         {
             if (!SDL_ShowWindow(window)) // show it otherwise
             {
@@ -488,367 +571,778 @@ namespace backend {
             }
         }
 
-        return window;
+        *outWindow = window;
+        return KAZE_TRUE;
     }
 
-    void PlatformBackend::windowDestroy(void *window)
+    auto window::close(const WindowHandle window) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
+        int windowCount;
+        auto windows = SDL_GetWindows(&windowCount);
+        if ( !windows )
+        {
+
+            return false;
+        }
+
         SDL_DestroyWindow(static_cast<SDL_Window *>(window));
+        return true;
     }
 
-    bool PlatformBackend::windowIsOpen(void *window)
+    auto window::isOpen(const WindowHandle window, bool *outOpen) noexcept -> bool
     {
-        return SDL_GetWindowID(static_cast<SDL_Window *>(window)) != 0;
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outOpen);
+
+        int windowCount;
+        auto windows = SDL_GetWindows(&windowCount);
+        if ( !windows )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get windows: {}", SDL_GetError());
+            return false;
+        }
+
+        for (int i = 0; i < windowCount; ++i)
+        {
+            if (windows[i] == window)
+            {
+                *outOpen = true;
+                return true;
+            }
+        }
+
+        *outOpen = false;
+        return true;
     }
 
-    void PlatformBackend::windowSetUserData(void *window, void *data)
+    auto window::setUserData(const WindowHandle window, void *data) noexcept -> bool
     {
-        const auto props = SDL_GetWindowProperties(static_cast<SDL_Window *>(window));
-        SDL_SetPointerProperty(props, "userptr", data);
+        RETURN_IF_NULL(window);
+
+        const auto props = SDL_GetWindowProperties( WIN_CAST(window) );
+        if ( !props )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
+            return false;
+        }
+
+        if ( !SDL_SetPointerProperty(props, "userptr", data) )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set userptr pointer property: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
     }
 
-    void *PlatformBackend::windowGetUserData(void *window)
+    auto window::getUserData(const WindowHandle window, void **outData) noexcept -> bool
     {
-        const auto props = SDL_GetWindowProperties(static_cast<SDL_Window *>(window));
-        return SDL_GetPointerProperty(props, "userptr", nullptr);
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outData);
+
+        const auto props = SDL_GetWindowProperties( WIN_CAST(window) );
+        if ( !props )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
+            return false;
+        }
+
+        *outData = SDL_GetPointerProperty(props, "userptr", nullptr);
+        return true;
     }
 
-    void PlatformBackend::windowSetTitle(void *window, const char *title)
+    auto window::setTitle(const WindowHandle window, const char *title) noexcept -> bool
     {
-        SDL_SetWindowTitle(WIN_CAST(window), title);
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(title);
+
+        if ( !SDL_SetWindowTitle( WIN_CAST(window), title ) )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set window title: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
     }
 
-    const char *PlatformBackend::windowGetTitle(void *window) noexcept
+    auto window::getTitle(const WindowHandle window, const char **outTitle) noexcept -> bool
     {
-        return SDL_GetWindowTitle(WIN_CAST(window));
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outTitle);
+
+        const auto title = SDL_GetWindowTitle(WIN_CAST(window));
+        if ( !title )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window title: {}", SDL_GetError());
+            return false;
+        }
+
+        *outTitle = title;
+        return true;
     }
 
-    void PlatformBackend::windowSetSize(void *window, const int x, const int y)
+    auto window::setSize(const WindowHandle window, const int x, const int y) noexcept -> bool
     {
-        SDL_SetWindowSize(WIN_CAST(window), x, y);
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_SetWindowSize( WIN_CAST(window), x, y ) )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "failed to set logical window size: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
     }
 
-    void PlatformBackend::windowGetSize(void *window, int *x, int *y) noexcept
+    auto window::getSize(const WindowHandle window, int *x, int *y) noexcept -> bool
     {
-        SDL_GetWindowSize(WIN_CAST(window), x, y);
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_GetWindowSize(WIN_CAST(window), x, y) )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window size: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
     }
 
-    void PlatformBackend::windowGetDisplaySize(void *window, int *x, int *y) noexcept
+    auto window::getFramebufferSize(const WindowHandle window, int *x, int *y) noexcept -> bool
     {
-        SDL_GetWindowSizeInPixels(WIN_CAST(window), x, y);
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_GetWindowSizeInPixels(WIN_CAST(window), x, y) )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window display size: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsNativeFullscreen(void *window) noexcept
+    auto window::isFullscreen(const WindowHandle window, bool *outFullscreen) noexcept -> bool
     {
-        return static_cast<bool>(SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_FULLSCREEN) &&
-            SDL_GetWindowFullscreenMode(WIN_CAST(window)) != nullptr;
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFullscreen);
+
+        *outFullscreen = static_cast<bool>(SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_FULLSCREEN);
+        return true;
     }
 
-    void PlatformBackend::windowSetNativeFullscreen(void *window, bool value)
+    auto window::setFullscreen(WindowHandle window, bool value) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_SetWindowFullscreen(WIN_CAST(window), value) )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set fullscreen to {}", value);
+            return false;
+        }
+
+        return true;
+    }
+
+    auto window::getFullscreenMode(const WindowHandle window, FullscreenMode *mode) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(mode);
+
+        *mode = SDL_GetWindowFullscreenMode(WIN_CAST(window)) == nullptr ?
+            FullscreenMode::Desktop : FullscreenMode::Native;
+        return true;
+    }
+
+    static auto setNativeFullscreenMode(const WindowHandle window) noexcept -> bool
+    {
+        KAZE_ASSERT(window);
+
         const auto display = SDL_GetPrimaryDisplay();
         if (!display)
         {
             KAZE_CORE_ERR("Failed to get primary display: {}", SDL_GetError());
-            return;
+            return false;
         }
 
         SDL_Rect displayBounds;
         if (!SDL_GetDisplayBounds(display, &displayBounds))
         {
             KAZE_CORE_ERR("Failed to get display bounds: {}", SDL_GetError());
-            return;
+            return false;
         }
 
         SDL_DisplayMode displayMode;
         if (!SDL_GetClosestFullscreenDisplayMode(display, displayBounds.w, displayBounds.y, 0, true, &displayMode))
         {
             KAZE_CORE_ERR("Failed to get fullscreen display mode: {}", SDL_GetError());
-            return;
+            return false;
         }
 
         if (!SDL_SetWindowFullscreenMode(WIN_CAST(window), &displayMode))
         {
             KAZE_CORE_ERR("Failed to set fullscreen mode: {}", SDL_GetError());
-            return;
+            return false;
         }
 
-        if (!SDL_SetWindowFullscreen(WIN_CAST(window), value))
-        {
-            KAZE_CORE_ERR("Failed to set fullscreen mode to {}: ", value, SDL_GetError());
-        }
+        return true;
     }
 
-    bool PlatformBackend::windowIsDesktopFullscreen(void *window) noexcept
+    static auto setDesktopFullscreenMode(const WindowHandle window) noexcept -> bool
+    {
+        KAZE_ASSERT(window);
+
+        if ( !SDL_SetWindowFullscreenMode(WIN_CAST(window), nullptr) )
+        {
+            KAZE_CORE_ERR("Failed to set window fullscreen mode to desktop: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
+    }
+
+    auto window::setFullscreenMode(WindowHandle window, FullscreenMode mode) noexcept -> bool
+    {
+        if (mode == FullscreenMode::Desktop)
+        {
+            if ( !setDesktopFullscreenMode(window) )
+                return false;
+        }
+        else if (mode == FullscreenMode::Native)
+        {
+            if ( !setNativeFullscreenMode(window) )
+                return false;
+        }
+        else
+        {
+            KAZE_CORE_ERR("Unknown FullscreenMode type");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool windowIsDesktopFullscreen(const WindowHandle window) noexcept
     {
         return static_cast<bool>(SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_FULLSCREEN) &&
             SDL_GetWindowFullscreenMode(WIN_CAST(window)) == nullptr;
     }
 
-    void PlatformBackend::windowSetDesktopFullscreen(void *window, const bool value)
+    static bool setDesktopFullscreen(const WindowHandle window, const bool value)
     {
-        if (!SDL_SetWindowFullscreenMode(WIN_CAST(window), nullptr))
+        const auto lastMode = SDL_GetWindowFullscreenMode(WIN_CAST(window));
+        if ( !SDL_SetWindowFullscreenMode(WIN_CAST(window), nullptr) )
         {
             KAZE_CORE_ERR("Failed to set SDL_Window's desktop fullscreen mode: {}", SDL_GetError());
-            return;
+            return false;
         }
 
-        if (!SDL_SetWindowFullscreen(WIN_CAST(window), value))
+        if (!SDL_SetWindowFullscreen( WIN_CAST(window), value) )
         {
             KAZE_CORE_ERR("Failed to set SDL_Window fullscreen: {}", SDL_GetError());
+            SDL_SetWindowFullscreenMode(WIN_CAST(window), lastMode); // revert to last mode
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsBorderless(void *window) noexcept
+    auto window::isBordered(const WindowHandle window, bool *outBordered) noexcept -> bool
     {
-        return static_cast<bool>(SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_BORDERLESS);
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outBordered);
+
+        *outBordered = !static_cast<bool>( SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_BORDERLESS );
+        return true;
     }
 
-    void PlatformBackend::windowSetBorderless(void *window, const bool value)
+    auto window::setBordered(const WindowHandle window, const bool value) noexcept -> bool
     {
-        if (!SDL_SetWindowBordered(WIN_CAST(window), !value))
+        if ( !SDL_SetWindowBordered(WIN_CAST(window), value) )
         {
             KAZE_CORE_ERR("Failed to set window borderless: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsMinimized(void *window) noexcept
+    auto window::isMinimized(const WindowHandle window, bool *outMinimized) noexcept -> bool
     {
-        return static_cast<bool>(
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outMinimized);
+
+        *outMinimized = static_cast<bool>(
             SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_MINIMIZED);
+        return true;
     }
 
-    void PlatformBackend::windowMinimize(void *window)
+    auto window::minimize(const WindowHandle window) noexcept -> bool
     {
-        if (!SDL_MinimizeWindow(WIN_CAST(window)))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_MinimizeWindow( WIN_CAST(window) ) )
         {
             KAZE_CORE_ERR("Failed to minimize window: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsMaximized(void *window) noexcept
+    auto window::isMaximized(const WindowHandle window, bool *outMaximized) noexcept -> bool
     {
-        return static_cast<bool>(
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outMaximized);
+
+        *outMaximized = static_cast<bool>(
             SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_MAXIMIZED);
+        return true;
     }
 
-    void PlatformBackend::windowMaximize(void *window)
+    auto window::maximize(const WindowHandle window) noexcept -> bool
     {
-        if (!SDL_MaximizeWindow(WIN_CAST(window)))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_MaximizeWindow( WIN_CAST(window) ) )
         {
             KAZE_CORE_ERR("Failed to maximize window: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void PlatformBackend::windowRestore(void *window)
+    auto window::restore(const WindowHandle window) noexcept -> bool
     {
-        if (!SDL_RestoreWindow(WIN_CAST(window)))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_RestoreWindow( WIN_CAST(window) ) )
         {
             KAZE_CORE_ERR("Failed to restore window: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void PlatformBackend::windowGetPosition(void *window, int *x, int *y) noexcept
+    auto window::getPosition(const WindowHandle window, int *x, int *y) noexcept -> bool
     {
-        if (!SDL_GetWindowPosition(WIN_CAST(window), x, y))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_GetWindowPosition( WIN_CAST(window), x, y ) )
         {
             KAZE_CORE_ERR("Failed to get window position: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void PlatformBackend::windowSetPosition(void *window, const int x, const int y) noexcept
+    auto window::setPosition(const WindowHandle window, const int x, const int y) noexcept -> bool
     {
-        if (!SDL_SetWindowPosition(WIN_CAST(window), x, y))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_SetWindowPosition( WIN_CAST(window), x, y ) )
         {
             KAZE_CORE_ERR("Failed to set window position to {{{}, {}}}: {}", x, y, SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowGetResizable(void *window) noexcept
+    auto window::getResizable(const WindowHandle window, bool *outResizable) noexcept -> bool
     {
-        return static_cast<bool>(
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outResizable);
+
+        *outResizable = static_cast<bool>(
             SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_RESIZABLE);
+        return true;
     }
 
-    void PlatformBackend::windowSetResizable(void *window, const bool value)
+    auto window::setResizable(const WindowHandle window, const bool value) noexcept -> bool
     {
-        if (!SDL_SetWindowResizable(WIN_CAST(window), value))
+        if ( !SDL_SetWindowResizable(WIN_CAST(window), value) )
         {
             KAZE_CORE_ERR("Failed to set window resizable attribute to {}: {}",
                 value, SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsHidden(void *window) noexcept
+    auto window::isHidden(const WindowHandle window, bool *outHidden) noexcept -> bool
     {
-        return static_cast<bool>(
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outHidden);
+
+        *outHidden = static_cast<bool>(
             SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_HIDDEN);
+        return true;
     }
 
-    void PlatformBackend::windowSetHidden(void *window, const bool value)
+    auto window::setHidden(const WindowHandle window, const bool value) noexcept -> bool
     {
+        RETURN_IF_NULL(window);
+
         bool result;
         if (value)
         {
-            result = SDL_HideWindow(WIN_CAST(window));
+            result = SDL_HideWindow( WIN_CAST(window) );
         }
         else
         {
-            result = SDL_ShowWindow(WIN_CAST(window));
+            result = SDL_ShowWindow( WIN_CAST(window) );
         }
 
-        if (!result)
+        if ( !result )
         {
-            KAZE_CORE_ERR("Failed to set window to {}: {}",
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set window to {}: {}",
                 value ? "hidden" : "shown", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsHovered(void *window) noexcept
+    auto window::isHovered(const WindowHandle window, bool *outHovered) noexcept -> bool
     {
-        const auto data = getWindowData(window);
-        KAZE_ASSERT(data);
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outHovered);
 
-        return data->isHovered;
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        *outHovered = data->isHovered;
+        return true;
     }
 
-    bool PlatformBackend::windowIsFloating(void *window) noexcept
+    auto window::isFloating(const WindowHandle window, bool *outFloating) noexcept -> bool
     {
-        return static_cast<bool>(
-            SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_ALWAYS_ON_TOP);
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFloating);
+
+        *outFloating = static_cast<bool>(
+            SDL_GetWindowFlags( WIN_CAST(window)) & SDL_WINDOW_ALWAYS_ON_TOP );
+        return true;
     }
 
-    void PlatformBackend::windowSetFloating(void *window, const bool value)
+    auto window::setFloating(const WindowHandle window, const bool value) noexcept -> bool
     {
-        if (!SDL_SetWindowAlwaysOnTop(WIN_CAST(window), value))
+        if ( !SDL_SetWindowAlwaysOnTop( WIN_CAST(window), value ) )
         {
             KAZE_CORE_ERR("Failed to set window floating attribute to {}: {}", value, SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsTransparent(void *window) noexcept
+    auto window::isTransparent(const WindowHandle window, bool *outTransparent) noexcept -> bool
     {
-        return static_cast<bool>(
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outTransparent);
+
+        *outTransparent = static_cast<bool>(
             SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_TRANSPARENT);
+        return true;
     }
 
-    void PlatformBackend::windowSetTransparent(void *window, const bool value)
+    auto window::setTransparent(const WindowHandle window, const bool value) noexcept -> bool
     {
-        if (!SDL_SetWindowOpacity(WIN_CAST(window), value ? 1.0f : 0))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_SetWindowOpacity( WIN_CAST(window), (value ? 1.0f : 0) ) )
         {
             KAZE_CORE_ERR("Failed to set window transparency to {}: {}", value, SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    bool PlatformBackend::windowIsFocused(void *window) noexcept
+    auto window::isFocused(const WindowHandle window, bool *outFocused) noexcept -> bool
     {
-        return static_cast<bool>(
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outFocused);
+
+        *outFocused = static_cast<bool>(
             SDL_GetWindowFlags(WIN_CAST(window)) & SDL_WINDOW_INPUT_FOCUS);
+        return true;
     }
 
-    void PlatformBackend::windowFocus(void *window)
+    auto window::focus(const WindowHandle window) noexcept -> bool
     {
-        if (windowIsHidden(window))
+        bool curHidden;
+        if ( !window::isHidden(window, &curHidden) )
+            return false;
+
+        if ( !curHidden )
         {
-            windowSetHidden(window, false);
+            if ( !window::setHidden(window, false) )
+                return false;
         }
 
-        if (!SDL_RaiseWindow(WIN_CAST(window)))
+        if ( !SDL_RaiseWindow( WIN_CAST(window) ) )
         {
             KAZE_CORE_WARN("Failed to raise window: {}", SDL_GetError());
+            return false;
         }
 
-        if (!SDL_SetWindowKeyboardGrab(WIN_CAST(window), true))
+        if ( !SDL_SetWindowKeyboardGrab(WIN_CAST(window), true) )
         {
             KAZE_CORE_WARN("Failed to set window keyboard grab: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void PlatformBackend::windowSetMinimumSize(void *window, const int minWidth, const int minHeight)
+    auto window::setMinSize(const WindowHandle window, const int minWidth, const int minHeight) noexcept -> bool
     {
-        if (!SDL_SetWindowMinimumSize(WIN_CAST(window), minWidth, minHeight))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_SetWindowMinimumSize( WIN_CAST(window), minWidth, minHeight ) )
         {
             KAZE_CORE_ERR("Failed to set window minimum size to {{{}, {}}}: {}",
                 minWidth, minHeight, SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void PlatformBackend::windowSetMaximumSize(void *window, const int maxWidth, const int maxHeight)
+    auto window::setMaxSize(const WindowHandle window, const int maxWidth, const int maxHeight) noexcept -> bool
     {
-        if (!SDL_SetWindowMaximumSize(WIN_CAST(window), maxWidth, maxHeight))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_SetWindowMaximumSize(WIN_CAST(window), maxWidth, maxHeight) )
         {
             KAZE_CORE_ERR("Failed to set window maximum size to {{{}, {}}}: {}",
                 maxWidth, maxHeight, SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void PlatformBackend::windowGetMinimumSize(void *window, int *minWidth, int *minHeight)
+    auto window::getMinSize(const WindowHandle window, int *minWidth, int *minHeight) noexcept -> bool
     {
-        if (!SDL_GetWindowMinimumSize(WIN_CAST(window), minWidth, minHeight))
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_GetWindowMinimumSize( WIN_CAST(window), minWidth, minHeight ) )
         {
             KAZE_CORE_ERR("Failed to get window minimum size: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
 
-    void PlatformBackend::windowGetMaximumSize(void *window, int *maxWidth, int *maxHeight)
+    auto window::getMaxSize(const WindowHandle window, int *maxWidth, int *maxHeight) noexcept -> bool
     {
-        if (!SDL_GetWindowMaximumSize(WIN_CAST(window), maxWidth, maxHeight))
+        if ( !SDL_GetWindowMaximumSize( WIN_CAST(window), maxWidth, maxHeight) )
         {
-            KAZE_CORE_ERR("Failed to get window maximum size: {}", SDL_GetError());
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window maximum size: {}", SDL_GetError());
+            return false;
         }
+
+        return true;
     }
+
+    auto window::setShowCursorMode(const WindowHandle window, bool value) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        data->cursorVisibleMode = value;
+        return true;
+    }
+
+    auto window::getShowCursorMode(const WindowHandle window, bool *outMode) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        *outMode = data->cursorVisibleMode;
+        return true;
+    }
+
+    auto window::setCaptureCursorMode(const WindowHandle window, bool value) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        if ( !SDL_SetWindowRelativeMouseMode( WIN_CAST(window), value ) )
+        {
+            KAZE_CORE_ERR("Failed to set window relative mouse mode: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
+    }
+
+    auto window::getCaptureCursorMode(const WindowHandle window, bool *outValue) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outValue);
+
+        if ( !SDL_GetWindowRelativeMouseMode( WIN_CAST(window) ) )
+        {
+            KAZE_CORE_ERR("Failed to get window relative mouse mode: {}", SDL_GetError());
+            return false;
+        }
+
+        return true;
+    }
+
+    auto keyboard::isDown(Key key, bool *outDown) noexcept -> bool
+    {
+        RETURN_IF_NULL(outDown);
+
+        const auto keys = SDL_GetKeyboardState(nullptr);
+        if ( !keys )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get keyboard state: {}", SDL_GetError());
+            return false;
+        }
+
+        const auto sdlKey =  s_keyToSdlKey[ static_cast<int>(key) ];
+
+        *outDown = keys[sdlKey];
+        return true;
+    }
+
+    auto mouse::getRelativePosition(const WindowHandle window, float *x, float *y) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        float tempX, tempY;
+        SDL_GetGlobalMouseState(&tempX, &tempY);
+
+        int winX, winY;
+        if ( !SDL_GetWindowPosition( WIN_CAST(window), &winX, &winY ) )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window position: {}", SDL_GetError());
+            return false;
+        }
+
+        if (x)
+            *x = tempX - winX;
+        if (y)
+            *y = tempY - winY;
+
+        return true;
+    }
+
+    auto mouse::getGlobalPosition(float *x, float *y) noexcept -> bool
+    {
+        SDL_GetGlobalMouseState(x, y);
+        return true;
+    }
+
+#define GP_IN_RANGE(index) \
+    do { if ( !((index) >= 0 && (index) < MaxGamepadSlots) )  { \
+        KAZE_CORE_ERRCODE(Error::OutOfRange, "gamepad index {} is out of range", (index)); \
+        return false; \
+    } } while(0)
 
     /// TODO: Implement Gamepad functions!
-    bool PlatformBackend::gamepadIsConnected(int index) noexcept
+    auto gamepad::isConnected(int index, bool *outConnected) noexcept -> bool
     {
+        GP_IN_RANGE(index);
         return static_cast<bool>(s_gamepads[index]);
     }
 
-    bool PlatformBackend::gamepadIsButtonDown(int index, GamepadBtn button)
+    auto gamepad::isDown(int index, GamepadBtn button, bool *outDown) noexcept -> bool
     {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outDown);
+
         const auto data = s_gamepads[index];
         if (!data)
-            return false;
-        return data->buttons[ static_cast<Uint8>(button) ].isDown[ data->currentIndex ];
+        {
+            *outDown = false;
+            return true;
+        }
+
+        *outDown = data->buttons[ static_cast<Uint8>(button) ].isDown[ data->currentIndex ];
+        return true;
     }
 
-    bool PlatformBackend::gamepadIsButtonJustDown(int index, GamepadBtn button)
+    auto gamepad::isJustDown(int index, GamepadBtn button, bool *outJustDown) noexcept -> bool
     {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outJustDown);
+
         const auto data = s_gamepads[index];
         if (!data)
-            return false;
+        {
+            *outJustDown = false;
+            return true;
+        }
         const auto &buttonData = data->buttons[ static_cast<Uint8>(button) ];
 
         return buttonData.isDown[ data->currentIndex ] && !buttonData.isDown[ !data->currentIndex ];
     }
 
-    bool PlatformBackend::gamepadIsButtonJustUp(int index, GamepadBtn button)
+    auto gamepad::isJustUp(int index, GamepadBtn button, bool *outJustUp) noexcept -> bool
     {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outJustUp);
+
         const auto data = s_gamepads[index];
         if (!data)
-            return false;
+        {
+            *outJustUp = false;
+            return true;
+        }
+
         const auto &buttonData = data->buttons[ static_cast<Uint8>(button) ];
 
-        return !buttonData.isDown[ data->currentIndex ] && buttonData.isDown[ !data->currentIndex ];
+        *outJustUp = !buttonData.isDown[ data->currentIndex ] && buttonData.isDown[ !data->currentIndex ];
+        return true;
     }
 
-    float PlatformBackend::gamepadGetAxis(int index, GamepadAxis axis)
+    auto gamepad::getAxis(int index, GamepadAxis axis, float *outValue) noexcept -> bool
     {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outValue);
+
         const auto data = s_gamepads[index];
         if (!data)
-            return 0;
-        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
+        {
+            *outValue = 0;
+            return true;
+        }
 
+        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
         return axisData.value[ data->currentIndex ];
+        return true;
     }
 
-    bool PlatformBackend::gamepadDidAxisMove(int index, GamepadAxis axis, float deadzone)
+    auto gamepad::getAxisMoved(int index, GamepadAxis axis, float deadzone, bool *outMoved) noexcept -> bool
     {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outMoved);
+
         const auto data = s_gamepads[index];
         if (!data)
-            return 0;
-        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
+        {
+            *outMoved = false;
+            return true;
+        }
 
+        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
         auto curValue = axisData.value[ data->currentIndex ];
         auto lastValue = axisData.value[ !data->currentIndex ];
 
@@ -856,14 +1350,22 @@ namespace backend {
             curValue = 0;
         if (lastValue <= deadzone)
             lastValue = 0;
-        return curValue != lastValue;
+        *outMoved = curValue != lastValue;
+        return true;
     }
 
-    bool PlatformBackend::gamepadDidAxesMove(int index, GamepadAxis axisX, GamepadAxis axisY, float deadzone)
+    auto gamepad::getAxesMoved(int index, GamepadAxis axisX, GamepadAxis axisY, float deadzone, bool *outMoved) noexcept -> bool
     {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outMoved);
+
         const auto data = s_gamepads[index];
         if (!data)
-            return 0;
+        {
+            *outMoved = false;
+            return true;
+        }
+
         const auto &axisDataX = data->axes[ static_cast<Uint8>(axisX) ];
         const auto &axisDataY = data->axes[ static_cast<Uint8>(axisY) ];
 
@@ -884,28 +1386,8 @@ namespace backend {
             lastValueY = 0;
         }
 
-        return curValueX != lastValueX || curValueY != lastValueY;
-    }
-
-    const char * PlatformBackend::getClipboard()
-    {
-        static String text;
-
-        const auto cstr = SDL_GetClipboardText();
-        text.assign(cstr);
-
-        SDL_free(cstr);
-
-        return text.c_str();
-    }
-
-    void PlatformBackend::setClipboard(const char *text)
-    {
-        if (!SDL_SetClipboardText(text))
-        {
-            KAZE_CORE_ERR("Failed to set clipboard text to \"{}\": {}",
-                (text ? text : ""), SDL_GetError());
-        }
+        *outMoved = curValueX != lastValueX || curValueY != lastValueY;
+        return true;
     }
 }
 

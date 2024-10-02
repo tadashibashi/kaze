@@ -3,42 +3,60 @@
 
 KAZE_NAMESPACE_BEGIN
 
-using backend::PlatformBackend;
-
 Bool Gamepad::isUp(const GamepadBtn btn) const noexcept
 {
-    return !PlatformBackend::gamepadIsButtonDown(m_id, btn);
+    bool btnIsDown;
+    if ( !backend::gamepad::isDown(m_id, btn, &btnIsDown) )
+        return false;
+    return !btnIsDown;
 }
 
 Bool Gamepad::isDown(const GamepadBtn btn) const noexcept
 {
-    return PlatformBackend::gamepadIsButtonDown(m_id, btn);
+    bool btnIsDown;
+    if ( !backend::gamepad::isDown(m_id, btn, &btnIsDown) )
+        return false;
+    return btnIsDown;
 }
 
 Bool Gamepad::isJustDown(const GamepadBtn btn) const noexcept
 {
-    return PlatformBackend::gamepadIsButtonJustDown(m_id, btn);
+    bool btnJustDown;
+    if ( !backend::gamepad::isJustDown(m_id, btn, &btnJustDown) )
+        return false;
+    return btnJustDown;
 }
 
 Bool Gamepad::isJustUp(const GamepadBtn btn) const noexcept
 {
-    return PlatformBackend::gamepadIsButtonJustUp(m_id, btn);
+    bool btnJustUp;
+    if ( !backend::gamepad::isJustUp(m_id, btn, &btnJustUp) )
+        return false;
+    return btnJustUp;
 }
 
 Float Gamepad::getAxis(const GamepadAxis axis, const Float deadzone) const noexcept
 {
-    const auto value = PlatformBackend::gamepadGetAxis(m_id, axis);
+    float value;
+    if ( !backend::gamepad::getAxis(m_id, axis, &value) )
+        return 0;
     return mathf::abs(value) <= deadzone ? 0 : value;
 }
 
-Bool Gamepad::didAxisMove(const GamepadAxis axis, const Float deadzone) const noexcept
+Bool Gamepad::getAxisMoved(const GamepadAxis axis, const Float deadzone) const noexcept
 {
-    return PlatformBackend::gamepadDidAxisMove(m_id, axis, deadzone);
+    bool axisMoved;
+    if ( !backend::gamepad::getAxisMoved(m_id, axis, deadzone, &axisMoved) )
+        return false;
+    return axisMoved;
 }
 
 Bool Gamepad::isConnected() const noexcept
 {
-    return PlatformBackend::gamepadIsConnected(m_id);
+    bool gamepadConnected;
+    if ( !backend::gamepad::isConnected(m_id, &gamepadConnected) )
+        return false;
+    return gamepadConnected;
 }
 
 Vec2f Gamepad::getAxes(const GamepadAxis axisX, const GamepadAxis axisY, const Float deadzone) const noexcept
@@ -47,9 +65,13 @@ Vec2f Gamepad::getAxes(const GamepadAxis axisX, const GamepadAxis axisY, const F
     return (result.magnitude() <= deadzone) ? Vec2f() : result;
 }
 
-Bool Gamepad::didAxesMove(const GamepadAxis axisX, const GamepadAxis axisY, const Float deadzone) const noexcept
+Bool Gamepad::getAxesMoved(const GamepadAxis axisX, const GamepadAxis axisY, const Float deadzone) const noexcept
 {
-    return PlatformBackend::gamepadDidAxesMove(m_id, axisX, axisY, deadzone);
+    bool axesMoved;
+    if ( !backend::gamepad::getAxesMoved(m_id, axisX, axisY, deadzone, &axesMoved) )
+        return false;
+
+    return axesMoved;
 }
 
 KAZE_NAMESPACE_END
