@@ -21,7 +21,14 @@ else()
     set(KAZE_BACKEND_LIBRARIES glfw)
 endif()
 
-set(KAZE_BACKEND_SOURCES ${KAZE_ROOT}/kaze/platform/backends/glfw3/PlatformBackend_glfw3.cpp)
+set(GLFW3_BACKEND_ROOT ${KAZE_ROOT}/kaze/platform/backends/glfw3)
+set(KAZE_BACKEND_SOURCES
+    ${GLFW3_BACKEND_ROOT}/PlatformBackend_glfw3.cpp
+    ${GLFW3_BACKEND_ROOT}/PlatformBackend_globals.cpp
+    ${GLFW3_BACKEND_ROOT}/Window_glfw3.cpp
+)
+
 if (APPLE)
-    list(APPEND KAZE_BACKEND_SOURCES ${KAZE_ROOT}/kaze/platform/backends/glfw3/PlatformBackend_glfw3_macos.mm)
+    list(APPEND KAZE_BACKEND_SOURCES
+        ${GLFW3_BACKEND_ROOT}/Window_glfw3.mm)
 endif()

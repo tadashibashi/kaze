@@ -20,6 +20,8 @@ set(SDL3_BACKEND_ROOT ${KAZE_BACKEND_ROOT}/sdl3)
 set(KAZE_BACKEND_SOURCES
     ${SDL3_BACKEND_ROOT}/Gamepad_sdl3.cpp
     ${SDL3_BACKEND_ROOT}/PlatformBackend_sdl3.cpp
+    ${SDL3_BACKEND_ROOT}/PlatformBackend_globals.cpp
+    ${SDL3_BACKEND_ROOT}/Window_sdl3.cpp
 )
 set(KAZE_BACKEND_LINK_FLAGS "")
 set(KAZE_BACKEND_COMPILE_FLAGS "")

@@ -6,17 +6,13 @@ endif()
 
 include(kaze/dependencies)
 
-add_library(${PROJECT_NAME}
-
-)
+add_library(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
         app/Input.h
-        platform/Keyboard.cpp
-        platform/backends/sdl3/GamepadConstants.h
-        platform/Key.cpp
+
         errors.h
         errors.cpp
-        platform/backends/WindowHandleContainer.h
+
         Optional.h
 
         app/App.h
@@ -46,9 +42,12 @@ target_sources(${PROJECT_NAME} PRIVATE
         math/Vec/Vec4.h
         math/Vec.hpp
         kaze.h
+
         platform/Gamepad.cpp
         platform/Key.h
+        platform/Key.cpp
         platform/Keyboard.h
+        platform/Keyboard.cpp
         platform/PlatformBackend.h
         platform/PlatformBackend.cpp
         platform/PlatformEvent.h
@@ -57,6 +56,8 @@ target_sources(${PROJECT_NAME} PRIVATE
         platform/Mouse.h
         platform/Window.h
         platform/Window.cpp
+
+        platform/backends/WindowHandleContainer.h
         ServiceProvider.h
         ServiceProvider.cpp
 

@@ -8,7 +8,7 @@
 KAZE_NAMESPACE_BEGIN
 
 /// Clickable button on a game controller
-enum class GamepadBtn : Uint {
+enum class GamepadBtn {
     A = 0,       ///< Bottom of ABXY buttons
     B,           ///< Right of ABXY buttons
     X,           ///< Left of ABXY buttons
@@ -29,7 +29,7 @@ enum class GamepadBtn : Uint {
 };
 
 /// Gradual axis inputs on a game controller
-enum class GamepadAxis : Uint {
+enum class GamepadAxis {
     LeftX = 0,     ///< Left stick X horizontal axis
     LeftY,         ///< Left stick Y vertical axis
     RightX,        ///< Right stick X horizontal axis

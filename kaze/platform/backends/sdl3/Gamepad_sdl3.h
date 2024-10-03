@@ -1,3 +1,6 @@
+/// @file Gamepad_sdl3.h
+/// @description
+/// Contains classes and functions related to backend SDL3 Gamepad handling
 #pragma once
 #ifndef kaze_platform_backends_sdl3_gamepad_sdl3_h_
 #define kaze_platform_backends_sdl3_gamepad_sdl3_h_

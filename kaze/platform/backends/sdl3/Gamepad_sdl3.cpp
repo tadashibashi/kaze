@@ -1,11 +1,13 @@
 #include "Gamepad_sdl3.h"
+#include "PlatformBackend_defines.h"
+#include "PlatformBackend_globals.h"
 
 #include <kaze/debug.h>
+#include <kaze/platform/PlatformBackend.h>
 
-#include "GamepadConstants.h"
 
 KAZE_NAMESPACE_BEGIN
-    namespace backend::sdl3 {
+namespace backend::sdl3 {
 
     int GamepadMgr::connect(const SDL_JoystickID id)
     {
@@ -236,7 +238,7 @@ KAZE_NAMESPACE_BEGIN
                 if (button.interactions == 0)
                 {
                     button.isDown[currentIndex] = SDL_GetGamepadButton(gamepad,
-                        gamepadButtonToSdl(static_cast<GamepadBtn>(i)));
+                        toSDLGamepadButton(static_cast<GamepadBtn>(i)));
                 }
                 else
                 {
@@ -283,6 +285,147 @@ KAZE_NAMESPACE_BEGIN
     }
 }
 
+namespace backend {
 
+#define GP_IN_RANGE(index) \
+    do { if ( !((index) >= 0 && (index) < MaxGamepadSlots) )  { \
+        KAZE_CORE_ERRCODE(Error::OutOfRange, "gamepad index {} is out of range", (index)); \
+        return false; \
+    } } while(0)
+
+    /// TODO: Implement Gamepad functions!
+    auto gamepad::isConnected(int index, bool *outConnected) noexcept -> bool
+    {
+        GP_IN_RANGE(index);
+        return static_cast<bool>(gamepads[index]);
+    }
+
+    auto gamepad::isDown(int index, GamepadBtn button, bool *outDown) noexcept -> bool
+    {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outDown);
+
+        const auto data = gamepads[index];
+        if (!data)
+        {
+            *outDown = false;
+            return true;
+        }
+
+        *outDown = data->buttons[ static_cast<Uint8>(button) ].isDown[ data->currentIndex ];
+        return true;
+    }
+
+    auto gamepad::isJustDown(int index, GamepadBtn button, bool *outJustDown) noexcept -> bool
+    {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outJustDown);
+
+        const auto data = gamepads[index];
+        if (!data)
+        {
+            *outJustDown = false;
+            return true;
+        }
+        const auto &buttonData = data->buttons[ static_cast<Uint8>(button) ];
+
+        return buttonData.isDown[ data->currentIndex ] && !buttonData.isDown[ !data->currentIndex ];
+    }
+
+    auto gamepad::isJustUp(int index, GamepadBtn button, bool *outJustUp) noexcept -> bool
+    {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outJustUp);
+
+        const auto data = gamepads[index];
+        if (!data)
+        {
+            *outJustUp = false;
+            return true;
+        }
+
+        const auto &buttonData = data->buttons[ static_cast<Uint8>(button) ];
+
+        *outJustUp = !buttonData.isDown[ data->currentIndex ] && buttonData.isDown[ !data->currentIndex ];
+        return true;
+    }
+
+    auto gamepad::getAxis(int index, GamepadAxis axis, float *outValue) noexcept -> bool
+    {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outValue);
+
+        const auto data = gamepads[index];
+        if (!data)
+        {
+            *outValue = 0;
+            return true;
+        }
+
+        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
+        return axisData.value[ data->currentIndex ];
+        return true;
+    }
+
+    auto gamepad::getAxisMoved(int index, GamepadAxis axis, float deadzone, bool *outMoved) noexcept -> bool
+    {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outMoved);
+
+        const auto data = gamepads[index];
+        if (!data)
+        {
+            *outMoved = false;
+            return true;
+        }
+
+        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
+        auto curValue = axisData.value[ data->currentIndex ];
+        auto lastValue = axisData.value[ !data->currentIndex ];
+
+        if (curValue <= deadzone)
+            curValue = 0;
+        if (lastValue <= deadzone)
+            lastValue = 0;
+        *outMoved = curValue != lastValue;
+        return true;
+    }
+
+    auto gamepad::getAxesMoved(int index, GamepadAxis axisX, GamepadAxis axisY, float deadzone, bool *outMoved) noexcept -> bool
+    {
+        GP_IN_RANGE(index);
+        RETURN_IF_NULL(outMoved);
+
+        const auto data = gamepads[index];
+        if (!data)
+        {
+            *outMoved = false;
+            return true;
+        }
+
+        const auto &axisDataX = data->axes[ static_cast<Uint8>(axisX) ];
+        const auto &axisDataY = data->axes[ static_cast<Uint8>(axisY) ];
+
+        auto curValueX = axisDataX.value[ data->currentIndex ];
+        auto lastValueX = axisDataX.value[ !data->currentIndex ];
+        auto curValueY = axisDataY.value[ data->currentIndex ];
+        auto lastValueY = axisDataY.value[ !data->currentIndex ];
+
+        if (mathf::distance(0.f, 0.f, curValueX, curValueY) <= deadzone)
+        {
+            curValueX = 0;
+            curValueY = 0;
+        }
+
+        if (mathf::distance(0.f, 0.f, lastValueX, lastValueY) <= deadzone)
+        {
+            lastValueX = 0;
+            lastValueY = 0;
+        }
+
+        *outMoved = curValueX != lastValueX || curValueY != lastValueY;
+        return true;
+    }
+}
 
 KAZE_NAMESPACE_END

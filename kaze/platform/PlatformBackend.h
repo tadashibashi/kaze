@@ -1,12 +1,12 @@
 #pragma once
-
 #ifndef kaze_platform_platformbackend_h_
 #define kaze_platform_platformbackend_h_
 
-#include <kaze/kaze.h>
 #include "PlatformEvent.h"
 #include "Window.h"
 #include "Gamepad.h"
+
+#include <kaze/kaze.h>
 
 KAZE_NAMESPACE_BEGIN
 
@@ -21,27 +21,36 @@ namespace backend {
 
     extern PlatformCallbacks events;
 
+    /// Initialize the backend
+    /// @returns whether initialization succeeded
     auto init() noexcept -> bool;
+
+    /// Shutdown/terminate the backend
     auto shutdown() noexcept -> void;
 
     /// Get time in seconds since init was first called.
     /// Most modern platforms and backends support nanosecond granularity.
-    [[nodiscard]]
     auto getTime(double *outTime) noexcept -> bool;
 
     /// Poll events for the current frame
     /// @returns whether the operation succeeded
     auto pollEvents() noexcept -> bool;
 
+    /// Set callbacks for input event handling.
+    /// @param callbacks callback struct with pointers to set
     inline auto setCallbacks(const PlatformCallbacks &callbacks) noexcept -> void
     {
         events = callbacks;
     }
 
+    /// Get system clipboard text, or empty string if none available.
+    /// @param [out] outText retrieves text string
+    /// @returns whether retrieval was successful.
     auto getClipboard(const char **outText) noexcept -> bool;
+    /// Set system clipboard text
+    /// @param text text to set
+    /// @returns whether operation was successful.
     auto setClipboard(const char *text) noexcept -> bool;
-
-
 
     // ===== Window =====
     namespace window
@@ -70,6 +79,8 @@ namespace backend {
         /// Get native platform-specific information about the window for use with bgfx
         /// Each platform the backend intends to support should be taken into account with pre-processor checks
         /// either from the backend library or via kaze's platform defines.
+        /// @param window window to get info from
+        /// @returns platform pointers for bgfx
         auto getNativeInfo(WindowHandle window) noexcept -> NativePlatformData;
 
         /// Check if a window is open.
