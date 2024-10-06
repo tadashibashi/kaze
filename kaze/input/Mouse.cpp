@@ -1,6 +1,6 @@
 #include "Mouse.h"
 
-#include <kaze/platform/PlatformBackend.h>
+#include <kaze/platform/backend.h>
 
 KAZE_NAMESPACE_BEGIN
 

@@ -3,8 +3,8 @@
 #include "window_glfw3.h"
 #include "common_glfw3.h"
 
-#include <kaze/platform/PlatformBackend.h>
-#include <kaze/platform/PlatformDefines.h>
+#include <kaze/platform/backend.h>
+#include <kaze/platform/defines.h>
 
 #include <GLFW/glfw3.h>
 

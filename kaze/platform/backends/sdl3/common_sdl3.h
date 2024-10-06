@@ -10,7 +10,7 @@
 #include <kaze/input/KeyboardConstants.h>
 #include <kaze/input/MouseConstants.h>
 
-#include "GamepadMgr.h"
+#include "private/GamepadMgr.h"
 
 #include <SDL3/SDL.h>
 

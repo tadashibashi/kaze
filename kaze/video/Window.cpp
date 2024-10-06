@@ -1,7 +1,7 @@
 /// @file Window.cpp
 /// Contains implementation of the Window class
 #include "Window.h"
-#include <kaze/platform/PlatformBackend.h>
+#include <kaze/platform/backend.h>
 #include <kaze/debug.h>
 
 KAZE_NAMESPACE_BEGIN

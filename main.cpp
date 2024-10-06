@@ -1,10 +1,9 @@
 #include <kaze/kaze.h>
-#include <kaze/platform/PlatformEvent.h>
 #include <kaze/debug.h>
 #include <kaze/input/Gamepad.h>
 #include <kaze/video/Window.h>
 
-#include <kaze/platform/PlatformBackend.h>
+#include <kaze/platform/backend.h>
 
 USING_KAZE_NAMESPACE;
 

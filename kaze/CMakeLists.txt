@@ -51,11 +51,11 @@ target_sources(${PROJECT_NAME} PRIVATE
         input/MouseConstants.h
 
 
-        platform/PlatformBackend.h
-        platform/PlatformBackend.cpp
-        platform/PlatformEvent.h
-        platform/PlatformEvent.cpp
-        platform/PlatformDefines.h
+        platform/backend.h
+        platform/backend.cpp
+        platform/PlatformCallbacks.h
+        platform/PlatformCallbacks.cpp
+        platform/defines.h
         platform/backends/WindowHandleContainer.h
 
         ServiceProvider.h

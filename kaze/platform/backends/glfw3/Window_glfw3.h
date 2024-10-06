@@ -6,8 +6,8 @@
 
 #include <kaze/kaze.h>
 #include <kaze/math/Rect.h>
-#include <kaze/platform/PlatformBackend.h>
-#include <kaze/platform/PlatformDefines.h>
+#include <kaze/platform/backend.h>
+#include <kaze/platform/defines.h>
 #include <kaze/video/WindowConstants.h>
 
 #include <GLFW/glfw3.h>

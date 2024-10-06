@@ -19,8 +19,8 @@ set(SDL3_BACKEND_ROOT ${KAZE_BACKEND_ROOT}/sdl3)
 
 set(KAZE_BACKEND_SOURCES
     ${SDL3_BACKEND_ROOT}/common_sdl3.cpp
-    ${SDL3_BACKEND_ROOT}/GamepadMgr.cpp
     ${SDL3_BACKEND_ROOT}/window_sdl3.cpp
+    ${SDL3_BACKEND_ROOT}/private/GamepadMgr.cpp
 )
 set(KAZE_BACKEND_LINK_FLAGS "")
 set(KAZE_BACKEND_COMPILE_FLAGS "")

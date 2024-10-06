@@ -1,7 +1,6 @@
 #include "Keyboard.h"
 
-#include <kaze/platform/PlatformBackend.h>
-#include <kaze/platform/PlatformEvent.h>
+#include <kaze/platform/backend.h>
 
 KAZE_NAMESPACE_BEGIN
 

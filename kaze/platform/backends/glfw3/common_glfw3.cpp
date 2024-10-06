@@ -1,9 +1,9 @@
 /// @file common_glfw3.cpp
-/// Contains general top-level Glfw3 backend implementation
+/// Top-level Glfw3 backend implementation
 #include "common_glfw3.h"
 
-#include <kaze/platform/PlatformBackend.h>
-#include <kaze/platform/PlatformDefines.h>
+#include <kaze/platform/backend.h>
+#include <kaze/platform/defines.h>
 
 KAZE_NAMESPACE_BEGIN
 

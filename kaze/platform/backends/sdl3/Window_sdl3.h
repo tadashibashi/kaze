@@ -4,7 +4,7 @@
 #ifndef kaze_platform_backends_sdl3_window_sdl3_h_
 #define kaze_platform_backends_sdl3_window_sdl3_h_
 #include <kaze/kaze.h>
-#include <kaze/platform/PlatformBackend.h>
+#include <kaze/platform/backend.h>
 
 KAZE_NAMESPACE_BEGIN
 namespace backend {

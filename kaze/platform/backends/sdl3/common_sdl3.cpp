@@ -3,10 +3,10 @@
 #include "common_sdl3.h"
 #include "window_sdl3.h"
 
-#include <kaze/platform/PlatformBackend.h>
+#include <kaze/platform/backend.h>
 
-#include "GamepadConstants.inl"
-#include "KeyboardConstants.inl"
+#include "private/GamepadConstants.inl"
+#include "private/KeyboardConstants.inl"
 
 KAZE_NAMESPACE_BEGIN
 

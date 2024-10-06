@@ -4,7 +4,7 @@
 
 #include <kaze/debug.h>
 #include <kaze/kaze.h>
-#include <kaze/platform/PlatformBackend.h>
+#include <kaze/platform/backend.h>
 
 #include <mutex>
 

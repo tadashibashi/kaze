@@ -1,11 +1,10 @@
 /// @file Gamepad_sdl3.cpp
 /// Implementation for gamepad-related functionality for the SDL3 backend
 #include "GamepadMgr.h"
-#include "common_sdl3.h"
+#include "../common_sdl3.h"
 
 #include <kaze/debug.h>
-#include <kaze/platform/PlatformBackend.h>
-
+#include <kaze/platform/backend.h>
 
 KAZE_NAMESPACE_BEGIN
 namespace backend {
