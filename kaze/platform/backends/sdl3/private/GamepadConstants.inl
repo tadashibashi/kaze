@@ -1,11 +1,10 @@
 /// @file GamepadConstants.inl
-/// @description
 /// Contains gamepad constants, which map SDL constants with kaze constants
 #pragma once
 #ifndef kaze_platform_backends_sdl3_gamepadconstants_inl_
 #define kaze_platform_backends_sdl3_gamepadconstants_inl_
 #include <kaze/kaze.h>
-#include <kaze/platform/Gamepad.h>
+#include <kaze/input/GamepadConstants.h>
 
 #include <SDL3/SDL_gamepad.h>
 

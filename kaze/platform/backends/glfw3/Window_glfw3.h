@@ -1,15 +1,14 @@
 /// @file Window_glfw3.h
-/// @description
 /// Contains GLFW3 window-handling functionality
 #pragma once
 #ifndef kaze_platform_backends_glfw3_window_glfw3_h_
 #define kaze_platform_backends_glfw3_window_glfw3_h_
 
 #include <kaze/kaze.h>
+#include <kaze/math/Rect.h>
 #include <kaze/platform/PlatformBackend.h>
 #include <kaze/platform/PlatformDefines.h>
-
-#include <kaze/platform/Window.h>
+#include <kaze/video/WindowConstants.h>
 
 #include <GLFW/glfw3.h>
 

@@ -1,10 +1,9 @@
 #include "Keyboard.h"
 
-#include "PlatformBackend.h"
-#include "PlatformEvent.h"
+#include <kaze/platform/PlatformBackend.h>
+#include <kaze/platform/PlatformEvent.h>
 
 KAZE_NAMESPACE_BEGIN
-
 
 #define ASSERT_KEY_RANGE(key) KAZE_ASSERT(static_cast<Int>(key) >= 0 && static_cast<Int>(key) < static_cast<Int>(Key::Count))
 
@@ -36,7 +35,10 @@ void Keyboard::preProcessEvents()
 
 void Keyboard::processEvent(const KeyboardEvent &e)
 {
+    // null window allows any key event; when a window is specified, it only allows events associated with it to pass
+    if (m_window && e.window != m_window) return;
     ASSERT_KEY_RANGE(e.key);
+
     if ( (e.type == KeyboardEvent::Down && !e.isRepeat) ||
         e.type == KeyboardEvent::Up )
     {

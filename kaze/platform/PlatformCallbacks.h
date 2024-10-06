@@ -1,106 +1,13 @@
 #pragma once
-
 #ifndef kaze_platform_platformevent_h_
 #define kaze_platform_platformevent_h_
 
 #include <kaze/kaze.h>
-#include <kaze/traits.h>
+#include <kaze/input/InputEvents.h>
 #include <kaze/math/Vec/Vec2.h>
-
-#include "Gamepad.h"
-#include "Key.h"
-#include "Mouse.h"
+#include <kaze/traits.h>
 
 KAZE_NAMESPACE_BEGIN
-
-struct WindowEvent
-{
-    enum Type
-    {
-        Resized,            ///< Resize in logical units
-        ResizedFramebuffer, ///< Resize in OS pixel units (hi-dpi monitors may differ from logical units)
-        Moved,              ///< Fires when user drags the window, returning the x and y coordinates
-        FocusGained,
-        FocusLost,
-        Minimized,
-        Maximized,
-        Restored,
-        Closed,
-        MouseEntered,
-        MouseExited,
-
-        Count
-    } type;
-
-    Int data0, data1;
-    void *window;
-};
-
-struct FileDropEvent
-{
-    String path;
-    void *window;
-    Vec2f position;
-};
-
-struct KeyboardEvent
-{
-    enum Type
-    {
-        Down,
-        Up
-    } type;
-
-    Key key; ///< key code
-    Bool isRepeat;
-    void *window;
-};
-
-struct MouseButtonEvent
-{
-    enum Type
-    {
-        Up,
-        Down
-    } type;
-
-    MouseBtn button;
-    void *window;
-};
-
-/// Describes scroll
-struct MouseScrollEvent
-{
-    Vec2f offset;
-    void *window;
-};
-
-struct MouseMotionEvent
-{
-    Vec2f position;
-    void *window;
-};
-
-/// Describes a gamepad connection
-struct GamepadConnectEvent {
-    enum Type { Connected, Disconnected } type;
-    Int id;
-};
-
-struct GamepadButtonEvent {
-    Int controllerIndex;
-    enum Type {
-        Up,
-        Down,
-    } type;
-    GamepadBtn button;
-};
-
-struct GamepadAxisEvent {
-    Int controllerIndex;
-    GamepadAxis axis;
-    Float value;
-};
 
 /// Struct to pass to the backend to hook into backend events
 struct PlatformCallbacks

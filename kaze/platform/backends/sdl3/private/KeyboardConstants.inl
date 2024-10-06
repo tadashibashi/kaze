@@ -1,11 +1,10 @@
 /// @file KeyboardConstants.inl
-/// @description
 /// Contains keyboard constants, which map SDL constants with kaze constants
 #pragma once
 #ifndef kaze_platform_backends_sdl3_keyboardconstants_inl_
 #define kaze_platform_backends_sdl3_keyboardconstants_inl_
 #include <kaze/kaze.h>
-#include <kaze/platform/Key.h>
+#include <kaze/input/KeyboardConstants.h>
 
 #include <SDL3/SDL_keyboard.h>
 

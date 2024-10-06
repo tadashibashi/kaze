@@ -1,9 +1,7 @@
 /// @file Window_glfw3.cpp
-/// @description
 /// Implementation file for GLFW3 window-related backend functions
-#include "Window_glfw3.h"
-#include "PlatformBackend_defines.h"
-#include "PlatformBackend_globals.h"
+#include "window_glfw3.h"
+#include "common_glfw3.h"
 
 #include <kaze/platform/PlatformBackend.h>
 #include <kaze/platform/PlatformDefines.h>

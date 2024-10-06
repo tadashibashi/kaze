@@ -1,3 +1,6 @@
+/// @file errors.h
+/// Conatains error codes and struct with static functionality to get the last error
+/// that occurred on the thread.
 #pragma once
 #ifndef kaze_errors_h_
 #define kaze_errors_h_
@@ -10,7 +13,9 @@ struct Error
 {
     enum Code
     {
-        Ok = 0,               ///< No errors
+        Unknown = -1,           ///< Unknown error
+        Ok = 0,                 ///< No errors
+        Unspecified,            ///< Placeholder, until implemented
 
         // ----- Backend Errors -----
         BE_InitErr,             ///< Error while initializing the backend library
@@ -27,38 +32,51 @@ struct Error
         OutOfRange,           ///< Index is out of range
         RuntimeErr,           ///< Unexpected error occurred at runtime
         LogicErr,             ///< User logic error
+        UnownedPointerCleanup,///< Attempted to clean up a pointer that is not owned by a wrapper class.
 
-        Unspecified,          ///< Placeholder, until implemented
-        Unknown,              ///< Unknown error
         Count                 ///< Number of error codes
     };
 
-    Error() : code(), message(), line(-1), file("") {}
+    // constructor
+    Error() : code(Unspecified), message(), line(-1), file("") {}
     explicit Error(const Code code, const StringView message = "",  const Cstring file = "", const int line = -1) :
         code(code), message(message), line(line), file(file) { }
+
+    // copy
     Error(const Error &other) = default;
     Error &operator=(const Error &other) = default;
+
+    // move
     Error(Error &&other) noexcept;
     Error &operator=(Error &&other) noexcept;
 
-    Code code{};
-    String message{};
+    // ----- member variables -----
+    Code code;        ///< error code
+    String message;   ///< error message
 
-    int line{-1};
-    Cstring file{""};
+    int line;       ///< error line occured on
+    Cstring file;   ///< filename error occured in
 };
 
 /// Get the last error that occurred on the current thread
 Error getError() noexcept;
 
 /// Set the current error message manually; this is normally reserved for core functionality.
-const Error &setError(StringView message, Error::Code code = Error::Unspecified, const char *filename = "", int line = -1) noexcept;
+/// @param message    error message
+/// @param code       error code, in the Error::Code enum
+/// @param filename   name of file that the error occurred in, usually set via __FILE__
+/// @param line       line error occurred on, usually set via __LINE__
+const Error &setError(StringView message, Error::Code code = Error::Unspecified,
+    const char *filename = "", int line = -1) noexcept;
+
 /// Set the error to an empty string
 /// Useful if you intend on handling errors gracefully
 /// and want continue program execution with a no error state.
 void clearError() noexcept;
+
 /// Check if there is any error available to get. Equivalent to `!getError().empty()`
-[[nodiscard]] bool hasError() noexcept;
+[[nodiscard]]
+bool hasError() noexcept;
 
 KAZE_NAMESPACE_END
 

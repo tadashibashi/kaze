@@ -1,6 +1,5 @@
 /// @file Window_sdl3.h
-/// @description
-/// Contains window data types and functions
+/// Contains SDL3 implementation window-specific data types and functions
 #pragma once
 #ifndef kaze_platform_backends_sdl3_window_sdl3_h_
 #define kaze_platform_backends_sdl3_window_sdl3_h_
@@ -17,6 +16,12 @@ namespace backend {
         bool cursorVisibleMode{true};
     };
 
+    /// Get window data associated with the window handle, if any
+    /// @param window window handle to get data from
+    /// @param outData retrieves data pointer
+    /// @returns whether retrieval was successful, also returns `false` if data was `nullptr`;
+    ///          this behavior is default since lack of associated data is considered an
+    ///          unexpected error.
     bool getWindowData(const WindowHandle window, WindowData **outData);
 }
 

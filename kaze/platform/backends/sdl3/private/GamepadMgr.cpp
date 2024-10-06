@@ -1,13 +1,14 @@
-#include "Gamepad_sdl3.h"
-#include "PlatformBackend_defines.h"
-#include "PlatformBackend_globals.h"
+/// @file Gamepad_sdl3.cpp
+/// Implementation for gamepad-related functionality for the SDL3 backend
+#include "GamepadMgr.h"
+#include "common_sdl3.h"
 
 #include <kaze/debug.h>
 #include <kaze/platform/PlatformBackend.h>
 
 
 KAZE_NAMESPACE_BEGIN
-namespace backend::sdl3 {
+namespace backend {
 
     int GamepadMgr::connect(const SDL_JoystickID id)
     {
@@ -134,7 +135,7 @@ namespace backend::sdl3 {
         }
     }
 
-    GamepadData *sdl3::GamepadMgr::operator[](const int index)
+    GamepadData *GamepadMgr::operator[](const int index)
     {
         const auto gamepad = m_gamepads[index];
         if ( !gamepad )
@@ -151,7 +152,7 @@ namespace backend::sdl3 {
         return static_cast<GamepadData *>(SDL_GetPointerProperty(props, GamepadMgr::DataKey, nullptr));
     }
 
-    const sdl3::GamepadData * sdl3::GamepadMgr::operator[](const int index) const
+    const GamepadData * GamepadMgr::operator[](const int index) const
     {
         const auto gamepad = m_gamepads[index];
         if ( !gamepad )
@@ -288,7 +289,7 @@ namespace backend::sdl3 {
 namespace backend {
 
 #define GP_IN_RANGE(index) \
-    do { if ( !((index) >= 0 && (index) < MaxGamepadSlots) )  { \
+    do { if ( !((index) >= 0 && (index) < GamepadMaxSlots) )  { \
         KAZE_CORE_ERRCODE(Error::OutOfRange, "gamepad index {} is out of range", (index)); \
         return false; \
     } } while(0)

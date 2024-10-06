@@ -1,6 +1,6 @@
 #pragma once
-#ifndef kaze_platform_key_h_
-#define kaze_platform_key_h_
+#ifndef kaze_platform_keyboardconstants_h_
+#define kaze_platform_keyboardconstants_h_
 
 #include <kaze/kaze.h>
 

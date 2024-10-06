@@ -1,18 +1,28 @@
-/// @file PlatformBackend_globals.h
-/// @description
-/// Contains private implementation helper functions that should be available to different backend implementation files
 #pragma once
-#ifndef kaze_platform_backends_sdl3_gamepadconstants_h_
-#define kaze_platform_backends_sdl3_gamepadconstants_h_
-
-#include "Gamepad_sdl3.h"
+#ifndef kaze_platform_backend_sdl3_common_sdl3_h_
+#define kaze_platform_backend_sdl3_common_sdl3_h_
 
 #include <kaze/kaze.h>
-#include <kaze/platform/Gamepad.h>
-#include <kaze/platform/Key.h>
+#include <kaze/debug.h>
 
-#include <SDL3/SDL_gamepad.h>
-#include <SDL3/SDL_keyboard.h>
+#include <kaze/input/InputEvents.h>
+#include <kaze/input/GamepadConstants.h>
+#include <kaze/input/KeyboardConstants.h>
+#include <kaze/input/MouseConstants.h>
+
+#include "GamepadMgr.h"
+
+#include <SDL3/SDL.h>
+
+/// Ensures a parameter is not null, passes a NullArgErr and returns false if so
+/// Used in most backend functions, since they all return success and fail state via boolean.
+#define RETURN_IF_NULL(obj) do { if ( !(obj) ) { \
+    KAZE_CORE_ERRCODE(Error::NullArgErr, "required argument `{}` was null", #obj); \
+    return false; \
+} } while(0)
+
+/// Convenience macro to cast void * => SDL_Window *
+#define WIN_CAST(window) static_cast<SDL_Window *>(window)
 
 KAZE_NAMESPACE_BEGIN
 
@@ -55,8 +65,9 @@ namespace backend {
     /// Initialize the backend global variable internals. Must be called before calling any constant conversion func.
     auto initGlobals() noexcept -> void;
 
-    extern sdl3::GamepadMgr gamepads;
+    extern GamepadMgr gamepads;
 }
+
 KAZE_NAMESPACE_END
 
-#endif // kaze_platform_backends_sdl3_gamepadconstants_h_
+#endif

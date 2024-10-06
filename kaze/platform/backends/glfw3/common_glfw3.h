@@ -1,26 +1,73 @@
-/// @file PlatformBackend_globals.h
-/// @description
-/// Contains private implementation helper functions related to backend constants and global singletons
+/// @file common_glfw3.h
+/// Contains common macros, functions and data types for the GLFW3 backend
 #pragma once
-#ifndef kaze_platform_backends_glfw3_platformbackend_globals_h_
-#define kaze_platform_backends_glfw3_platformbackend_globals_h_
+#ifndef kaze_platform_backends_glf3_common_glfw3_h_
+#define kaze_platform_backends_glf3_common_glfw3_h_
+
+#include "window_glfw3.h"
 
 #include <kaze/kaze.h>
+#include <kaze/debug.h>
+
+#include <kaze/input/GamepadConstants.h>
+#include <kaze/input/KeyboardConstants.h>
 #include <kaze/platform/backends/WindowHandleContainer.h>
 
-#include <kaze/platform/Gamepad.h>
-#include <kaze/platform/Key.h>
-
-#include "Window_glfw3.h"
-
 #include <GLFW/glfw3.h>
+
+#define WIN_CAST(window) static_cast<GLFWwindow*>(window)
+
+/// Log error on glfw error then return false
+/// @param actionStr message containing the present-tense action describing the previous function's intended goal
+#define ERR_CHECK(code, actionStr) do { \
+    const char *message_for_error_check; \
+    auto err = glfwGetError(&message_for_error_check); \
+    if (err != GLFW_NO_ERROR && message_for_error_check) { \
+        KAZE_CORE_ERRCODE((code), "Failed to {}: {}", (actionStr), message_for_error_check); \
+        return false; \
+    } \
+} while(0)
+
+/// Log on glfw error, and call a block of code for cleanup, then return false
+/// @param actionStr message containing present-tense action describing the previous function's intended goal
+/// @param cleanupBlock code wrapped in braces to call for cleanup
+#define ERR_CHECK_CLEANUP(code, actionStr, cleanupBlock) do { \
+    const char *message; \
+    auto err = glfwGetError(&message); \
+    if (err != GLFW_NO_ERROR && message) { \
+        KAZE_CORE_ERR((code), "{}:{}: Failed to {}: {}", __FILE__, __LINE__, (actionStr), message); \
+        cleanupBlock \
+        return false; \
+    } \
+} while(0)
+
+#if KAZE_DEBUG
+/// Warn without returning
+/// @param actionStr message containing the present-tense action describing the previous function's intended goal
+#define WARN_CHECK(actionStr) do { \
+    const char *message; \
+    auto err = glfwGetError(&message); \
+    if (err != GLFW_NO_ERROR && message) { \
+        KAZE_CORE_WARN("{}:{}: Failed to {}: {}", __FILE__, __LINE__, (actionStr), message); \
+    } \
+} while(0)
+#else
+/// On non-debug mode, just consume the error, if any
+#define WARN_CHECK(actionStr) do { \
+    glfwGetError(nullptr); \
+} while(0)
+#endif
+
+#define RETURN_IF_NULL(obj) do { if ( !static_cast<bool>(obj) ) { \
+    KAZE_CORE_ERRCODE(Error::NullArgErr, "{}:{}: required parameter {} was null", __FILE__, __LINE__, #obj); \
+    return false; \
+} } while(0)
 
 
 KAZE_NAMESPACE_BEGIN
 
 namespace backend {
-
-    /// GLFW gamepad data per controller slot
+        /// GLFW gamepad data per controller slot
     struct GamepadData {
         /// Reset the state to a clean state (all buttons and axes zeroed)
         void resetStates() noexcept
@@ -99,6 +146,4 @@ namespace backend {
 }
 
 KAZE_NAMESPACE_END
-
 #endif
-

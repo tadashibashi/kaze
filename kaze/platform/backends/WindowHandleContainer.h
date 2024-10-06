@@ -16,7 +16,7 @@ namespace backend
     template <typename T>
     class WindowHandleContainer {
         std::mutex m_windowMutex{};
-        Dictionary<backend::WindowHandle, T> m_windows{};
+        Dictionary<WindowHandle, T> m_windows{};
     public:
         /// Add a window to the container
         /// @param window window to add

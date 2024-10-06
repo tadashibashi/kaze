@@ -1,9 +1,7 @@
 /// @file Window_glfw3.mm
-/// @description
 /// Native MacOS window-related functions for the GLFW3 backend
-#include "Window_glfw3.h"
-#include "PlatformBackend_globals.h"
-#include "PlatformBackend_defines.h"
+#include "window_glfw3.h"
+#include "common_glfw3.h"
 
 #include <kaze/kaze.h>
 #include <kaze/debug.h>

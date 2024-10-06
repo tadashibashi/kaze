@@ -1,3 +1,5 @@
+/// @file errors.cpp
+/// Contains the implementation of the Error struct and thread-local error functionality
 #include "errors.h"
 #include <utility>
 

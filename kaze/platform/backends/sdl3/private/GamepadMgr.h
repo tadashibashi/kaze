@@ -1,12 +1,11 @@
 /// @file Gamepad_sdl3.h
-/// @description
 /// Contains classes and functions related to backend SDL3 Gamepad handling
 #pragma once
 #ifndef kaze_platform_backends_sdl3_gamepad_sdl3_h_
 #define kaze_platform_backends_sdl3_gamepad_sdl3_h_
 
 #include <kaze/kaze.h>
-#include <kaze/platform/Gamepad.h>
+#include <kaze/input/GamepadConstants.h>
 #include <kaze/platform/PlatformEvent.h>
 
 #include <SDL3/SDL_events.h>
@@ -14,7 +13,7 @@
 
 KAZE_NAMESPACE_BEGIN
 
-namespace backend::sdl3
+namespace backend
 {
     struct ButtonData
     {

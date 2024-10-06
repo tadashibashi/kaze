@@ -6,7 +6,8 @@ endif()
 
 include(kaze/dependencies)
 
-add_library(${PROJECT_NAME})
+add_library(${PROJECT_NAME}
+        input/Mouse.cpp)
 target_sources(${PROJECT_NAME} PRIVATE
         app/Input.h
 
@@ -19,10 +20,9 @@ target_sources(${PROJECT_NAME} PRIVATE
         app/App.cpp
         app/BackendInitGuard.h
         app/BackendInitGuard.cpp
+
         concepts.h
         endian.h
-        graphics/Color.cpp
-        graphics/Color.h
         json.h
         debug.h
         debug.cpp
@@ -43,23 +43,29 @@ target_sources(${PROJECT_NAME} PRIVATE
         math/Vec.hpp
         kaze.h
 
-        platform/Gamepad.cpp
-        platform/Key.h
-        platform/Key.cpp
-        platform/Keyboard.h
-        platform/Keyboard.cpp
+        input/Gamepad.cpp
+        input/KeyboardConstants.h
+        input/KeyboardConstants.cpp
+        input/Keyboard.h
+        input/Keyboard.cpp
+        input/MouseConstants.h
+
+
         platform/PlatformBackend.h
         platform/PlatformBackend.cpp
         platform/PlatformEvent.h
         platform/PlatformEvent.cpp
         platform/PlatformDefines.h
-        platform/Mouse.h
-        platform/Window.h
-        platform/Window.cpp
-
         platform/backends/WindowHandleContainer.h
+
         ServiceProvider.h
         ServiceProvider.cpp
+
+        video/Color.h
+        video/Color.cpp
+        video/Window.h
+        video/Window.cpp
+        video/WindowConstants.h
 
         ${KAZE_BACKEND_SOURCES}
 )

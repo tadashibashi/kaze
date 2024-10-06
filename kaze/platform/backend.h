@@ -2,22 +2,22 @@
 #ifndef kaze_platform_platformbackend_h_
 #define kaze_platform_platformbackend_h_
 
-#include "PlatformEvent.h"
-#include "Window.h"
-#include "Gamepad.h"
+#include "PlatformCallbacks.h"
 
 #include <kaze/kaze.h>
+#include <kaze/input/GamepadConstants.h>
+#include <kaze/input/KeyboardConstants.h>
+#include <kaze/input/MouseConstants.h>
+#include <kaze/video/WindowConstants.h>
 
 KAZE_NAMESPACE_BEGIN
 
 namespace backend {
-    using WindowHandle = void *;
+    /// Window native platform pointers
     struct NativePlatformData {
         void *windowHandle;
         void *displayType;
     };
-
-    const int MaxGamepadSlots = 16;
 
     extern PlatformCallbacks events;
 
@@ -33,7 +33,7 @@ namespace backend {
     auto getTime(double *outTime) noexcept -> bool;
 
     /// Poll events for the current frame
-    /// @returns whether the operation succeeded
+    /// @returns whether the operation succeeded.
     auto pollEvents() noexcept -> bool;
 
     /// Set callbacks for input event handling.
@@ -52,7 +52,7 @@ namespace backend {
     /// @returns whether operation was successful.
     auto setClipboard(const char *text) noexcept -> bool;
 
-    // ===== Window =====
+    // ===== window-related functions =====
     namespace window
     {
         /// Open/create a new window

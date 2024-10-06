@@ -1,8 +1,7 @@
 /// @file Window_sdl3.h
-/// @description
 /// SDL3 implementation for functions in the backend::window namespace
-#include "Window_sdl3.h"
-#include "PlatformBackend_defines.h"
+#include "window_sdl3.h"
+#include "common_sdl3.h"
 
 #include <kaze/errors.h>
 #include <kaze/debug.h>

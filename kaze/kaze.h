@@ -1,8 +1,10 @@
+/// @file kaze.h
+/// Contains type aliases, and basic engine defines
 #pragma once
 #ifndef kaze_h_
 #define kaze_h_
 
-#include "platform/PlatformDefines.h"
+#include "platform/defines.h"
 
 #include <array>
 #include <cassert>
