@@ -13,9 +13,9 @@ struct Error
 {
     enum Code
     {
-        Unknown = -1,           ///< Unknown error
+        Unknown = -2,           ///< Unknown error
+        Unspecified = -1,       ///< Placeholder, unset value
         Ok = 0,                 ///< No errors
-        Unspecified,            ///< Placeholder, until implemented
 
         // ----- Backend Errors -----
         BE_InitErr,             ///< Error while initializing the backend library
@@ -59,24 +59,25 @@ struct Error
 };
 
 /// Get the last error that occurred on the current thread
-Error getError() noexcept;
+[[nodiscard]]
+auto getError() noexcept -> Error;
 
 /// Set the current error message manually; this is normally reserved for core functionality.
 /// @param message    error message
 /// @param code       error code, in the Error::Code enum
 /// @param filename   name of file that the error occurred in, usually set via __FILE__
 /// @param line       line error occurred on, usually set via __LINE__
-const Error &setError(StringView message, Error::Code code = Error::Unspecified,
-    const char *filename = "", int line = -1) noexcept;
+auto setError(StringView message, Error::Code code = Error::Unspecified,
+    const char *filename = "", int line = -1) noexcept -> const Error &;
 
 /// Set the error to an empty string
 /// Useful if you intend on handling errors gracefully
 /// and want continue program execution with a no error state.
-void clearError() noexcept;
+auto clearError() noexcept -> void;
 
 /// Check if there is any error available to get. Equivalent to `!getError().empty()`
 [[nodiscard]]
-bool hasError() noexcept;
+auto hasError() noexcept -> Bool;
 
 KAZE_NAMESPACE_END
 

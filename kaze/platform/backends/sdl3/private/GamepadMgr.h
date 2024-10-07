@@ -39,15 +39,14 @@ namespace backend
         SDL_JoystickID joystickID {};
         SDL_Gamepad *gamepad{};
 
-        void reset();
+        auto reset() noexcept -> void;
+        auto preProcessEvents() noexcept -> void;
+        auto postProcessEvents() noexcept -> void;
+        auto processEvent(const GamepadButtonEvent &e) noexcept -> void;
+        auto processEvent(const GamepadAxisEvent &e) noexcept -> void;
 
-        void preProcessEvents();
-        void postProcessEvents();
-        void processEvent(const GamepadButtonEvent &e);
-        void processEvent(const GamepadAxisEvent &e);
-
-        [[nodiscard]] bool isDown(GamepadBtn btn) const noexcept;
-        [[nodiscard]] float getAxis(GamepadAxis axis) const noexcept;
+        [[nodiscard]] auto isDown(GamepadBtn btn) const noexcept -> bool;
+        [[nodiscard]] auto getAxis(GamepadAxis axis) const noexcept -> float;
     };
 
     class GamepadMgr
@@ -56,28 +55,25 @@ namespace backend
         static const char *DataKey;
         /// Connect a joystick id that was registered as connected in a Gamepad connection event
         /// @returns the index slot that the gamepad was placed in, or -1 on failure
-        int connect(SDL_JoystickID id);
+        auto connect(SDL_JoystickID id) noexcept -> int;
 
         /// Disconnect a gamepad owned by the GamepadMgr that was received in a gamepad disconnection event
         /// @param id joystick id of the controller to remove
         /// @returns  index slot of the gamepad, or -1 on error;
         ///           if `-1`, the manager probably doesn't own it, or it is an invalid id
-        int disconnect(SDL_JoystickID id);
+        auto disconnect(SDL_JoystickID id) noexcept -> int;
 
-        GamepadData *operator[](int index);
-        const GamepadData *operator[](int index) const;
+        auto operator[](int index) noexcept -> GamepadData *;
+        auto operator[](int index) const noexcept -> const GamepadData *;
 
-        void preProcessEvents();
-        void postProcessEvents();
-
-        void processEvent(const GamepadButtonEvent &e);
-        void processEvent(const GamepadAxisEvent &e);
-
-        static void initGamepadConstants();
+        auto preProcessEvents() noexcept -> void;
+        auto postProcessEvents() noexcept -> void;
+        auto processEvent(const GamepadButtonEvent &e) noexcept -> void;
+        auto processEvent(const GamepadAxisEvent &e) noexcept -> void;
 
     private:
 
-        static bool emplaceNew(SDL_Gamepad *gamepad, int controllerIndex);
+        static auto emplaceNew(SDL_Gamepad *gamepad, int controllerIndex) noexcept -> bool;
         Array<SDL_Gamepad *, 16> m_gamepads{};
     };
 }

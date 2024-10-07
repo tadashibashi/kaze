@@ -16,8 +16,8 @@ struct KeyboardEvent;
 class Keyboard
 {
 public:
-    [[nodiscard]] auto getWindow() const noexcept -> WindowHandle;
-    auto setWindow(const WindowHandle window) noexcept -> void;
+    [[nodiscard]] auto getWindow() const noexcept -> WindowHandle { return m_window; }
+    auto setWindow(const WindowHandle window) noexcept -> void { m_window = window; }
 
     [[nodiscard]] bool isDown(Key key) const noexcept;
     [[nodiscard]] bool isUp(Key key) const noexcept { return !isDown(key); }

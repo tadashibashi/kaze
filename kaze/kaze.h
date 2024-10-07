@@ -104,6 +104,8 @@ KAZE_NAMESPACE_END
 #   define KAZE_ASSERT(statement) KAZE_NOOP
 #endif
 
-#define KAZE_ARRAY_LENGTH(array) (sizeof(array) / sizeof(array[0]))
+#define KAZE_NO_COPY(classname) \
+    classname(const classname &) = delete; \
+    auto operator=(const classname &)->classname & = delete
 
 #endif // kaze_h_

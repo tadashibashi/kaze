@@ -17,6 +17,7 @@ namespace backend
     class WindowHandleContainer {
         std::mutex m_windowMutex{};
         Dictionary<WindowHandle, T> m_windows{};
+        WindowHandle m_mainWindow{};
     public:
         /// Add a window to the container
         /// @param window window to add
@@ -42,6 +43,13 @@ namespace backend
         ///                        does not exist in this container.
         /// @returns whether retrieval succeeded.
         bool getData(WindowHandle window, T **outData) noexcept;
+
+        [[nodiscard]]
+        auto size() const noexcept -> Size;
+        [[nodiscard]]
+        auto empty() const noexcept -> bool;
+        [[nodiscard]]
+        auto getMainWindow() -> WindowHandle;
     };
 
     template <typename T>
@@ -53,6 +61,8 @@ namespace backend
             auto it = m_windows.find(window);
             if (it == m_windows.end())
             {
+                if (m_windows.empty())
+                    m_mainWindow = window;
                 m_windows[window] = std::move(data);
             }
             else
@@ -75,7 +85,7 @@ namespace backend
     }
 
     template <typename T>
-    bool WindowHandleContainer<T>::contains(const WindowHandle window, bool *outContains) noexcept
+    auto WindowHandleContainer<T>::contains(const WindowHandle window, bool *outContains) noexcept -> bool
     {
         std::lock_guard lockGuard(m_windowMutex);
         try
@@ -103,8 +113,11 @@ namespace backend
         try
         {
             const auto wasErased = m_windows.erase(window) > 0;
-            if (outWasErased)
+            if (outWasErased) // report whether a window was actually removed form the container
                 *outWasErased = wasErased;
+
+            if (window == m_mainWindow && !m_windows.empty()) // replace main window if it just got closed
+                m_mainWindow = m_windows.begin()->first;
             return true;
         }
         catch(const std::exception &e)
@@ -151,6 +164,24 @@ namespace backend
             KAZE_CORE_ERRCODE(Error::Unknown, "Unknown error occurred while fetching window data");
             return false;
         }
+    }
+
+    template <typename T>
+    auto WindowHandleContainer<T>::size() const noexcept -> Size
+    {
+        return m_windows.size();
+    }
+
+    template <typename T>
+    auto WindowHandleContainer<T>::empty() const noexcept -> bool
+    {
+        return m_windows.empty();;
+    }
+
+    template <typename T>
+    auto WindowHandleContainer<T>::getMainWindow() -> WindowHandle
+    {
+        return m_mainWindow;;
     }
 }
 

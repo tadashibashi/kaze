@@ -16,11 +16,6 @@ KAZE_NAMESPACE_BEGIN
 
 namespace backend {
 
-    static void sdlWindowDataCleanUp(void *userptr, void *value) noexcept
-    {
-        delete static_cast<WindowData *>(value);
-    }
-
     bool getWindowData(const WindowHandle window,
                                          WindowData **outData)
     {
@@ -113,7 +108,7 @@ namespace backend {
     auto window::open(const char *title, const int width, const int height, const WindowInit::Flags flags,
         WindowHandle *outWindow) noexcept -> bool
     {
-        auto sdl3Flags = SDL_WINDOW_HIDDEN;
+        auto sdl3Flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
     #ifdef KAZE_TARGET_APPLE
         sdl3Flags |= SDL_WINDOW_METAL;
     #endif
@@ -145,8 +140,12 @@ namespace backend {
             return KAZE_FALSE;
         }
 
+        // Set up associated window metadata
         const auto windowData = new WindowData();
-        if ( !SDL_SetPointerPropertyWithCleanup(props, "WindowData", windowData, sdlWindowDataCleanUp, nullptr) )
+        if ( !SDL_SetPointerPropertyWithCleanup(props, "WindowData", windowData,
+            [](void *userptr, void *value) noexcept {
+                delete static_cast<WindowData *>(value);
+            }, nullptr) )
         {
             KAZE_CORE_ERR("Failed to set WindowData to SDL_Window properties: {}", SDL_GetError());
             SDL_DestroyWindow(window);
@@ -154,7 +153,7 @@ namespace backend {
             return KAZE_FALSE;
         }
 
-        // Check if mouse is inside the window
+        // Check if mouse is inside the window to set initial hover state
         {
             float mouseX = 0, mouseY = 0;
             SDL_GetGlobalMouseState(&mouseX, &mouseY);

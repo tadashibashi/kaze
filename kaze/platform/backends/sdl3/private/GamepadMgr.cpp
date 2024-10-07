@@ -7,9 +7,10 @@
 #include <kaze/platform/backend.h>
 
 KAZE_NAMESPACE_BEGIN
+
 namespace backend {
 
-    int GamepadMgr::connect(const SDL_JoystickID id)
+    auto GamepadMgr::connect(const SDL_JoystickID id) noexcept -> int
     {
         constexpr int CONNECT_FAILED = -1;
 
@@ -25,7 +26,7 @@ namespace backend {
         // check that a slot is available
         if (index >= m_gamepads.size())
         {
-            KAZE_CORE_ERR("Failed to connect controller with jid {}: too many controllers are open",
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to connect controller with jid {}: too many controllers are open",
                           static_cast<int>(id));
             return CONNECT_FAILED;
         }
@@ -34,7 +35,7 @@ namespace backend {
         const auto gamepad = SDL_OpenGamepad(id);
         if ( !gamepad )
         {
-            KAZE_CORE_ERR("Failed to open gamepad with id {}: {}",
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to open gamepad with id {}: {}",
                           static_cast<int>(id), SDL_GetError());
             return CONNECT_FAILED;
         }
@@ -53,7 +54,7 @@ namespace backend {
         return index;
     }
 
-    int GamepadMgr::disconnect(const SDL_JoystickID id)
+    auto GamepadMgr::disconnect(const SDL_JoystickID id) noexcept -> int
     {
         constexpr int DISCONNECT_FAILED = -1;
 
@@ -92,7 +93,7 @@ namespace backend {
         return gamepadIndex;
     }
 
-    void GamepadMgr::preProcessEvents()
+    auto GamepadMgr::preProcessEvents() noexcept -> void
     {
         for (int i = 0; i < m_gamepads.size(); ++i)
         {
@@ -104,7 +105,7 @@ namespace backend {
         }
     }
 
-    void GamepadMgr::postProcessEvents()
+    auto GamepadMgr::postProcessEvents() noexcept -> void
     {
         for (int i = 0; i < m_gamepads.size(); ++i)
         {
@@ -116,7 +117,7 @@ namespace backend {
         }
     }
 
-    void GamepadMgr::processEvent(const GamepadButtonEvent &e)
+    auto GamepadMgr::processEvent(const GamepadButtonEvent &e) noexcept -> void
     {
         auto data = operator[](e.controllerIndex);
         if (data)
@@ -125,7 +126,7 @@ namespace backend {
         }
     }
 
-    void GamepadMgr::processEvent(const GamepadAxisEvent &e)
+    auto GamepadMgr::processEvent(const GamepadAxisEvent &e) noexcept -> void
     {
         auto data = operator[](e.controllerIndex);
         if (data)
@@ -134,7 +135,7 @@ namespace backend {
         }
     }
 
-    GamepadData *GamepadMgr::operator[](const int index)
+    auto GamepadMgr::operator[](const int index) noexcept -> GamepadData *
     {
         const auto gamepad = m_gamepads[index];
         if ( !gamepad )
@@ -143,7 +144,7 @@ namespace backend {
         const auto props = SDL_GetGamepadProperties(gamepad);
         if ( !props )
         {
-            KAZE_CORE_ERR("Internal error: failed to get properties from gamepad: {}",
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Internal error: failed to get properties from gamepad: {}",
                 SDL_GetError());
             return nullptr;
         }
@@ -151,7 +152,7 @@ namespace backend {
         return static_cast<GamepadData *>(SDL_GetPointerProperty(props, GamepadMgr::DataKey, nullptr));
     }
 
-    const GamepadData * GamepadMgr::operator[](const int index) const
+    auto GamepadMgr::operator[](const int index) const noexcept -> const GamepadData *
     {
         const auto gamepad = m_gamepads[index];
         if ( !gamepad )
@@ -160,7 +161,7 @@ namespace backend {
         const auto props = SDL_GetGamepadProperties(gamepad);
         if ( !props )
         {
-            KAZE_CORE_ERR("Internal error: failed to get properties from gamepad: {}",
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Internal error: failed to get properties from gamepad: {}",
                 SDL_GetError());
             return nullptr;
         }
@@ -170,13 +171,13 @@ namespace backend {
 
     const char *GamepadMgr::DataKey = "GamepadData";
 
-    bool GamepadMgr::emplaceNew(SDL_Gamepad *gamepad, const int controllerIndex)
+    auto GamepadMgr::emplaceNew(SDL_Gamepad *gamepad, const int controllerIndex) noexcept -> bool
     {
         /// Ensure this is a valid gamepad
         const auto id = SDL_GetGamepadID(gamepad);
         if (!id)
         {
-            KAZE_CORE_ERR("Failed to get gamepad id: {}", SDL_GetError());
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get gamepad id: {}", SDL_GetError());
             return false;
         }
 
@@ -184,7 +185,7 @@ namespace backend {
         const auto props = SDL_GetGamepadProperties(gamepad);
         if (!props)
         {
-            KAZE_CORE_ERR("Failed to get gamepad properties for joystick id {}: {}",
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get gamepad properties for joystick id {}: {}",
                           static_cast<int>(id), SDL_GetError());
             return false;
         }
@@ -201,7 +202,7 @@ namespace backend {
 
         if ( !result )
         {
-            KAZE_CORE_ERR("Failed to set data property on the SDL_Gamepad: {}", SDL_GetError());
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set data property on the SDL_Gamepad: {}", SDL_GetError());
             delete data; // clean up b/c ownership has not passed to the SDL_Gamepad successfully
             return false;
         }
@@ -209,7 +210,7 @@ namespace backend {
         return true;
     }
 
-    void GamepadData::reset()
+    auto GamepadData::reset() noexcept -> void
     {
         std::memset(buttons.data(), 0, sizeof(buttons));
         for (auto &axis : axes)
@@ -221,12 +222,12 @@ namespace backend {
         currentIndex = 0;
     }
 
-    void GamepadData::preProcessEvents()
+    auto GamepadData::preProcessEvents() noexcept -> void
     {
         currentIndex = !currentIndex;
     }
 
-    void GamepadData::postProcessEvents()
+    auto GamepadData::postProcessEvents() noexcept -> void
     {
         // Process buttons
         for (int i = 0; i < buttons.size(); ++i)
@@ -270,14 +271,14 @@ namespace backend {
         }
     }
 
-    void GamepadData::processEvent(const GamepadButtonEvent &e)
+    auto GamepadData::processEvent(const GamepadButtonEvent &e) noexcept -> void
     {
         KAZE_ASSERT(static_cast<Uint8>(e.button) < static_cast<Uint8>(GamepadBtn::Count) &&
             static_cast<Uint8>(e.button) >= 0);
         ++buttons[static_cast<Uint8>(e.button)].interactions;
     }
 
-    void GamepadData::processEvent(const GamepadAxisEvent &e)
+    auto GamepadData::processEvent(const GamepadAxisEvent &e) noexcept -> void
     {
         KAZE_ASSERT(static_cast<Uint8>(e.axis) < static_cast<Uint8>(GamepadAxis::Count) &&
             static_cast<Uint8>(e.axis) >= 0);
@@ -411,17 +412,21 @@ namespace backend {
         auto curValueY = axisDataY.value[ data->currentIndex ];
         auto lastValueY = axisDataY.value[ !data->currentIndex ];
 
-        if (mathf::distance(0.f, 0.f, curValueX, curValueY) <= deadzone)
+        if (deadzone > 0)
         {
-            curValueX = 0;
-            curValueY = 0;
+            if (mathf::distance(0.f, 0.f, curValueX, curValueY) <= deadzone)
+            {
+                curValueX = 0;
+                curValueY = 0;
+            }
+
+            if (mathf::distance(0.f, 0.f, lastValueX, lastValueY) <= deadzone)
+            {
+                lastValueX = 0;
+                lastValueY = 0;
+            }
         }
 
-        if (mathf::distance(0.f, 0.f, lastValueX, lastValueY) <= deadzone)
-        {
-            lastValueX = 0;
-            lastValueY = 0;
-        }
 
         *outMoved = curValueX != lastValueX || curValueY != lastValueY;
         return true;

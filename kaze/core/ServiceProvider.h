@@ -1,3 +1,5 @@
+/// @file ServiceProvider.h
+/// Contains ServiceProvider class declaration
 #pragma once
 #ifndef kaze_servicecontainer_h_
 #define kaze_servicecontainer_h_
@@ -21,23 +23,32 @@ public:
     ServiceProvider &operator=(const ServiceProvider &other);
     ServiceProvider &operator=(ServiceProvider &&other) noexcept;
 
-    /// Get pointer of type `T` that was previously provided to this provider.
-    /// Returns `nullptr` if it doesn't exist. Make sure to check.
+    /// Get pointer of type `T` that was previously provided to this container.
+    /// @tparam T type of pointer to get from the container
+    /// @returns pointer, or `nullptr` if it doesn't exist.
     template <typename T>
-    [[nodiscard]] T *getService()
+    [[nodiscard]]
+    T *getService()
     {
-        return static_cast<T *>(this->getService(typeid(T)));
+        return static_cast<T *>( getService(typeid(T)) );
     }
 
+    /// Get pointer of type `T` that was previously provided to this container.
+    /// @tparam T type of pointer to get from the container
+    /// @returns pointer, or `nullptr` if it doesn't exist.
     template <typename T>
-    [[nodiscard]] const T *getService() const
+    [[nodiscard]]
+    const T *getService() const
     {
-        return this->getService<T>();
+        return getService<T>();
     }
 
-    /// Try to get a pointer of type `T`. Returns whether the pointer exists and was output to `outPtr`.
+    /// Try to get a pointer of type `T`
+    /// @tparam T type of pointer to get from the container
     /// @param outPtr pointer to receive the service object ptr
-    /// @returns whether pointer exists in the ServiceProvider
+    /// @returns whether pointer exists in the ServiceProvider:
+    ///     `true`  - the pointer exists and was output to `outPtr`,
+    ///     `false` - `outPtr` is left unaltered
     template <typename T>
     bool tryGetService(T **outPtr)
     {
@@ -52,9 +63,12 @@ public:
     }
 
 
-    /// Try to get a pointer of type `T`. Returns whether the pointer exists and was output to `outPtr`.
+    /// Try to get a pointer of type `T`
+    /// @tparam T type of pointer to get from the container
     /// @param outPtr pointer to receive the service object ptr
-    /// @returns whether pointer exists in the ServiceProvider
+    /// @returns whether pointer exists in the ServiceProvider:
+    ///     `true`  - the pointer exists and was output to `outPtr`,
+    ///     `false` - `outPtr` is left unaltered
     template <typename T>
     bool tryGetService(const T **outPtr) const
     {
@@ -79,9 +93,11 @@ public:
     }
 
     /// Try to set a service–if one already exists, it will not overwrite it.
-    /// @returns whether the service was set
+    /// @param service the service to add.
+    /// @returns `true`  - the service was set,
+    ///          `false` - the service already exists in the container and was not altered
     template <typename T>
-    bool tryProvide(T *service)
+    auto tryProvide(T *service) -> Bool
     {
         if (auto item = this->getService<T>(); item == nullptr)
         {
@@ -92,8 +108,11 @@ public:
         return false;
     }
 
+    /// Erase a service from the container.
+    /// @tparam T type of service to erase
+    /// @return whether service was successfully deleted (if it doesn't exist, it will return false)
     template <typename T>
-    bool erase() noexcept
+    auto erase() noexcept -> Bool
     {
         return this->erase(typeid(T));
     }

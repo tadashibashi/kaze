@@ -1,14 +1,61 @@
+/// @file App.h
+/// The App class provides a convenient framework, an optional implementation of encapsulating backend functionality.
+/// All relevant wrapper classes are provided in the kaze/app folder.
 #pragma once
 #ifndef kaze_app_app_h_
 #define kaze_app_app_h_
 
 #include <kaze/kaze.h>
+#include <kaze/input/InputMgr.h>
+#include <kaze/math/Vec/Vec2.h>
+#include <kaze/video/WindowConstants.h>
 
 KAZE_NAMESPACE_BEGIN
 
-/// Optional application class
-class App {
+/// Application init object
+struct AppInit {
+    String title           {String("")}; ///< App title bar text
+    Vec2i size             {640, 480};   ///< Initial window size
+    WindowInit::Flags flags{};           ///< Initial window attribute flags, can be or'd together
+};
 
+/// Application class
+class App
+{
+public:
+    App(const AppInit &config);
+
+    // no copy
+    KAZE_NO_COPY(App);
+
+    auto run() -> void;
+
+    /// Time since the last frame
+    [[nodiscard]]
+    auto deltaTime() const noexcept -> Double;
+
+    /// Time since the application started
+    /// @returns the time since the app started, in seconds, or a value < 0 of it failed.
+    [[nodiscard]]
+    auto time() const noexcept -> Double;
+
+    /// Get the input manager
+    [[nodiscard]]
+    auto input() const noexcept -> const InputMgr &;
+
+    auto quit() -> void;
+private:
+    auto preInit() -> Bool;
+    virtual auto init() -> Bool { return KAZE_TRUE; }
+    virtual auto update() -> void {}
+    virtual auto draw() -> void {}
+    virtual auto close() -> void {}
+
+    auto pollEvents() -> void;
+    auto runOneFrame() -> void;
+
+    struct Impl;
+    Impl *m;
 };
 
 KAZE_NAMESPACE_END

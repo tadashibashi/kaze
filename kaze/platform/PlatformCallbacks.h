@@ -13,25 +13,25 @@ KAZE_NAMESPACE_BEGIN
 struct PlatformCallbacks
 {
     void *userptr{};
-    funcptr_t<void(const KeyboardEvent &e, Double timestamp, void *userptr)>      keyCallback{[](auto...){}};
-    funcptr_t<void(const MouseButtonEvent &e, Double timestamp, void *userptr)>   mouseButtonCallback{[](auto...){}};
-    funcptr_t<void(const MouseScrollEvent &e, Double timestamp, void *userptr)>   mouseScrollCallback{[](auto...){}};
-    funcptr_t<void(const MouseMotionEvent &e, Double timestamp, void *userptr)>   mouseMotionCallback{[](auto...){}};
-    funcptr_t<void(const GamepadConnectEvent &e, Double timestamp, void *userptr)>gamepadConnectCallback{[](auto...){}};
-    funcptr_t<void(const GamepadButtonEvent &e, Double timestamp, void *userptr)> gamepadButtonCallback{[](auto...){}};
-    funcptr_t<void(const GamepadAxisEvent &e, Double timestamp, void *userptr)>   gamepadAxisCallback{[](auto...){}};
-    funcptr_t<void(const WindowEvent &e, Double timestamp, void *userptr)>        windowCallback{[](auto...){}};
-    funcptr_t<void(const FileDropEvent &e, Double timestamp, void *userptr)>      fileDropCallback{[](auto...){}};
+    funcptr_t<void(const KeyboardEvent &e, double timestamp, void *userptr)>      keyCallback{[](auto...){}};
+    funcptr_t<void(const MouseButtonEvent &e, double timestamp, void *userptr)>   mouseButtonCallback{[](auto...){}};
+    funcptr_t<void(const MouseScrollEvent &e, double timestamp, void *userptr)>   mouseScrollCallback{[](auto...){}};
+    funcptr_t<void(const MouseMotionEvent &e, double timestamp, void *userptr)>   mouseMotionCallback{[](auto...){}};
+    funcptr_t<void(const GamepadConnectEvent &e, double timestamp, void *userptr)>gamepadConnectCallback{[](auto...){}};
+    funcptr_t<void(const GamepadButtonEvent &e, double timestamp, void *userptr)> gamepadButtonCallback{[](auto...){}};
+    funcptr_t<void(const GamepadAxisEvent &e, double timestamp, void *userptr)>   gamepadAxisCallback{[](auto...){}};
+    funcptr_t<void(const WindowEvent &e, double timestamp, void *userptr)>        windowCallback{[](auto...){}};
+    funcptr_t<void(const FileDropEvent &e, double timestamp, void *userptr)>      fileDropCallback{[](auto...){}};
 
-    void emit(const KeyboardEvent &e, double timestamp = 0) const;
-    void emit(const MouseButtonEvent &e, double timestamp = 0) const;
-    void emit(const MouseScrollEvent &e, double timestamp = 0) const;
-    void emit(const MouseMotionEvent &e, double timestamp = 0) const;
-    void emit(const GamepadConnectEvent &e, double timestamp = 0) const;
-    void emit(const GamepadButtonEvent &e, double timestamp = 0) const;
-    void emit(const GamepadAxisEvent &e, double timestamp = 0) const;
-    void emit(const WindowEvent &e, double timestamp = 0) const;
-    void emit(const FileDropEvent &e, double timestamp = 0) const;
+    auto emit(const KeyboardEvent &e, double timestamp = 0) const -> void;
+    auto emit(const MouseButtonEvent &e, double timestamp = 0) const -> void;
+    auto emit(const MouseScrollEvent &e, double timestamp = 0) const -> void;
+    auto emit(const MouseMotionEvent &e, double timestamp = 0) const -> void;
+    auto emit(const GamepadConnectEvent &e, double timestamp = 0) const -> void;
+    auto emit(const GamepadButtonEvent &e, double timestamp = 0) const -> void;
+    auto emit(const GamepadAxisEvent &e, double timestamp = 0) const -> void;
+    auto emit(const WindowEvent &e, double timestamp = 0) const -> void;
+    auto emit(const FileDropEvent &e, double timestamp = 0) const -> void;
 };
 
 KAZE_NAMESPACE_END

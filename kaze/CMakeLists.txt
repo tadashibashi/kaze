@@ -6,28 +6,41 @@ endif()
 
 include(kaze/dependencies)
 
-add_library(${PROJECT_NAME}
-        input/Mouse.cpp)
+add_library(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
-        app/Input.h
-
+        kaze.h
+        concepts.h
+        debug.h
+        debug.cpp
         errors.h
         errors.cpp
-
-        Optional.h
+        endian.h
+        json.h
 
         app/App.h
         app/App.cpp
         app/BackendInitGuard.h
         app/BackendInitGuard.cpp
 
-        concepts.h
-        endian.h
-        json.h
-        debug.h
-        debug.cpp
+        core/Optional.h
+        core/ServiceProvider.h
+        core/ServiceProvider.cpp
+
+        input/Gamepad.h
+        input/Gamepad.cpp
+        input/InputMgr.h
+        input/InputMgr.cpp
+        input/KeyboardConstants.h
+        input/KeyboardConstants.cpp
+        input/Keyboard.h
+        input/Keyboard.cpp
+        input/Mouse.h
+        input/Mouse.cpp
+        input/MouseConstants.h
+
         macros/enum.h
         macros/map.h
+
         math/Circle.h
         math/easings.h
         math/geometry.h
@@ -41,15 +54,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         math/Vec/Vec3.h
         math/Vec/Vec4.h
         math/Vec.hpp
-        kaze.h
-
-        input/Gamepad.cpp
-        input/KeyboardConstants.h
-        input/KeyboardConstants.cpp
-        input/Keyboard.h
-        input/Keyboard.cpp
-        input/MouseConstants.h
-
 
         platform/backend.h
         platform/backend.cpp
@@ -57,9 +61,6 @@ target_sources(${PROJECT_NAME} PRIVATE
         platform/PlatformCallbacks.cpp
         platform/defines.h
         platform/backends/WindowHandleContainer.h
-
-        ServiceProvider.h
-        ServiceProvider.cpp
 
         video/Color.h
         video/Color.cpp

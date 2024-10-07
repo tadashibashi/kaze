@@ -12,21 +12,26 @@ tasks:
       - cmake -B build/web -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
       - cmake -E create_hardlink build/web/compile_commands.json build/compile_commands.json
 
-  build-tests:
+  build-unittests:
     cmds:
-      - cmake --build build/desktop --target kaze_tests
-  run-tests:
-    deps: [build-tests]
+      - cmake --build build/desktop --target kaze_unit_tests
+  run-unittests:
+    deps: [build-unittests]
     cmds:
-      - build/desktop/tests/kaze_tests
+      - build/desktop/tests/unit_tests/kaze_unit_tests
 
-  build-sandbox:
+  build-*:
+    vars:
+        TEST_NAME: "{{index .MATCH 0}}"
     cmds:
-      - cmake --build build/desktop --target kaze_engine_sandbox
-  run-sandbox:
-    deps: [build-sandbox]
+      - cmake --build build/desktop --target kaze_test_{{.TEST_NAME}}
+  run-*:
+    deps: ["build-{{index .MATCH 0}}"]
+    vars:
+        TEST_NAME: "{{index .MATCH 0}}"
     cmds:
-      - build/desktop/kaze_engine_sandbox
+      - build/desktop/tests/runtime/kaze_test_{{.TEST_NAME}}
+
   build-sandbox-web:
     cmds:
       - cmake --build build/web --target kaze_engine_sandbox

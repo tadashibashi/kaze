@@ -5,7 +5,7 @@
 
 KAZE_NAMESPACE_BEGIN
 
-thread_local Error s_curError{};
+thread_local Error s_curError{Error::Ok};
 
 Error::Error(Error &&other) noexcept :
     code(other.code), message(std::move(other.message)), line(other.line), file(other.file)
@@ -13,7 +13,7 @@ Error::Error(Error &&other) noexcept :
 
 }
 
-Error &Error::operator=(Error &&other) noexcept
+auto Error::operator=(Error &&other) noexcept -> Error &
 {
     this->message = std::move(other.message);
     this->code = other.code;
@@ -23,15 +23,14 @@ Error &Error::operator=(Error &&other) noexcept
     return *this;
 }
 
-Error getError() noexcept
+auto getError() noexcept -> Error
 {
     const auto moved = std::move(s_curError);
-    s_curError = {};
 
     return moved;
 }
 
-const Error &setError(const StringView message, const Error::Code code, const Cstring filename, const int line) noexcept
+auto setError(const StringView message, const Error::Code code, const Cstring filename, const int line) noexcept -> const Error &
 {
     s_curError = Error{code, String(message), filename, line};
     return s_curError;
@@ -39,7 +38,7 @@ const Error &setError(const StringView message, const Error::Code code, const Cs
 
 void clearError() noexcept
 {
-    s_curError = {};
+    s_curError = Error(Error::Ok);
 }
 
 bool hasError() noexcept

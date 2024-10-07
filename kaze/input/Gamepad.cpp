@@ -3,7 +3,7 @@
 
 KAZE_NAMESPACE_BEGIN
 
-Bool Gamepad::isUp(const GamepadBtn btn) const noexcept
+auto Gamepad::isUp(const GamepadBtn btn) const noexcept -> Bool
 {
     bool btnIsDown;
     if ( !backend::gamepad::isDown(m_id, btn, &btnIsDown) )
@@ -11,7 +11,7 @@ Bool Gamepad::isUp(const GamepadBtn btn) const noexcept
     return !btnIsDown;
 }
 
-Bool Gamepad::isDown(const GamepadBtn btn) const noexcept
+auto Gamepad::isDown(const GamepadBtn btn) const noexcept -> Bool
 {
     bool btnIsDown;
     if ( !backend::gamepad::isDown(m_id, btn, &btnIsDown) )
@@ -19,7 +19,7 @@ Bool Gamepad::isDown(const GamepadBtn btn) const noexcept
     return btnIsDown;
 }
 
-Bool Gamepad::isJustDown(const GamepadBtn btn) const noexcept
+auto Gamepad::isJustDown(const GamepadBtn btn) const noexcept -> Bool
 {
     bool btnJustDown;
     if ( !backend::gamepad::isJustDown(m_id, btn, &btnJustDown) )
@@ -27,7 +27,7 @@ Bool Gamepad::isJustDown(const GamepadBtn btn) const noexcept
     return btnJustDown;
 }
 
-Bool Gamepad::isJustUp(const GamepadBtn btn) const noexcept
+auto Gamepad::isJustUp(const GamepadBtn btn) const noexcept -> Bool
 {
     bool btnJustUp;
     if ( !backend::gamepad::isJustUp(m_id, btn, &btnJustUp) )
@@ -35,7 +35,7 @@ Bool Gamepad::isJustUp(const GamepadBtn btn) const noexcept
     return btnJustUp;
 }
 
-Float Gamepad::getAxis(const GamepadAxis axis, const Float deadzone) const noexcept
+auto Gamepad::getAxis(const GamepadAxis axis, const Float deadzone) const noexcept -> Float
 {
     float value;
     if ( !backend::gamepad::getAxis(m_id, axis, &value) )
@@ -43,7 +43,7 @@ Float Gamepad::getAxis(const GamepadAxis axis, const Float deadzone) const noexc
     return mathf::abs(value) <= deadzone ? 0 : value;
 }
 
-Bool Gamepad::getAxisMoved(const GamepadAxis axis, const Float deadzone) const noexcept
+auto Gamepad::getAxisMoved(const GamepadAxis axis, const Float deadzone) const noexcept -> Bool
 {
     bool axisMoved;
     if ( !backend::gamepad::getAxisMoved(m_id, axis, deadzone, &axisMoved) )
@@ -51,7 +51,7 @@ Bool Gamepad::getAxisMoved(const GamepadAxis axis, const Float deadzone) const n
     return axisMoved;
 }
 
-Bool Gamepad::isConnected() const noexcept
+auto Gamepad::isConnected() const noexcept -> Bool
 {
     bool gamepadConnected;
     if ( !backend::gamepad::isConnected(m_id, &gamepadConnected) )
@@ -59,13 +59,13 @@ Bool Gamepad::isConnected() const noexcept
     return gamepadConnected;
 }
 
-Vec2f Gamepad::getAxes(const GamepadAxis axisX, const GamepadAxis axisY, const Float deadzone) const noexcept
+auto Gamepad::getAxes(const GamepadAxis axisX, const GamepadAxis axisY, const Float deadzone) const noexcept -> Vec2f
 {
     const Vec2f result { getAxis(axisX), getAxis(axisY) };
     return (result.magnitude() <= deadzone) ? Vec2f() : result;
 }
 
-Bool Gamepad::getAxesMoved(const GamepadAxis axisX, const GamepadAxis axisY, const Float deadzone) const noexcept
+auto Gamepad::getAxesMoved(const GamepadAxis axisX, const GamepadAxis axisY, const Float deadzone) const noexcept -> Bool
 {
     bool axesMoved;
     if ( !backend::gamepad::getAxesMoved(m_id, axisX, axisY, deadzone, &axesMoved) )

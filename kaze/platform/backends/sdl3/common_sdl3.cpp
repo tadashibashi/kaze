@@ -466,6 +466,15 @@ namespace backend {
         SDL_GetGlobalMouseState(x, y);
         return true;
     }
+
+    auto mouse::isDown(const WindowHandle window, kaze::MouseBtn button, bool *outDown) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outDown);
+
+        *outDown = static_cast<bool>( SDL_GetMouseState(nullptr, nullptr) & static_cast<uint32_t>(button) );
+        return true;
+    }
 }
 
 KAZE_NAMESPACE_END

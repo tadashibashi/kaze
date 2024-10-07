@@ -1,7 +1,6 @@
 #include <doctest/doctest.h>
 
-#include <kaze/kaze.h>
-#include <kaze/graphics/Color.h>
+#include <kaze/video/Color.h>
 
 USING_KAZE_NAMESPACE;
 

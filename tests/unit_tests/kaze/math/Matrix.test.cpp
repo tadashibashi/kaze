@@ -1,6 +1,5 @@
 #include <doctest/doctest.h>
 
-#include <kaze/kaze.h>
 #include <kaze/math/Matrix.h>
 
 USING_KAZE_NAMESPACE;

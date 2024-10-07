@@ -362,13 +362,6 @@ namespace backend {
         /// @returns whether the retrieval succeeded.
         auto getGlobalPosition(float *outX, float *outY) noexcept -> bool;
 
-        /// Get relative scroll wheel values detected this frame in the specified window
-        /// @param [in]  window window to check
-        /// @param [out] outX   retrieves the X scroll value
-        /// @param [out] outY   retrieves the Y scroll value
-        /// @returns whether the retrieval was successful.
-        auto getScroll(WindowHandle window, float *outX, float *outY) noexcept -> bool;
-
         /// Get whether a mouse button is down in a window
         /// @param [in]  window  window to check
         /// @param [in]  button  mouse button to check

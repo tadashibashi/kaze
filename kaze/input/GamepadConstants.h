@@ -1,6 +1,9 @@
 #pragma once
 #ifndef kaze_input_gamepadconstants_h_
 #define kaze_input_gamepadconstants_h_
+#include <kaze/kaze.h>
+
+KAZE_NAMESPACE_BEGIN
 
 constexpr int GamepadMaxSlots = 16;
 
@@ -36,5 +39,7 @@ enum class GamepadAxis {
 
     Count
 };
+
+KAZE_NAMESPACE_END
 
 #endif

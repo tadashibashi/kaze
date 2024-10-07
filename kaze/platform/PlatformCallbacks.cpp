@@ -11,40 +11,41 @@ static double getTime()
     return time;
 }
 
-void PlatformCallbacks::emit(const KeyboardEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const KeyboardEvent &e, const double timestamp) const -> void {
 
     keyCallback(e, (timestamp != 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const MouseButtonEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const MouseButtonEvent &e, const double timestamp) const -> void {
     mouseButtonCallback(e,  (timestamp != 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const MouseScrollEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const MouseScrollEvent &e, const double timestamp) const -> void {
     mouseScrollCallback(e, (timestamp != 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const MouseMotionEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const MouseMotionEvent &e, const double timestamp) const -> void {
     mouseMotionCallback(e, (timestamp != 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const GamepadConnectEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const GamepadConnectEvent &e, const double timestamp) const -> void {
     gamepadConnectCallback(e, (timestamp != 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const GamepadButtonEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const GamepadButtonEvent &e, const double timestamp) const -> void {
     gamepadButtonCallback(e, (timestamp == 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const GamepadAxisEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const GamepadAxisEvent &e, const double timestamp) const -> void {
     gamepadAxisCallback(e, (timestamp == 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const WindowEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const WindowEvent &e, const double timestamp) const -> void {
     windowCallback(e,  (timestamp != 0 ? timestamp : getTime()), userptr);
 }
 
-void PlatformCallbacks::emit(const FileDropEvent &e, const Double timestamp) const {
+auto PlatformCallbacks::emit(const FileDropEvent &e, const double timestamp) const -> void {
     fileDropCallback(e,  (timestamp != 0 ? timestamp : getTime()), userptr);
 }
+
 KAZE_NAMESPACE_END

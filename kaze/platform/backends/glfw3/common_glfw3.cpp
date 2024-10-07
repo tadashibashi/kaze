@@ -258,7 +258,7 @@ namespace backend {
         }
     }
 
-    bool init() noexcept
+    auto init() noexcept -> bool
     {
         if ( !glfwInit() )
         {
@@ -364,14 +364,14 @@ namespace backend {
     {
         RETURN_IF_NULL(outDown);
 
-        const auto window = glfwGetCurrentContext();
+        const auto window = windows.getMainWindow();
         if ( !window )
         {
             KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "failed to get current window context, no window was open");
             return false;
         }
 
-        const auto down = glfwGetKey(window, backend::toGLFWkey(key)) == GLFW_PRESS;
+        const auto down = glfwGetKey(WIN_CAST(window), backend::toGLFWkey(key)) == GLFW_PRESS;
         ERR_CHECK(Error::BE_RuntimeErr, "get key down");
 
         *outDown = down;
@@ -397,7 +397,7 @@ namespace backend {
     auto mouse::getGlobalPosition(float *outX, float *outY) noexcept -> bool
     {
         double tempX=0, tempY=0;
-        if (const auto window = glfwGetCurrentContext())
+        if (const auto window = static_cast<GLFWwindow *>(windows.getMainWindow()))
         {
             glfwGetCursorPos(window, &tempX, &tempY); ERR_CHECK(Error::BE_RuntimeErr, "get cursor position");
 
@@ -420,6 +420,18 @@ namespace backend {
 
         return true;
     }
+
+    auto mouse::isDown(WindowHandle window, MouseBtn button, bool *outDown) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outDown);
+
+        *outDown = glfwGetMouseButton(WIN_CAST(window), static_cast<int>(button)) == GLFW_PRESS;
+        ERR_CHECK(Error::BE_RuntimeErr, "get mouse button state");
+
+        return true;
+    }
+
 
 #define GP_INDEX_IN_RANGE(index) \
     do { if ( !((index) >= 0 && (index) < GamepadMaxSlots) ) { \
@@ -519,16 +531,19 @@ namespace backend {
         auto valueLastX = gamepads[index].getLastState().axes[glfwAxisX];
         auto valueLastY = gamepads[index].getLastState().axes[glfwAxisY];
 
-        if (mathf::distance(0.f, 0.f, valueX, valueY) < deadzone)
+        if (deadzone > 0)
         {
-            valueX = 0;
-            valueY = 0;
-        }
+            if (mathf::distance(0.f, 0.f, valueX, valueY) < deadzone)
+            {
+                valueX = 0;
+                valueY = 0;
+            }
 
-        if (mathf::distance(0.f, 0.f, valueLastX, valueLastY) < deadzone)
-        {
-            valueLastX = 0;
-            valueLastY = 0;
+            if (mathf::distance(0.f, 0.f, valueLastX, valueLastY) < deadzone)
+            {
+                valueLastX = 0;
+                valueLastY = 0;
+            }
         }
 
         *outMoved = valueX != valueLastX || valueY != valueLastY;

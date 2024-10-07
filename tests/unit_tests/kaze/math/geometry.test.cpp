@@ -1,5 +1,4 @@
 #include <doctest/doctest.h>
-#include <kaze/kaze.h>
 
 #include <kaze/math/geometry.h>
 

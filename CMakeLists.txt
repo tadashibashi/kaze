@@ -43,7 +43,3 @@ add_subdirectory(kaze)
 if (KAZE_BUILD_TESTS)
     add_subdirectory(tests)
 endif()
-
-add_executable(${PROJECT_NAME}_sandbox main.cpp)
-target_link_libraries(${PROJECT_NAME}_sandbox PRIVATE kaze)
-

@@ -1,6 +1,5 @@
 #include <doctest/doctest.h>
 
-#include <kaze/kaze.h>
 #include <kaze/math/Circle.h>
 
 USING_KAZE_NAMESPACE;
