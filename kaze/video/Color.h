@@ -139,27 +139,27 @@ public:
 
     // Basic color constants
     // ----- grays -----
-    static constinit Color White; ///< pure white (255, 255, 255)
-    static constinit Color Gray;  ///< half way gray (128, 128, 128)
-    static constinit Color Black; ///< pure black (0, 0, 0)
+    static const Color White; ///< pure white (255, 255, 255)
+    static const Color Gray;  ///< half way gray (128, 128, 128)
+    static const Color Black; ///< pure black (0, 0, 0)
 
     // ----- primary colors -----
-    static constinit Color Red;   ///< pure red (255, 0, 0)
-    static constinit Color Green; ///< pure green (0, 255, 0)
-    static constinit Color Blue;  ///< pure blue (0, 0, 255)
+    static const Color Red;   ///< pure red (255, 0, 0)
+    static const Color Green; ///< pure green (0, 255, 0)
+    static const Color Blue;  ///< pure blue (0, 0, 255)
 
     // ----- secondary colors -----
-    static constinit Color Cyan;    ///< (0, 255, 255)
-    static constinit Color Magenta; ///< (255, 0, 255)
-    static constinit Color Yellow;  ///< (255, 255, 0)
+    static const Color Cyan;    ///< (0, 255, 255)
+    static const Color Magenta; ///< (255, 0, 255)
+    static const Color Yellow;  ///< (255, 255, 0)
 
     // ----- tertiary colors -----
-    static constinit Color Orange;      ///< (255, 128, 0)
-    static constinit Color Chartreuse;  ///< (128, 255, 0)
-    static constinit Color SpringGreen; ///< (0, 255, 128)
-    static constinit Color Azure;       ///< (0, 128, 255)
-    static constinit Color Violet;      ///< (128, 0, 255)
-    static constinit Color Rose;        ///< (255, 0, 128)
+    static const Color Orange;      ///< (255, 128, 0)
+    static const Color Chartreuse;  ///< (128, 255, 0)
+    static const Color SpringGreen; ///< (0, 255, 128)
+    static const Color Azure;       ///< (0, 128, 255)
+    static const Color Violet;      ///< (128, 0, 255)
+    static const Color Rose;        ///< (255, 0, 128)
 
     /// Convert to an unsigned 32-bit integer in RGBA channel order, big-endian
     [[nodiscard]] constexpr Uint toRGBA8() const
@@ -202,29 +202,6 @@ public:
     }
 };
 #pragma pack(pop)
-
-// ----- grays -----
-constinit Color Color::White = Color(255, 255, 255);
-constinit Color Color::Gray = Color(128, 128, 128);
-constinit Color Color::Black = Color(0, 0, 0);
-
-// ----- primary colors -----
-constinit Color Color::Red = Color(255, 0, 0);
-constinit Color Color::Green = Color(0, 255, 0);
-constinit Color Color::Blue = Color(0, 0, 255);
-
-// ----- secondary colors -----
-constinit Color Color::Cyan = Color(0, 255, 255);
-constinit Color Color::Magenta = Color(255, 0, 255);
-constinit Color Color::Yellow = Color(255, 255, 0);
-
-// ----- tertiary colors -----
-constinit Color Color::Orange = Color(255, 128, 0);
-constinit Color Color::Chartreuse = Color(128, 255, 0);
-constinit Color Color::SpringGreen = Color(0, 255, 128);
-constinit Color Color::Azure = Color(0, 128, 255);
-constinit Color Color::Violet = Color(128, 0, 255);
-constinit Color Color::Rose = Color(255, 0, 128);
 
 /// for British programmers
 using Colour = Color;
