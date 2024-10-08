@@ -254,9 +254,8 @@ namespace backend {
         }
 
         // Process axes
-        for (int i = 0; i < axes.size(); ++i)
+        for (auto &axis : axes)
         {
-            auto &axis = axes[i];
             if (axis.interaction != AxisData::NullInteraction) // sentry value
             {
                 // Set value to interaction captured this frame
@@ -273,16 +272,26 @@ namespace backend {
 
     auto GamepadData::processEvent(const GamepadButtonEvent &e) noexcept -> void
     {
-        KAZE_ASSERT(static_cast<Uint8>(e.button) < static_cast<Uint8>(GamepadBtn::Count) &&
-            static_cast<Uint8>(e.button) >= 0);
-        ++buttons[static_cast<Uint8>(e.button)].interactions;
+        KAZE_ASSERT(static_cast<int>(e.button) < static_cast<int>(GamepadBtn::Count) &&
+            static_cast<int>(e.button) >= 0);
+        ++buttons[static_cast<int>(e.button)].interactions;
     }
 
     auto GamepadData::processEvent(const GamepadAxisEvent &e) noexcept -> void
     {
-        KAZE_ASSERT(static_cast<Uint8>(e.axis) < static_cast<Uint8>(GamepadAxis::Count) &&
-            static_cast<Uint8>(e.axis) >= 0);
-        axes[static_cast<Uint8>(e.axis)].interaction = e.value;
+        KAZE_ASSERT(static_cast<int>(e.axis) < static_cast<int>(GamepadAxis::Count) &&
+            static_cast<int>(e.axis) >= 0);
+        axes[static_cast<int>(e.axis)].interaction = e.value;
+    }
+
+    auto GamepadData::isDown(GamepadBtn btn) const noexcept -> bool
+    {
+        return buttons[static_cast<int>(btn)].isDown[currentIndex];
+    }
+
+    auto GamepadData::getAxis(GamepadAxis axis) const noexcept -> float
+    {
+        return axes[static_cast<int>(axis)].value[currentIndex];
     }
 }
 
@@ -313,7 +322,7 @@ namespace backend {
             return true;
         }
 
-        *outDown = data->buttons[ static_cast<Uint8>(button) ].isDown[ data->currentIndex ];
+        *outDown = data->buttons[ static_cast<int>(button) ].isDown[ data->currentIndex ];
         return true;
     }
 
@@ -328,7 +337,7 @@ namespace backend {
             *outJustDown = false;
             return true;
         }
-        const auto &buttonData = data->buttons[ static_cast<Uint8>(button) ];
+        const auto &buttonData = data->buttons[ static_cast<int>(button) ];
 
         return buttonData.isDown[ data->currentIndex ] && !buttonData.isDown[ !data->currentIndex ];
     }
@@ -345,7 +354,7 @@ namespace backend {
             return true;
         }
 
-        const auto &buttonData = data->buttons[ static_cast<Uint8>(button) ];
+        const auto &buttonData = data->buttons[ static_cast<int>(button) ];
 
         *outJustUp = !buttonData.isDown[ data->currentIndex ] && buttonData.isDown[ !data->currentIndex ];
         return true;
@@ -363,8 +372,8 @@ namespace backend {
             return true;
         }
 
-        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
-        return axisData.value[ data->currentIndex ];
+        const auto &axisData = data->axes[ static_cast<int>(axis) ];
+        *outValue = axisData.value[ data->currentIndex ];
         return true;
     }
 
@@ -380,7 +389,7 @@ namespace backend {
             return true;
         }
 
-        const auto &axisData = data->axes[ static_cast<Uint8>(axis) ];
+        const auto &axisData = data->axes[ static_cast<int>(axis) ];
         auto curValue = axisData.value[ data->currentIndex ];
         auto lastValue = axisData.value[ !data->currentIndex ];
 
@@ -404,8 +413,8 @@ namespace backend {
             return true;
         }
 
-        const auto &axisDataX = data->axes[ static_cast<Uint8>(axisX) ];
-        const auto &axisDataY = data->axes[ static_cast<Uint8>(axisY) ];
+        const auto &axisDataX = data->axes[ static_cast<int>(axisX) ];
+        const auto &axisDataY = data->axes[ static_cast<int>(axisY) ];
 
         auto curValueX = axisDataX.value[ data->currentIndex ];
         auto lastValueX = axisDataX.value[ !data->currentIndex ];

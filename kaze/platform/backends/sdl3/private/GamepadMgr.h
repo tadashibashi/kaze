@@ -74,7 +74,7 @@ namespace backend
     private:
 
         static auto emplaceNew(SDL_Gamepad *gamepad, int controllerIndex) noexcept -> bool;
-        Array<SDL_Gamepad *, 16> m_gamepads{};
+        Array<SDL_Gamepad *, GamepadMaxSlots> m_gamepads{};
     };
 }
 
