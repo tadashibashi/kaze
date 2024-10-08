@@ -19,4 +19,4 @@ using funcptr_t = typename funcptr<T>::type;
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_traits_h_

@@ -37,4 +37,4 @@ constexpr WindowInit::Flags operator |(const WindowInit::Flags a, const WindowIn
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_video_windowconstants_h_

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef kaze_optional_h_
-#define kaze_optional_h_
+#ifndef kaze_core_optional_h_
+#define kaze_core_optional_h_
 
 #include <kaze/kaze.h>
 
@@ -51,4 +51,4 @@ public:
 
 KAZE_NAMESPACE_END
 
-#endif // kaze_optional_h_
+#endif // kaze_core_optional_h_

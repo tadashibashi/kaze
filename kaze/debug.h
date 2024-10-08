@@ -1,6 +1,7 @@
 #pragma once
 #ifndef kaze_debug_h_
 #define kaze_debug_h_
+
 #include <kaze/kaze.h>
 #include <kaze/errors.h>
 

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef kaze_core_delegate_h_
-#define kaze_core_delegate_h_
+#ifndef kaze_core_action_h_
+#define kaze_core_action_h_
 
 #include <kaze/kaze.h>
 #include <kaze/traits.h>
@@ -149,4 +149,4 @@ private:
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_core_action_h_

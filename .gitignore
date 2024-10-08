@@ -20,11 +20,11 @@ out/
 .history/
 
 # Preserve project settings files, just make sure they're cross-platform
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-!.vscode/*.code-snippets
+#!.vscode/settings.json
+#!.vscode/tasks.json
+#!.vscode/launch.json
+#!.vscode/extensions.json
+#!.vscode/*.code-snippets
 
 ## Built extension files
 *.visix

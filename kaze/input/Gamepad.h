@@ -47,4 +47,4 @@ private:
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_input_gamepad_h_

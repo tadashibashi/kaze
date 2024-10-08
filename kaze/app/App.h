@@ -1,14 +1,14 @@
 /// @file App.h
-/// The App class provides a convenient framework, an optional implementation of encapsulating backend functionality.
-/// All relevant wrapper classes are provided in the kaze/app folder.
+/// Application class
 #pragma once
 #ifndef kaze_app_app_h_
 #define kaze_app_app_h_
 
 #include <kaze/kaze.h>
+#include <kaze/core/Action.h>
 #include <kaze/input/InputMgr.h>
 #include <kaze/math/Vec/Vec2.h>
-#include <kaze/video/WindowConstants.h>
+#include <kaze/video/Window.h>
 
 KAZE_NAMESPACE_BEGIN
 
@@ -19,7 +19,7 @@ struct AppInit {
     WindowInit::Flags flags{};           ///< Initial window attribute flags, can be or'd together
 };
 
-/// Application class
+/// The App class provides a convenient framework, an optional implementation of encapsulating backend functionality.
 class App
 {
 public:
@@ -27,6 +27,8 @@ public:
 
     // no copy
     KAZE_NO_COPY(App);
+
+    Action<const WindowEvent &, Double> onWindowEvent;
 
     auto run() -> void;
 
@@ -43,14 +45,26 @@ public:
     [[nodiscard]]
     auto input() const noexcept -> const InputMgr &;
 
+    /// Get the window object
+    [[nodiscard]]
+    auto window() const noexcept -> const Window &;
+
+    /// Get the window object
+    [[nodiscard]]
+    auto window() noexcept -> Window &;
+
+    /// Quit the application after this frame is over
     auto quit() -> void;
 private:
-    auto preInit() -> Bool;
+    // ----- Overridable callbacks -----
     virtual auto init() -> Bool { return KAZE_TRUE; }
     virtual auto update() -> void {}
     virtual auto draw() -> void {}
     virtual auto close() -> void {}
+    virtual auto processWindowEvent(const WindowEvent &e, Double timestamp) -> void;
 
+    // ----- Private implementation -----
+    auto preInit() -> Bool;
     auto pollEvents() -> void;
     auto runOneFrame() -> void;
 
@@ -60,4 +74,4 @@ private:
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_app_app_h_

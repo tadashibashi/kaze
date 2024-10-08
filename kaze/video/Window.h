@@ -100,7 +100,7 @@ public:
     /// @param width logical window width to set
     /// @param height logical window height to set
     /// @returns reference to this Window for chained calls.
-    auto setSize(int width, int height) noexcept -> Window &;
+    auto setSize(Int width, Int height) noexcept -> Window &;
 
     /// Get the size of the window in logical (virtual) units
     [[nodiscard]]
@@ -250,4 +250,4 @@ private:
 
 KAZE_NAMESPACE_END
 
-#endif // kaze_platform_window_h_
+#endif // kaze_video_window_h_

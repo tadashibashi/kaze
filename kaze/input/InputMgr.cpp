@@ -47,24 +47,43 @@ auto InputMgr::getWindow() const noexcept -> ConstWindowHandle
     return m->window;
 }
 
-auto InputMgr::processEvent(const KeyboardEvent &e) noexcept -> void
+auto InputMgr::processEvent(const KeyboardEvent &e, Double timestamp) noexcept -> void
 {
+    this->onKeyboard(e, timestamp);
     m->keyboard.processEvent(e);
 }
 
-auto InputMgr::processEvent(const MouseMotionEvent &e) noexcept -> void
+auto InputMgr::processEvent(const MouseMotionEvent &e, Double timestamp) noexcept -> void
 {
+    this->onMouseMotion(e, timestamp);
     m->mouse.processEvent(e);
 }
 
-auto InputMgr::processEvent(const MouseScrollEvent &e) noexcept -> void
+auto InputMgr::processEvent(const MouseScrollEvent &e, Double timestamp) noexcept -> void
 {
+    this->onMouseScroll(e, timestamp);
     m->mouse.processEvent(e);
 }
 
-auto InputMgr::processEvent(const MouseButtonEvent &e) noexcept-> void
+auto InputMgr::processEvent(const MouseButtonEvent &e, Double timestamp) noexcept-> void
 {
+    this->onMouseButton(e, timestamp);
     m->mouse.processEvent(e);
+}
+
+auto InputMgr::processEvent(const GamepadAxisEvent &e, Double timestamp) noexcept -> void
+{
+    this->onGamepadAxis(e, timestamp);
+}
+
+auto InputMgr::processEvent(const GamepadButtonEvent &e, Double timestamp) noexcept -> void
+{
+    this->onGamepadButton(e, timestamp);
+}
+
+auto InputMgr::processEvent(const GamepadConnectEvent &e, Double timestamp) noexcept -> void
+{
+    this->onGamepadConnect(e, timestamp);
 }
 
 auto InputMgr::preProcessEvents() noexcept -> void

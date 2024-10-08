@@ -1,8 +1,9 @@
 #pragma once
-#ifndef kaze_app_inputmgr_h_
-#define kaze_app_inputmgr_h_
+#ifndef kaze_input_inputmgr_h_
+#define kaze_input_inputmgr_h_
 
 #include <kaze/kaze.h>
+#include <kaze/core/Action.h>
 #include <kaze/input/GamepadConstants.h>
 #include <kaze/input/KeyboardConstants.h>
 #include <kaze/input/MouseConstants.h>
@@ -25,10 +26,21 @@ public:
 
     auto preProcessEvents() noexcept -> void;
     auto postProcessEvents() noexcept -> void;
-    auto processEvent(const KeyboardEvent &e) noexcept -> void;
-    auto processEvent(const MouseMotionEvent &e) noexcept -> void;
-    auto processEvent(const MouseScrollEvent &e) noexcept -> void;
-    auto processEvent(const MouseButtonEvent &e) noexcept -> void;
+    auto processEvent(const KeyboardEvent &e, Double timestamp) noexcept -> void;
+    auto processEvent(const MouseMotionEvent &e, Double timestamp) noexcept -> void;
+    auto processEvent(const MouseScrollEvent &e, Double timestamp) noexcept -> void;
+    auto processEvent(const MouseButtonEvent &e, Double timestamp) noexcept -> void;
+    auto processEvent(const GamepadAxisEvent &e, Double timestamp) noexcept -> void;
+    auto processEvent(const GamepadButtonEvent &e, Double timestamp) noexcept -> void;
+    auto processEvent(const GamepadConnectEvent &e, Double timestamp) noexcept -> void;
+
+    Action<const KeyboardEvent &, Double> onKeyboard;              ///< occurs on a keyup or keydown; 2nd argument is seconds since app start
+    Action<const MouseMotionEvent &, Double> onMouseMotion;        ///< occurs on mouse move; 2nd argument is seconds since app start
+    Action<const MouseScrollEvent &, Double> onMouseScroll;        ///<
+    Action<const MouseButtonEvent &, Double> onMouseButton;
+    Action<const GamepadButtonEvent &, Double> onGamepadButton;
+    Action<const GamepadAxisEvent &, Double> onGamepadAxis;
+    Action<const GamepadConnectEvent &, Double> onGamepadConnect;
 
     // ----- Keyboard -----
 
@@ -117,4 +129,4 @@ private:
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_input_inputmgr_h_

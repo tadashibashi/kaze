@@ -17,4 +17,4 @@ private:
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_app_backendinitguard_h_

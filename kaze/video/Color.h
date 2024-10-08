@@ -1,6 +1,6 @@
 #pragma once
-#ifndef kaze_graphics_color_h_
-#define kaze_graphics_color_h_
+#ifndef kaze_video_color_h_
+#define kaze_video_color_h_
 
 #include <kaze/kaze.h>
 #include <bit>
@@ -231,4 +231,4 @@ using Colour = Color;
 
 KAZE_NAMESPACE_END
 
-#endif // kaze_graphics_color_h_
+#endif // kaze_video_color_h_

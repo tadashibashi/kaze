@@ -6,33 +6,33 @@ KAZE_NAMESPACE_BEGIN
 
 #define ASSERT_KEY_RANGE(key) KAZE_ASSERT(static_cast<Int>(key) >= 0 && static_cast<Int>(key) < static_cast<Int>(Key::Count))
 
-bool Keyboard::isDown(Key key) const noexcept
+auto Keyboard::isDown(Key key) const noexcept -> Bool
 {
     ASSERT_KEY_RANGE(key);
     const auto &keyData = m_keyData[ static_cast<Int>(key) ];
     return keyData.isDown[m_currentIndex];
 }
 
-bool Keyboard::isJustDown(Key key) const noexcept
+auto Keyboard::isJustDown(Key key) const noexcept -> Bool
 {
     ASSERT_KEY_RANGE(key);
     const auto &keyData = m_keyData[ static_cast<Int>(key) ];
     return keyData.isDown[m_currentIndex] && !keyData.isDown[!m_currentIndex];
 }
 
-bool Keyboard::isJustUp(Key key) const noexcept
+auto Keyboard::isJustUp(Key key) const noexcept -> Bool
 {
     ASSERT_KEY_RANGE(key);
     const auto &keyData = m_keyData[ static_cast<Int>(key) ];
     return !keyData.isDown[m_currentIndex] && keyData.isDown[ !m_currentIndex ];
 }
 
-void Keyboard::preProcessEvents()
+auto Keyboard::preProcessEvents() -> void
 {
     m_currentIndex = !m_currentIndex;
 }
 
-void Keyboard::processEvent(const KeyboardEvent &e)
+auto Keyboard::processEvent(const KeyboardEvent &e) -> void
 {
     // null window allows any key event; when a window is specified, it only allows events associated with it to pass
     if (m_window && e.window != m_window) return;
@@ -45,7 +45,7 @@ void Keyboard::processEvent(const KeyboardEvent &e)
     }
 }
 
-void Keyboard::postProcessEvents()
+auto Keyboard::postProcessEvents() -> void
 {
     for (int i = 0; auto &key : m_keyData)
     {

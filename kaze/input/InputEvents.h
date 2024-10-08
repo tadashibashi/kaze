@@ -103,4 +103,5 @@ struct GamepadAxisEvent {
 };
 
 KAZE_NAMESPACE_END
-#endif
+
+#endif // kaze_input_inputevents_h_

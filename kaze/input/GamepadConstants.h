@@ -42,4 +42,4 @@ enum class GamepadAxis {
 
 KAZE_NAMESPACE_END
 
-#endif
+#endif // kaze_input_gamepadconstants_h_
