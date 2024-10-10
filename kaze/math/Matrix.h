@@ -5,6 +5,10 @@
 #include <kaze/kaze.h>
 #include <kaze/concepts.h>
 #include <kaze/math/Vec.hpp>
+
+#include <bgfx/bgfx.h>
+#include <bx/math.h>
+
 #include <glm/matrix.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
@@ -25,8 +29,25 @@ struct alignas(16) Matrix {
     constexpr Matrix(const Matrix &other) : m_mat(other.m_mat)
     {}
 
+    constexpr auto operator=(const Matrix &other) -> Matrix &
+    {
+        m_mat = other.m_mat;
+        return *this;
+    }
+
+    constexpr Matrix(Matrix &&other) noexcept : m_mat(std::move(other.m_mat))
+    { }
+
+    constexpr Matrix &operator=(Matrix &&other) noexcept
+    {
+        if (this == &other) return *this;
+
+        m_mat = std::move(other.m_mat);
+        return *this;
+    }
+
     /// assumes the array is Cols * Rows long, sorted with column-priority
-    static constexpr Matrix fromArray(const T array[Cols * Rows]) noexcept
+    static constexpr auto fromArray(const T array[Cols * Rows]) noexcept -> Matrix
     {
         Matrix mat;
         for (Size col = 0; col < Cols; ++col)
@@ -40,10 +61,10 @@ struct alignas(16) Matrix {
         return mat;
     }
 
-    [[nodiscard]] static constexpr auto fromOrtho(T left, T right, T top, T bottom) -> std::enable_if_t<Cols==4 && Rows==4, Matrix>
+    [[nodiscard]] static constexpr auto fromOrtho(T left, T right, T top, T bottom) -> std::enable_if_t< Cols==4 && Rows==4, Matrix >
     {
         Matrix result;
-        result.m_mat = glm::ortho(left, right, top, bottom);
+        bx::mtxOrtho(result.data(), left, right, bottom, top, 0, 100.f, 0, bgfx::getCaps()->homogeneousDepth);
         return result;
     }
 
@@ -67,8 +88,8 @@ struct alignas(16) Matrix {
 
     // ===== Direct getters ===================================================
 
-    [[nodiscard]] const T *data() const noexcept { return &m_cols.data()[0]; }
-    [[nodiscard]] T *data() noexcept { return &m_cols.data()[0]; }
+    [[nodiscard]] const T *data() const noexcept { return &m_cols[0][0]; }
+    [[nodiscard]] T *data() noexcept { return &m_cols[0][0]; }
 
     /// Get a column in the matrix - no bounds check.
     [[nodiscard]] constexpr Vec<T, Rows> &operator[](const Size column) noexcept
@@ -169,7 +190,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto scale(const Vec<T, 3> &v) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    constexpr auto scale(const Vec<T, 3> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
     {
         m_mat = glm::scale(m_mat, glm::vec<3, T>{
             v.x,
@@ -192,7 +213,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto scale(const Vec<T, 2> &v) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    constexpr auto scale(const Vec<T, 2> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
     {
         m_mat = glm::scale(m_mat, glm::vec<3, T>{
             v.x,
@@ -215,7 +236,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto rotate(T angle, const Vec<T, 3> &v) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    constexpr auto rotate(T angle, const Vec<T, 3> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
     {
         m_mat = glm::rotate(m_mat, angle, glm::vec<3, T>{
             v.x,
@@ -272,6 +293,20 @@ struct alignas(16) Matrix {
     {
         Matrix<T, Rows, UCols> result;
         result.m_mat = m_mat * other.m_mat;
+        return result;
+    }
+
+    template <Arithmetic U>
+    [[nodiscard]] constexpr auto operator *(const Vec<U, Rows> &v) const -> Vec<U, Rows>
+    {
+        glm::vec<Rows, U> temp;
+        for (int r = 0; r < Rows; ++r)
+            temp[r] = v[r];
+        temp = m_mat * temp;
+
+        Vec<U, Rows> result;
+        for (int r = 0; r < Rows; ++r)
+            result[r] = temp[r];
         return result;
     }
 

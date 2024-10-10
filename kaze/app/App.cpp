@@ -14,6 +14,7 @@ struct App::Impl
     Bool isRunning{};
     Double lastTime{}, deltaTime{};
     InputMgr input{};
+    GraphicsMgr graphics{};
 
     AppInit config;
     Window window;
@@ -41,6 +42,7 @@ void App::run()
     } while (m->isRunning);
 
     close();
+    m->graphics.close();
     m->window.close();
 }
 
@@ -72,6 +74,16 @@ auto App::window() noexcept -> Window &
     return m->window;
 }
 
+auto App::graphics() const noexcept -> const GraphicsMgr &
+{
+    return m->graphics;
+}
+
+auto App::graphics() noexcept -> GraphicsMgr &
+{
+    return m->graphics;
+}
+
 auto App::quit() -> void
 {
     m->isRunning = false;
@@ -80,7 +92,10 @@ auto App::quit() -> void
 auto App::preInit() -> Bool
 {
     if ( !m->window.open(m->config.title.c_str(), m->config.size.x, m->config.size.y, m->config.flags) )
-        return false;
+        return KAZE_FALSE;
+
+    if ( !m->graphics.init(m->window.getPtr()) )
+        return KAZE_FALSE;
 
     backend::setCallbacks(PlatformCallbacks {
         .userptr = m,
@@ -117,7 +132,7 @@ auto App::preInit() -> Bool
             impl->app->processWindowEvent(e, timestamp);
         }
     });
-    return true;
+    return KAZE_TRUE;
 }
 
  /// Standard window behavior
@@ -129,6 +144,16 @@ auto App::processWindowEvent(const WindowEvent &e, Double timestamp) -> void
         if (m->window.getPtr() == e.window)
             m->isRunning = false;
         break;
+    case WindowEvent::ResizedFramebuffer:
+    {
+        if (m->window.getPtr() == e.window)
+        {
+            m->graphics.reset(e.data0, e.data1);
+            draw();
+            m->graphics.frame();
+            m->graphics.renderFrame();
+        }
+    } break;
     default:
         break;
     }
@@ -150,7 +175,7 @@ void App::runOneFrame()
     pollEvents();
     update();
     draw();
-
+    m->graphics.frame();
     m->lastTime = currentTime;
 }
 

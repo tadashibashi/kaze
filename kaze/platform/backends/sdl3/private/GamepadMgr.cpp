@@ -6,6 +6,8 @@
 #include <kaze/debug.h>
 #include <kaze/platform/backend.h>
 
+#include <cstring>
+
 KAZE_NAMESPACE_BEGIN
 
 namespace backend {

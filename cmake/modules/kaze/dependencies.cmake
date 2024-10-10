@@ -20,7 +20,12 @@ FetchContent_Declare(spdlog
     GIT_TAG        v1.14.1
 )
 
-FetchContent_MakeAvailable(json gcem glm spdlog)
+FetchContent_Declare(bgfx
+    GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake
+    GIT_TAG        v1.128.8808-482
+)
+
+FetchContent_MakeAvailable(json gcem glm spdlog bgfx)
 
 # ===== Backend ===============================================================
 # Backends are fetched from a cmake module and the following variables are available to set:

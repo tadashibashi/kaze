@@ -34,6 +34,9 @@ struct Error
         LogicErr,             ///< User logic error
         UnownedPointerCleanup,///< Attempted to clean up a pointer that is not owned by a wrapper class.
 
+        ShaderCompileErr,     ///< Shader encountered an error during compilation
+        ShaderLinkErr,         ///< Shader program encountered an error during link
+
         Count                 ///< Number of error codes
     };
 

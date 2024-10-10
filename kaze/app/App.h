@@ -8,7 +8,9 @@
 #include <kaze/core/Action.h>
 #include <kaze/input/InputMgr.h>
 #include <kaze/math/Vec/Vec2.h>
+#include <kaze/video/GraphicsMgr.h>
 #include <kaze/video/Window.h>
+
 
 KAZE_NAMESPACE_BEGIN
 
@@ -52,6 +54,12 @@ public:
     /// Get the window object
     [[nodiscard]]
     auto window() noexcept -> Window &;
+
+    [[nodiscard]]
+    auto graphics() const noexcept -> const GraphicsMgr &;
+
+    [[nodiscard]]
+    auto graphics() noexcept -> GraphicsMgr &;
 
     /// Quit the application after this frame is over
     auto quit() -> void;

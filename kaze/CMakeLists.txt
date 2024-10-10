@@ -8,67 +8,81 @@ include(kaze/dependencies)
 
 add_library(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
-        kaze.h
-        concepts.h
-        debug.h
-        debug.cpp
-        errors.h
-        errors.cpp
-        endian.h
-        json.h
+    kaze.h
+    concepts.h
+    debug.h
+    debug.cpp
+    errors.h
+    errors.cpp
+    endian.h
+    json.h
 
-        app/App.h
-        app/App.cpp
-        app/BackendInitGuard.h
-        app/BackendInitGuard.cpp
+    app/App.h
+    app/App.cpp
+    app/BackendInitGuard.h
+    app/BackendInitGuard.cpp
+    app/Camera2D.h
+    app/Camera2D.cpp
+    app/SpriteBatch.h
+    app/SpriteBatch.cpp
 
-        core/Optional.h
-        core/ServiceProvider.h
-        core/ServiceProvider.cpp
+    core/Optional.h
+    core/ServiceProvider.h
+    core/ServiceProvider.cpp
 
-        input/Gamepad.h
-        input/Gamepad.cpp
-        input/InputMgr.h
-        input/InputMgr.cpp
-        input/KeyboardConstants.h
-        input/KeyboardConstants.cpp
-        input/Keyboard.h
-        input/Keyboard.cpp
-        input/Mouse.h
-        input/Mouse.cpp
-        input/MouseConstants.h
+    input/Gamepad.h
+    input/Gamepad.cpp
+    input/InputMgr.h
+    input/InputMgr.cpp
+    input/KeyboardConstants.h
+    input/KeyboardConstants.cpp
+    input/Keyboard.h
+    input/Keyboard.cpp
+    input/Mouse.h
+    input/Mouse.cpp
+    input/MouseConstants.h
 
-        macros/enum.h
-        macros/map.h
+    macros/enum.h
+    macros/map.h
 
-        math/Circle.h
-        math/easings.h
-        math/geometry.h
-        math/Matrix.h
-        math/mathf.h
-        math/Rect.h
-        math/Rect3D.h
-        math/Vec/VecBase.h
-        math/Vec/Vec1.h
-        math/Vec/Vec2.h
-        math/Vec/Vec3.h
-        math/Vec/Vec4.h
-        math/Vec.hpp
+    math/Circle.h
+    math/easings.h
+    math/geometry.h
+    math/Matrix.h
+    math/mathf.h
+    math/Rect.h
+    math/Rect3D.h
+    math/Vec/VecBase.h
+    math/Vec/Vec1.h
+    math/Vec/Vec2.h
+    math/Vec/Vec3.h
+    math/Vec/Vec4.h
+    math/Vec.hpp
 
-        platform/backend.h
-        platform/backend.cpp
-        platform/PlatformCallbacks.h
-        platform/PlatformCallbacks.cpp
-        platform/defines.h
-        platform/backends/WindowHandleContainer.h
+    platform/backend.h
+    platform/backend.cpp
+    platform/PlatformCallbacks.h
+    platform/PlatformCallbacks.cpp
+    platform/defines.h
+    platform/backends/WindowHandleContainer.h
 
-        video/Color.h
-        video/Color.cpp
-        video/Window.h
-        video/Window.cpp
-        video/WindowConstants.h
+    video/Color.h
+    video/Color.cpp
+    video/GraphicsMgr.h
+    video/GraphicsMgr.cpp
+    video/Renderable.h
+    video/Renderable.cpp
+    video/Shader.h
+    video/Shader.cpp
+    video/ShaderProgram.h
+    video/ShaderProgram.cpp
+    video/VertexLayout.h
+    video/VertexLayout.cpp
+    video/Window.h
+    video/Window.cpp
+    video/WindowConstants.h
 
-        ${KAZE_BACKEND_SOURCES}
+    ${KAZE_BACKEND_SOURCES}
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC ${KAZE_ROOT})
@@ -79,7 +93,14 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC
     KAZE_NO_NAMESPACE=${KAZE_NO_NAMESPACE}
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC gcem glm nlohmann_json spdlog::spdlog ${KAZE_BACKEND_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    gcem
+    glm
+    nlohmann_json
+    spdlog::spdlog
+    bgfx bx bimg
+    ${KAZE_BACKEND_LIBRARIES}
+)
 target_link_options(${PROJECT_NAME} PUBLIC ${KAZE_BACKEND_LINK_FLAGS})
 target_compile_options(${PROJECT_NAME} PUBLIC ${KAZE_BACKEND_COMPILE_FLAGS})
 
