@@ -82,6 +82,29 @@ auto Texture2D::load(const void *data, Size byteLength) -> Bool
         return KAZE_FALSE;
     }
 
+    release();
+    m_textureId = texture.idx;
+    return KAZE_TRUE;
+}
+
+auto Texture2D::loadPixels(const Color *pixels, Size pixelCount, Size width, Size height) -> Bool
+{
+    if (pixelCount != width * height)
+    {
+        KAZE_CORE_ERRCODE(Error::LogicErr, "`width * height` must equal `pixelCount`, instead got: `{} * {} != {}`",
+            width, height, pixelCount);
+        return KAZE_FALSE;
+    }
+
+    const auto texture = bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA8,
+        BGFX_TEXTURE_NONE | BGFX_SAMPLER_POINT);
+    if ( !bgfx::isValid(texture) )
+    {
+        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Failed to load Texture2D from pixels");
+        return KAZE_FALSE;
+    }
+
+    release();
     m_textureId = texture.idx;
     return KAZE_TRUE;
 }
