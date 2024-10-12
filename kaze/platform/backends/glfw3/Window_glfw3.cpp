@@ -64,8 +64,8 @@ namespace backend {
     }
 
     /// Private helper to safely grab window data associated with window
-    /// @param [in]  window  window to get data associated to
-    /// @param [out] outData retrieves pointer to data
+    /// @param[in]  window  window to get data associated to
+    /// @param[out] outData retrieves pointer to data
     /// @returns true if successfully retrieved, and false if missing or unsuccessfully retrieved
     auto getWindowData(const WindowHandle window, WindowData **outData) noexcept -> bool
     {

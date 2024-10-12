@@ -45,7 +45,7 @@ public:
 
     /// Try to get a pointer of type `T`
     /// @tparam T type of pointer to get from the container
-    /// @param outPtr pointer to receive the service object ptr
+    /// @param[out] outPtr pointer to receive the service object ptr
     /// @returns whether pointer exists in the ServiceProvider:
     ///     `true`  - the pointer exists and was output to `outPtr`,
     ///     `false` - `outPtr` is left unaltered
@@ -65,7 +65,7 @@ public:
 
     /// Try to get a pointer of type `T`
     /// @tparam T type of pointer to get from the container
-    /// @param outPtr pointer to receive the service object ptr
+    /// @param[out] outPtr pointer to receive the service object ptr
     /// @returns whether pointer exists in the ServiceProvider:
     ///     `true`  - the pointer exists and was output to `outPtr`,
     ///     `false` - `outPtr` is left unaltered
@@ -93,7 +93,7 @@ public:
     }
 
     /// Try to set a service–if one already exists, it will not overwrite it.
-    /// @param service the service to add.
+    /// @param[in] service the service pointer to add.
     /// @returns `true`  - the service was set,
     ///          `false` - the service already exists in the container and was not altered
     template <typename T>

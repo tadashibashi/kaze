@@ -62,10 +62,10 @@ namespace mathf {
     /// and a positive value if `a > b` beyond the approximated threshhold. You can set the epsilon and scale values.
     /// (I'm not sure how to describe these, other than they are used to determine the approximated threshhold.
     /// Equation referenced from doctest::Approx.)
-    /// @param a first value to check
-    /// @param b second value to check
-    /// @param epsilon
-    /// @param scale
+    /// @param[in] a        first value to check
+    /// @param[in] b        second value to check
+    /// @param[in] epsilon  smallest differing value * 100
+    /// @param[in] scale    scales epsilon
     template <FloatingPoint T>
     T approxCompare(T a, T b, T epsilon = std::numeric_limits<T>::epsilon() * 100, T scale = 1.0)
     {
@@ -117,7 +117,7 @@ namespace mathf {
     }
 
     /// Get the square root of a number
-    /// @param x the number to perform square root operation on
+    /// @param[in] x the number to perform square root operation on
     template <Arithmetic T>
     constexpr auto sqrt(const T x) noexcept
     {
@@ -128,8 +128,8 @@ namespace mathf {
 
     /// Get `x` to the p of `p`
 
-    /// @param x the number to perform the operation on
-    /// @param p the power to raise `x` to
+    /// @param[in] x the number to perform the operation on
+    /// @param[in] p the power to raise `x` to
     /// @returns x to the power of p as an double if an integral, otherwise, type T.
     template <Arithmetic T, Arithmetic U>
     constexpr auto pow(const T x, const U p) noexcept
@@ -155,9 +155,9 @@ namespace mathf {
 
     /// Clamp a value between a min and max value inclusively.
     /// Use {@link clampBounds} if `min` may be greater than `max`.
-    /// @param x the value to clamp
-    /// @param min lower bounds (inclusive), must be <= `max`
-    /// @param max upper bounds (inclusive), must be >= `min`
+    /// @param[in] x the value to clamp
+    /// @param[in] min lower bounds (inclusive), must be <= `max`
+    /// @param[in] max upper bounds (inclusive), must be >= `min`
     template <Arithmetic T>
     constexpr T clamp(const T x, const T min, const T max) noexcept
     {
@@ -199,10 +199,10 @@ namespace mathf {
     /// @tparam T the floating point type of each parameter and the return value; if set explicitly, all args will
     ///           be cast to `T`; useful to set explicitly when various point value types are be provided.
     ///
-    /// @param x1 x value of the first point
-    /// @param y1 y value of the first point
-    /// @param x2 x value of the second point
-    /// @param y2 y value of the second point
+    /// @param[in] x1   x value of the first point
+    /// @param[in] y1   y value of the first point
+    /// @param[in] x2   x value of the second point
+    /// @param[in] y2   y value of the second point
     ///
     /// @returns the distance between points one and two
     template <Arithmetic T>
@@ -283,8 +283,8 @@ namespace mathf {
     /// Calculate the angle between {0, 0} and the provided point.
     /// Answer will always be positive, from 0 to 2PI radians where 0 points rightward
     /// and moves clockwise.
-    /// @param x x-coordinate of point to check
-    /// @param y y-coordinate of point to check
+    /// @param[in] x   x-coordinate of point to check
+    /// @param[in] y   y-coordinate of point to check
     template <Arithmetic T>
     constexpr auto coordsToAngle(const T x, const T y) {
         return gcem::fmod(gcem::atan2(y, x) + TwoPi, TwoPi);
@@ -293,10 +293,10 @@ namespace mathf {
     /// Calculate the angle between two provided points.
     /// Answer will always be positive, from 0 to 2PI radians where 0 points rightward
     /// and moves clockwise.
-    /// @param x1 x-coord of point 1
-    /// @param y1 y-coord of point 1
-    /// @param x2 x-coord of point 2
-    /// @param y2 y-coord of point 2
+    /// @param[in] x1   x-coord of point 1
+    /// @param[in] y1   y-coord of point 1
+    /// @param[in] x2   x-coord of point 2
+    /// @param[in] y2   y-coord of point 2
     /// @returns resultant angle from the line drawn between the two points, in radians
     template <Arithmetic T>
     constexpr auto coordsToAngle(const T x1, const T y1, const T x2, const T y2) {

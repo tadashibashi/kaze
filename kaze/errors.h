@@ -33,6 +33,11 @@ struct Error
         RuntimeErr,           ///< Unexpected error occurred at runtime
         LogicErr,             ///< User logic error
         UnownedPointerCleanup,///< Attempted to clean up a pointer that is not owned by a wrapper class.
+        FileOpenErr,          ///< Error occurred during file read
+        FileSeekErr,
+        FileReadErr,
+        FileWriteErr,
+        OutOfMemory,          ///< System is out of memory
 
         ShaderCompileErr,     ///< Shader encountered an error during compilation
         ShaderLinkErr,         ///< Shader program encountered an error during link
@@ -66,10 +71,10 @@ struct Error
 auto getError() noexcept -> Error;
 
 /// Set the current error message manually; this is normally reserved for core functionality.
-/// @param message    error message
-/// @param code       error code, in the Error::Code enum
-/// @param filename   name of file that the error occurred in, usually set via __FILE__
-/// @param line       line error occurred on, usually set via __LINE__
+/// @param[in] message    error message
+/// @param[in] code       error code, in the Error::Code enum [optional, default: `Error::Unspecified`]
+/// @param[in] filename   name of file that the error occurred in, usually set via __FILE__ [optional, default: `""`]
+/// @param[in] line       line error occurred on, usually set via __LINE__ [optional, default: `-1`]
 auto setError(StringView message, Error::Code code = Error::Unspecified,
     const char *filename = "", int line = -1) noexcept -> const Error &;
 

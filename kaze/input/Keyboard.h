@@ -19,27 +19,28 @@ public:
     /// Get the associated window
     [[nodiscard]]
     auto getWindow() const noexcept -> WindowHandle { return m_window; }
+
     /// Set the associated window
-    /// @param window window to set
+    /// @param[in] window   window to set
     auto setWindow(const WindowHandle window) noexcept -> void { m_window = window; }
 
     /// Check if a key is currently pressed down
-    /// @param key the key to check
+    /// @param[in] key   the key to query
     /// @return whether the key is currently pressed down
     [[nodiscard]]
     auto isDown(Key key) const noexcept -> Bool;
     /// Check if a key is currently un-pressed
-    /// @param key key to check
+    /// @param[in] key   key to query
     /// @return whether the key is unpressed
     [[nodiscard]]
     auto isUp(Key key) const noexcept -> Bool { return !isDown(key); }
     /// Check if a key was just pressed down this frame
-    /// @param key key to check
+    /// @param[in] key   key to query
     /// @return whether the key was just pressed down this frame
     [[nodiscard]]
     auto isJustDown(Key key) const noexcept -> Bool;
     /// Check if a key was just released this frame
-    /// @param key key to check
+    /// @param[in] key   key to query
     /// @return whether the key was just released this frame
     [[nodiscard]]
     auto isJustUp(Key key) const noexcept -> Bool;

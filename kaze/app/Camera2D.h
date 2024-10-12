@@ -15,7 +15,7 @@ class Camera2D {
 public:
 
     /// Set the viewport rectangle
-    /// @param viewport rectangle to set
+    /// @param[in] viewport rectangle to set
     /// @returns this class
     auto setViewport(Recti viewport) -> Camera2D &;
 
@@ -23,7 +23,7 @@ public:
     [[nodiscard]] auto getViewport() const -> Recti { return m_viewport; }
 
     /// Set the normalized origin/anchor point of the camera in the viewport.
-    /// @param origin origin anchor point to set
+    /// @param[in] origin origin anchor point to set
     /// @returns this class
     auto setOrigin(Vec2f origin) noexcept -> Camera2D &;
 
@@ -31,7 +31,7 @@ public:
     [[nodiscard]] auto getOrigin() const noexcept -> Vec2f { return m_origin; }
 
     /// Set the logical 2D world coordinates of the camera
-    /// @param position the position to set
+    /// @param[in] position the position to set
     /// @returns this class
     auto setPosition(Vec2f position) noexcept -> Camera2D &;
 
@@ -40,7 +40,7 @@ public:
     auto getPosition() const noexcept -> Vec2f;
 
     /// Set the rotation, in radians, of the camera about the Z-axis
-    /// @param radians number of radians, where 0 is at the top, and moves clockwise
+    /// @param[in] radians number of radians, where 0 is at the top, and moves clockwise
     auto setRotation(Float radians) noexcept -> Camera2D &;
 
     /// Get the rotation, in radians, of the camera about the Z-axis
@@ -48,7 +48,7 @@ public:
     auto getRotation() const noexcept -> Float;
 
     /// Set the rotation, in degrees, of the camera about the Z-axis
-    /// @param degrees number of degrees where 0 is at the top, and moves clockwise
+    /// @param[in] degrees number of degrees where 0 is at the top, and moves clockwise
     /// @returns this class
     auto setRotationDegrees(Float degrees) noexcept -> Camera2D &;
 

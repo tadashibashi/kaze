@@ -17,8 +17,8 @@ namespace backend {
     };
 
     /// Get window data associated with the window handle, if any
-    /// @param window window handle to get data from
-    /// @param outData retrieves data pointer
+    /// @param[in]  window    window handle to get data from
+    /// @param[out] outData   retrieves data pointer
     /// @returns whether retrieval was successful, also returns `false` if data was `nullptr`;
     ///          this behavior is default since lack of associated data is considered an
     ///          unexpected error.

@@ -11,6 +11,8 @@ auto Camera2D::setOrigin(const Vec2f origin) noexcept -> Camera2D &
 
 auto Camera2D::setViewport(Recti viewport) -> Camera2D &
 {
+    if (viewport == m_viewport) return *this;
+
     m_viewport = viewport;
     m_proj = Mat4f::fromOrtho(viewport.left(), viewport.right(), viewport.top(), viewport.bottom());
     m_invProj = m_proj.toInverse();

@@ -101,37 +101,37 @@ namespace backend {
 
     /// Convert a kaze::GamepadAxis to a GLFW gamepad axis enum value
     /// @note make sure to call backend::initGlobals before calling this function
-    /// @param axis axis to convert
+    /// @param[in] axis   axis to convert
     /// @return the equivalent GLFW gamepad axis, assuming that the `axis` is valid, otherwise the result is undefined.
     [[nodiscard]] int toGLFWaxis(GamepadAxis axis) noexcept;
 
     /// Convert a kaze::GamepadBtn to a GLFW gamepad button enum value
     /// @note make sure to call backend::initGlobals before calling this function
-    /// @param button button to convert
+    /// @param[in] button   button to convert
     /// @return the equivalent GLFW gamepad button, assuming that the `button` is valid, otherwise the result is undefined.
     [[nodiscard]] int toGLFWbutton(GamepadBtn button) noexcept;
 
     /// Convert a glfw gamepad button to a kaze::GamepadBtn
     /// @note make sure to call backend::initGlobals before calling this function
-    /// @param glfwButton button to convert
+    /// @param[in] glfwButton   button to convert
     /// @return the equivalent GamepadBtn, assuming that the `glfwButton` is valid, otherwise the result is undefined.
     [[nodiscard]] GamepadBtn toGamepadBtn(int glfwButton) noexcept;
 
     /// Convert a glfw gamepad axis to a kaze::GamepadAxis
     /// @note make sure to call backend::initGlobals before calling this function
-    /// @param glfwAxis axis to convert
+    /// @param[in] glfwAxis   axis to convert
     /// @return the equivalent GamepadAxis, assuming that the `glfwAxis` is valid, otherwise the result is undefined.
     [[nodiscard]] GamepadAxis toGamepadAxis(int glfwAxis) noexcept;
 
     /// Convert a glfw key to a kaze::Key
     /// @note make sure to call backend::initGlobals before calling this function
-    /// @param key key to convert
+    /// @param[in] key   key to convert
     /// @return the equivalent glfw key assuming that the `key` is valid, otherwise the result is undefined.
     [[nodiscard]] int toGLFWkey(Key key) noexcept;
 
     /// Convert a glfw key to a kaze::Key
     /// @note make sure to call backend::initGlobals before calling this function
-    /// @param glfw key to convert
+    /// @param[in] glfw   key to convert
     /// @return the equivalent Key, assuming that the `glfwKey` is valid, otherwise the result is undefined.
     [[nodiscard]] Key toKey(int glfwKey) noexcept;
 

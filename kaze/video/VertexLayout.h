@@ -75,12 +75,12 @@ public:
         Bool normalized = KAZE_FALSE, Bool asInt = KAZE_FALSE) -> VertexLayout &;
 
     /// Skip a number of bytes in vertex stream.
-    /// @param bytes number of bytes to skip
+    /// @param[in] bytes number of bytes to skip
     /// @returns Returns itself.
     auto skip(Uint8 bytes) -> VertexLayout &;
 
     /// Check if VertexLayout contains an attribute.
-    /// @param attrib attribute to check
+    /// @param[in] attrib attribute to check
     /// @return `true` if VerxLayout contains attribute.
     auto has(Attrib::Enum attrib) const -> Bool;
     auto getOffset(Attrib::Enum attrib) const -> Uint16;

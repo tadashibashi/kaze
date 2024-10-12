@@ -80,36 +80,37 @@ public:
     auto getAxisMoved(Int index, GamepadAxis axis, Float deadzone = 0) const noexcept -> Bool;
 
     /// Check if one or both provided gamepad axes moved since last frame.
-    /// @param index
-    /// @param axisX
-    /// @param axisY
-    /// @param deadzone if the length formed by both axes is <= to this value, both values are clamped to 0
-    /// @return
+    /// @param[in] index      index of the gamepad slot (0-15)
+    /// @param[in] axisX      x-axis to query
+    /// @param[in] axisY      y-axis to query
+    /// @param[in] deadzone   the length threshhold beneath which both axes' combined length will be measured
+    ///                       against where if <= `deadzone`, both axis values will be forced to 0.
+    /// @returns a vector containing both axes.
     [[nodiscard]]
     auto getAxesMoved(Int index, GamepadAxis axisX, GamepadAxis axisY, Float deadzone = 0) const noexcept -> Bool;
 
     // ----- Mouse -----
 
     /// Check if a mouse button is currently pressed down
-    /// @param button the button to query
+    /// @param[in] button   the button to query
     /// @returns whether the button is currently pressed down
     [[nodiscard]]
     auto isDown(MouseBtn button) const noexcept -> Bool;
 
     /// Check if a mouse button is currently unpressed
-    /// @param button the button to query
+    /// @param[in] button   the button to query
     /// @returns whether the button is currently unpressed
     [[nodiscard]]
     auto isUp(MouseBtn button) const noexcept -> Bool;
 
     /// Check if a mouse button was just pressed
-    /// @param button the button to query
+    /// @param[in] button   the button to query
     /// @return whether the button has just been pressed this frame.
     [[nodiscard]]
     auto isJustDown(MouseBtn button) const noexcept -> Bool;
 
     /// Check if a mouse button was just released
-    /// @param button the button to query
+    /// @param[in] button   the button to query
     /// @returns whether the button has just been released this frame.
     [[nodiscard]]
     auto isJustUp(MouseBtn button) const noexcept -> Bool;

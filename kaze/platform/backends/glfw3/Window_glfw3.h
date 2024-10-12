@@ -37,8 +37,8 @@ namespace backend {
     };
 
     /// Get data from a glfw window
-    /// @param window window to get data from
-    /// @param outData retreives the data pointer
+    /// @param[in]  window    window to get data from
+    /// @param[out] outData   retreives the data pointer
     /// @returns whether retrieval was successful;
     ///          on true, `outData` is non-null and should contain associated data pointer
     auto getWindowData(const WindowHandle window, WindowData **outData) noexcept -> bool;

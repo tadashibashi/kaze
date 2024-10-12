@@ -21,8 +21,8 @@ public:
     [[nodiscard]] Float getAxis(GamepadAxis axis, Float deadzone = 0) const noexcept;
 
     /// Check if 1D axis changed values since last frame
-    /// @param axis axis to check
-    /// @param deadzone deadzone
+    /// @param[in] axis axis to check
+    /// @param[in] deadzone deadzone
     /// @returns whether axis moved since last frame
     [[nodiscard]] Bool  getAxisMoved(GamepadAxis axis, Float deadzone = 0) const noexcept;
 
@@ -30,11 +30,11 @@ public:
     [[nodiscard]] Bool  isConnected() const noexcept;
 
     /// Get a two-dimensional axis with deadzone.
-    /// @param axisX    index of x-axis to get
-    /// @param axisY    index of y-axis to get
-    /// @param deadzone measured against resultant length of the provided X and Y axes;
+    /// @param[in] axisX    index of x-axis to get
+    /// @param[in] axisY    index of y-axis to get
+    /// @param[in] deadzone measured against resultant length of the provided X and Y axes;
     ///                 any length at or beneath this value is clipped to 0.
-    /// @returns axes
+    /// @returns a vector containing both axes
     [[nodiscard]] Vec2f getAxes(GamepadAxis axisX, GamepadAxis axisY, Float deadzone = 0) const noexcept;
     [[nodiscard]] Bool  getAxesMoved(GamepadAxis axisX, GamepadAxis axisY, Float deadzone = 0) const noexcept;
 

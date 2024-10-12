@@ -15,8 +15,8 @@ public:
     ~Shader();
 
     /// Compile a shader from const data buffer
-    /// @param data   pointer to the shader data
-    /// @param length length of the data in bytes
+    /// @param[in] data     pointer to the shader data
+    /// @param[in] length   length of the data in bytes
     /// @return whether compilation succeeded or not
     auto compile(const void *data, Size length) -> Bool;
 

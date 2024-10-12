@@ -28,7 +28,7 @@ public:
     /// that the data is in big-endian format. You'll need to use the opposite order function if it is in little-endian.
 
     /// Create a color from an unsigned integer in RGBA format (big-endian)
-    /// @param value    the unsigned 32-bit integer to parse
+    /// @param[in] value    the unsigned 32-bit integer to parse
     [[nodiscard]] static constexpr Color fromRGBA8(const Uint value)
     {
         return {
@@ -40,7 +40,7 @@ public:
     }
 
     /// Create a color from an unsigned integer in ABGR format (big-endian)
-    /// @param value    the unsigned 32-bit integer to parse
+    /// @param[in] value    the unsigned 32-bit integer to parse
     [[nodiscard]] static constexpr Color fromABGR8(const Uint value)
     {
         return {
@@ -52,7 +52,7 @@ public:
     }
 
     /// Create a color from an unsigned integer in ARGB format (big-endian)
-    /// @param value    the unsigned 32-bit integer to parse
+    /// @param[in] value    the unsigned 32-bit integer to parse
     [[nodiscard]] static constexpr Color fromARGB8(const Uint value)
     {
         return {
@@ -64,7 +64,7 @@ public:
     }
 
     /// Create a color from an unsigned integer in BGRA format (big-endian)
-    /// @param value    the unsigned 32-bit integer to parse
+    /// @param[in] value    the unsigned 32-bit integer to parse
     [[nodiscard]] static constexpr Color fromBGRA8(const Uint value)
     {
         return {

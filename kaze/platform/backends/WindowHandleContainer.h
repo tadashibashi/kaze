@@ -20,26 +20,26 @@ namespace backend
         WindowHandle m_mainWindow{};
     public:
         /// Add a window to the container
-        /// @param window window to add
-        /// @param data   associated data to emplace
+        /// @param[in] window window to add
+        /// @param[in] data   associated data to emplace
         /// @returns whether the operation was successful.
         bool emplace(WindowHandle window, T &&data) noexcept;
 
         /// Check if the container contains a window handle
-        /// @param [in]  window   window to check for
-        /// @param [out] outContains whether the container has the window inside
+        /// @param[in]  window   window to check for
+        /// @param[out] outContains whether the container has the window inside
         /// @returns whether the retrieval was successful.
         bool contains(WindowHandle window, bool *outContains) noexcept;
 
         /// Erase a window from the container
-        /// @param [in]  window       the handle to remove from the s_windows set
-        /// @param [out] outWasErased retrieves whether the WindowHandle was erased from the container
+        /// @param[in]  window       the handle to remove from the s_windows set
+        /// @param[out] outWasErased retrieves whether the WindowHandle was erased from the container
         /// @returns whether retrieval succeeded.
         bool erase(WindowHandle window, bool *outWasErased = nullptr) noexcept;
 
         /// Get data associated with a window
-        /// @param [in]  window
-        /// @param [out] outData   retrieves the data pointer associated with the window, or `nullptr` if the window
+        /// @param[in]  window
+        /// @param[out] outData   retrieves the data pointer associated with the window, or `nullptr` if the window
         ///                        does not exist in this container.
         /// @returns whether retrieval succeeded.
         bool getData(WindowHandle window, T **outData) noexcept;

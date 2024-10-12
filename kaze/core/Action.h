@@ -105,8 +105,8 @@ public:
     }
 
     /// Check if a callback exists in the container
-    /// @param func function pointer
-    /// @param userptr associated user data context pointer
+    /// @param[in] func function pointer
+    /// @param[in] userptr associated user data context pointer
     /// @return whether callback exists in container or not
     auto contains(funcptr_t<void(Args..., void *)> func, void *userptr = nullptr) noexcept -> Bool
     {

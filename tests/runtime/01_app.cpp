@@ -99,10 +99,11 @@ private:
     }
 
     auto draw() -> void override {
-        const auto size = window().getDisplaySize();
-
+        const auto displaySize = window().getDisplaySize();
+        const auto size = window().getSize();
+        camera.setViewport({0, 0, size.x, size.y});
         renderable.setViewTransform(camera.getView(), camera.getProj());
-        renderable.setViewRect({0, 0, size.x, size.y});
+        renderable.setViewRect({0, 0, displaySize.x, displaySize.y});
         renderable.submit();
     }
 

@@ -16,6 +16,8 @@ target_sources(${PROJECT_NAME} PRIVATE
     errors.cpp
     endian.h
     json.h
+    memory.h
+    memory.cpp
 
     app/App.h
     app/App.cpp
@@ -41,6 +43,13 @@ target_sources(${PROJECT_NAME} PRIVATE
     input/Mouse.h
     input/Mouse.cpp
     input/MouseConstants.h
+
+    io/BufferView.h
+    io/BufferView.cpp
+    io/FileBuffer.h
+    io/FileBuffer.cpp
+    io/io.h
+    io/io.cpp
 
     macros/enum.h
     macros/map.h

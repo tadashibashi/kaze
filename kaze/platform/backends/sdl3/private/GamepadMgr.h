@@ -58,7 +58,7 @@ namespace backend
         auto connect(SDL_JoystickID id) noexcept -> int;
 
         /// Disconnect a gamepad owned by the GamepadMgr that was received in a gamepad disconnection event
-        /// @param id joystick id of the controller to remove
+        /// @param[in] id   joystick id of the controller to remove
         /// @returns  index slot of the gamepad, or -1 on error;
         ///           if `-1`, the manager probably doesn't own it, or it is an invalid id
         auto disconnect(SDL_JoystickID id) noexcept -> int;

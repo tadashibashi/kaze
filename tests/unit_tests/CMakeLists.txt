@@ -5,6 +5,7 @@ add_executable(${PROJECT_NAME}
     kaze/core/Action.test.cpp
     kaze/debug.tests.cpp
     kaze/graphics/Color.test.cpp
+    kaze/io/BufferView.test.cpp
     kaze/macros/enum.test.cpp
     kaze/math/Circle.test.cpp
     kaze/math/geometry.test.cpp

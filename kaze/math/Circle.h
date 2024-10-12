@@ -40,7 +40,7 @@ struct Circle {
     }
 
     /// Set the y position of the circle
-    /// @param y
+    /// @param[in] y  y-coord value to set
     /// @return
     constexpr Circle &setY(const T y) noexcept
     {

@@ -33,16 +33,16 @@ public:
     /// (the returned object will not clean up the handle via RAII). This is useful
     /// for enabling convenient access to window functionality when receiving a
     /// raw window pointer.
-    /// @param window window handle to pass
+    /// @param[in] window window handle to pass
     /// @returns Window wrapper. User should not call `close()` with it,
     /// as it will result in an error. The original Window must make this call.
     static Window fromHandleRef(WindowHandle window) noexcept;
 
     /// Open a window, or re-open it with the new settings if it is already open
-    /// @param title window title text
-    /// @param width logical width of the window
-    /// @param height logical height of the window
-    /// @param initFlags window attributes to initialize with
+    /// @param[in] title window title text
+    /// @param[in] width logical width of the window
+    /// @param[in] height logical height of the window
+    /// @param[in] initFlags window attributes to initialize with
     /// @returns whether the operation succeeded; a true return value means that
     ///          all other member functions in this class are ready to be called.
     auto open(
@@ -66,12 +66,12 @@ public:
     // ----- decoration -------------------------------------------------------
 
     /// Set the window's title bar text
-    /// @param title text to set
+    /// @param[in] title text to set
     /// @returns reference to this Window for chaining
     auto setTitle(Cstring title) noexcept -> Window &;
 
     /// Set the window's title bar text
-    /// @param title text to set
+    /// @param[in] title text to set
     /// @returns reference to this Window for chaining
     auto setTitle(const String &title) noexcept -> Window &;
 
@@ -84,7 +84,7 @@ public:
     auto isBordered() const noexcept -> Bool;
 
     /// Set whether the window is currently bordered
-    /// @param value `true` - window is bordered,
+    /// @param[in] value `true` - window is bordered,
     ///              `false` - window is borderless
     /// @returns reference to this Window for chained calls.
     auto setBordered(Bool value) noexcept -> Window &;
@@ -93,12 +93,12 @@ public:
     // ----- size & position --------------------------------------------------
 
     /// Set the size of the window in logical (virtual) units
-    /// @param size logical window size, packed into a Vec2i
+    /// @param[in] size logical window size, packed into a Vec2i
     auto setSize(Vec2i size) noexcept -> Window &;
 
     /// Set the size of the window in logical (virtual) units
-    /// @param width logical window width to set
-    /// @param height logical window height to set
+    /// @param[in] width logical window width to set
+    /// @param[in] height logical window height to set
     /// @returns reference to this Window for chained calls.
     auto setSize(Int width, Int height) noexcept -> Window &;
 
@@ -111,7 +111,7 @@ public:
     auto getPosition() const noexcept -> Vec2i;
 
     /// Set the position of the window
-    /// @param position position to set
+    /// @param[in] position position to set
     /// @returns reference to this Window for chained calls.
     auto setPosition(Vec2i position) noexcept -> Window &;
 
@@ -135,8 +135,8 @@ public:
     auto isFullscreen() const noexcept -> Bool;
 
     /// Set whether the window is fullscreen or regular windowed
-    /// @param value `true` - set window to fullscreen
-    ///              `false` - set window to windowed
+    /// @param[in] value `true` - set window to fullscreen
+    ///                  `false` - set window to windowed
     auto setFullscreen(Bool value) noexcept -> Window &;
 
     /// Get the fullscreen mode type
@@ -144,7 +144,7 @@ public:
     auto getFullscreenMode() const noexcept -> FullscreenMode;
 
     /// Set the fullscreen mode type
-    /// @param mode
+    /// @param[in] mode    fullscreen mode to set:
     ///     Desktop - remove bordered, make window take up entire screen
     ///     Native - utilize native platform for app fullscreen
     /// @returns reference to this Window for chained calls.
@@ -173,8 +173,8 @@ public:
     auto restore() noexcept -> Window &;
 
     /// Set whether the window should always float on top
-    /// @param value `true` set window to float on top of others
-    ///              `false` set window to behave regularly–overlappable by others
+    /// @param[in] value   `true` set window to float on top of others
+    ///                    `false` set window to behave regularly–overlappable by others
     /// @returns wreference to this Window for chained calls.
     auto setFloating(Bool value) noexcept -> Window &;
 
@@ -183,8 +183,9 @@ public:
     auto isFloating() const noexcept -> Bool;
 
     /// Set whether this window is hidden or not
-    /// @param value `true` hide window,
-    ///              `false` show window
+    /// @param[in] value   hidden setting:
+    ///                    `true` hide window,
+    ///                    `false` show window
     /// @returns reference to this Window for chained calls.
     auto setHidden(Bool value) noexcept -> Window &;
 
@@ -193,8 +194,9 @@ public:
     auto isHidden() const noexcept -> Bool;
 
     /// Set whether this window is set to have a transparent background (default: false)
-    /// @param value `true` window background is capable of transparency (visible with transparent alpha clear color);
-    ///              `false` window has a solid background, non-transparent;
+    /// @param[in] value   transparency setting:
+    ///                    `true` window background is capable of transparency (visible with transparent alpha clear color);
+    ///                    `false` window has a solid background, non-transparent;
     /// @returns reference to this Window for chained calls.
     auto setTransparent(Bool value) noexcept -> Window &;
 
@@ -210,9 +212,9 @@ public:
     auto isFocused() const noexcept -> Bool;
 
     /// Set whether the window is in cursor capture mode
-    /// @param value `true` - cursor is centered in screen, and values received
-    ///                       from the cursor motion event are relative;
-    ///              `false` - cursor is free to move, and values received from
+    /// @param[in] value `true` - cursor is centered in screen, and values received
+    ///                           from the cursor motion event are relative;
+    ///                  `false` - cursor is free to move, and values received from
     ///                       the cursor are positional (not relative)
     /// @returns reference to this Window for chained calls.
     auto setCursorCaptureMode(Bool value) noexcept -> Window &;
@@ -223,8 +225,8 @@ public:
     auto getCursorCaptureMode() const noexcept -> Bool;
 
     /// Set whether cursor should be visible in the window
-    /// @param value `true` cursor is visible when inside the window,
-    ///              `false` cursor is invisible when inside the window
+    /// @param[in] value `true` cursor is visible when inside the window,
+    ///                  `false` cursor is invisible when inside the window
     /// @returns reference to this Window for chained calls.
     auto setCursorVisibleMode(Bool value) noexcept -> Window &;
 

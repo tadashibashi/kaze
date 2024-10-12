@@ -140,6 +140,20 @@ struct Rect
         return !(other.position.x + other.size.x <= position.x || other.position.x >= position.x + size.x ||
             other.position.y + other.size.y <= position.y || other.position.y >= position.y + size.y);
     }
+
+    template <Arithmetic U>
+    [[nodiscard]]
+    auto operator==(const Rect<U> &other) const noexcept
+    {
+        return x == other.x && y == other.y && w == other.w && h == other.h;
+    }
+
+    template <Arithmetic U>
+    [[nodiscard]]
+    auto operator !=(const Rect<U> &other) const noexcept
+    {
+        return !operator==(other);
+    }
 };
 
 using Recti = Rect<Int>;
