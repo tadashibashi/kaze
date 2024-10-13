@@ -5,24 +5,28 @@
 #include <kaze/math/Vec/Vec3.h>
 #include <kaze/video/GraphicsMgr.h>
 #include <kaze/video/Renderable.h>
+#include <kaze/video/Texture2D.h>
 
-#include "f_simple.h"
-#include "v_simple.h"
+#include "spritebatch_f.sc.bin.h"
+#include "spritebatch_v.sc.bin.h"
 
 #include <bgfx/bgfx.h>
+#include <kaze/core/AssetLoader.h>
+#include <kaze/video/UniformMgr.h>
 
 USING_KAZE_NAMESPACE;
 
 struct Vertex {
     Vec3f position;
+    Vec2f uv;
     Color color;
 };
 
 Vertex rectVertices[] = {
-    { {50, 50, 0.0f},   Color::fromRGBA8(0xff0000ff) },
-    { {100, 50, 0.0f},  Color::fromRGBA8(0xff0000ff) },
-    { {100, 100, 0.0f}, Color::fromRGBA8(0xff00ff00) },
-    { {50, 100, 0.0f},  Color::fromRGBA8(0xff00ff00) }
+    { {50, 50, 0.0f},   {0, 0},  Color::White },
+    { {100, 50, 0.0f},  {1, 0},  Color::White },
+    { {100, 100, 0.0f}, {1, 1},  Color::White },
+    { {50, 100, 0.0f},  {0, 1},  Color::White }
 };
 
 Uint16 rectTriangles[] = {
@@ -40,20 +44,35 @@ public:
 private:
     Renderable renderable;
     Camera2D camera;
+    Texture2D pixel;
+    UniformMgr uniforms;
+    AssetLoader<String, Texture2D> textures;
+    const Texture2D *warioTexture{};
 
     auto init() -> Bool override {
         if ( !renderable.init({
-            .vertShader = Shader(v_simple, std::size(v_simple)),
-            .fragShader = Shader(f_simple, std::size(f_simple)),
+            .vertShader = Shader(spritebatch_v_mtl, std::size(spritebatch_v_mtl)),
+            .fragShader = Shader(spritebatch_f_mtl, std::size(spritebatch_f_mtl)),
             .layout = VertexLayout()
                 .begin()
                     .add(Attrib::Position, 3, AttribType::Float)
+                    .add(Attrib::TexCoord0, 2, AttribType::Float)
                     .add(Attrib::Color0, 4, AttribType::Uint8, KAZE_TRUE)
                 .end(),
             .viewId = 0,
             .initialVertexCount = 10000,
             .initialIndexCount = 10000
         }) )
+        {
+            return KAZE_FALSE;
+        }
+
+        if ( !pixel.loadPixels(&Color::White, 1, 1, 1) )
+        {
+            return KAZE_FALSE;
+        }
+
+        if (warioTexture = textures.load("dungeon_tiles.png"); warioTexture == nullptr)
         {
             return KAZE_FALSE;
         }
@@ -87,6 +106,16 @@ private:
             camera.setPosition(camera.getPosition() + Vec2f{4.f, 0});
         }
 
+        if (input().isDown(Key::Up))
+        {
+            camera.setPosition(camera.getPosition() + Vec2f{0, -4.f});
+        }
+
+        if (input().isDown(Key::Down))
+        {
+            camera.setPosition(camera.getPosition() + Vec2f{0, 4.f});
+        }
+
         if (input().isDown(Key::Z))
         {
             camera.setScale(camera.getScale() + Vec2f{.05f, .05f});
@@ -102,12 +131,17 @@ private:
         const auto displaySize = window().getDisplaySize();
         const auto size = window().getSize();
         camera.setViewport({0, 0, size.x, size.y});
+
+        uniforms.setTexture(0, *warioTexture);
         renderable.setViewTransform(camera.getView(), camera.getProj());
         renderable.setViewRect({0, 0, displaySize.x, displaySize.y});
         renderable.submit();
     }
 
     auto close() -> void override {
+        uniforms.clear();
+        pixel.release();
+        textures.clear();
         renderable.release();
     }
 };

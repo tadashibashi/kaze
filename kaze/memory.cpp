@@ -16,7 +16,7 @@ auto alloc(const Size bytes) -> void *
     return buffer;
 }
 
-auto free(void *memory) -> void
+auto release(void *memory) -> void
 {
     std::free(memory);
 }

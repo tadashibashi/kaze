@@ -83,11 +83,10 @@ auto BufferView::read(void *data, Int64 bytes, Endian::Type endian) noexcept -> 
     }
     else
     {
-        copy(data, m_head, bytesToRead);
+        KAZE_NAMESPACE::copy(data, m_head, bytesToRead);
     }
 
-
-
+    // Progress head
     if (bytesToRead < bytes)
     {
         m_isEof = true;
@@ -98,31 +97,28 @@ auto BufferView::read(void *data, Int64 bytes, Endian::Type endian) noexcept -> 
         m_head += bytesToRead;
     }
 
+    // Done
     return bytesToRead;
 }
 
 auto BufferView::seek(Int64 offset, SeekBase::Enum base) -> BufferView &
 {
+    // Seek by base
     switch (base)
     {
-    case SeekBase::Start:
-        m_head = m_begin + offset;
-        break;
-    case SeekBase::Relative:
-        m_head = m_head + offset;
-        break;
-    case SeekBase::End:
-        m_head = m_end + offset;
-        break;
-    default:
-        break;
+    case SeekBase::Start:     m_head = m_begin + offset; break;
+    case SeekBase::Relative:  m_head = m_head + offset;  break;
+    case SeekBase::End:       m_head = m_end + offset;   break;
+    default:                  return *this;
     }
 
+    // Set eof flag
     if (m_head >= m_end)
         m_isEof = true;
     else if (m_isEof && m_head < m_end)
         m_isEof = false;
 
+    // Clamp head
     if (m_head < m_begin)
         m_head = m_begin;
     if (m_head > m_end)

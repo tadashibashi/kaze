@@ -6,7 +6,7 @@
 #include <fstream>
 
 KAZE_NAMESPACE_BEGIN
-const int BytesPerRead = 1024;
+constexpr int BytesPerRead = 1024;
 
 auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool
 {
@@ -25,6 +25,7 @@ auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool
     if ( !outSize )
     {
         KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outSize` was null");
+        return KAZE_FALSE;
     }
 
     std::ifstream file(path, std::ios::binary | std::ios::in);
@@ -43,19 +44,26 @@ auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool
         return KAZE_FALSE;
     }
 
-    Ubyte *data = alloc<Ubyte>(byteLength);
+    byteLength = file.tellg();
+    if ( !file.seekg(0, std::ios::beg) ) // seek back to beginning to read entire file
+    {
+        KAZE_CORE_ERRCODE(Error::FileSeekErr, "Failed to seek to beginning of file");
+        return KAZE_FALSE;
+    }
+
+    auto data = static_cast<Ubyte *>(alloc(byteLength));
     if ( !data )
     {
         return KAZE_FALSE;
     }
 
-    byteLength = file.tellg();
     Size b = 0;
     for (const Int64 limit = static_cast<Int64>(byteLength) - static_cast<Int64>(BytesPerRead); b <= limit; b += BytesPerRead)
     {
-        if ( !file.read((char *)&data[b], BytesPerRead) )
+        if ( !file.read((char *)data + b, BytesPerRead) )
         {
             KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
+            kaze::release(data);
             return KAZE_FALSE;
         }
     }
@@ -63,9 +71,10 @@ auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool
     // Catch leftovers
     if (b < byteLength)
     {
-        if ( !file.read((char *)&data[b], byteLength - b) )
+        if ( !file.read((char *)data + b, byteLength - b) )
         {
             KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
+            kaze::release(data);
             return KAZE_FALSE;
         }
     }

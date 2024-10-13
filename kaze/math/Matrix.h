@@ -61,22 +61,25 @@ struct alignas(16) Matrix {
         return mat;
     }
 
-    [[nodiscard]] static constexpr auto fromOrtho(T left, T right, T top, T bottom) -> std::enable_if_t< Cols==4 && Rows==4, Matrix >
+    [[nodiscard]] static constexpr auto fromOrtho(T left, T right, T top, T bottom) -> Matrix<T, Cols, Rows>
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         bx::mtxOrtho(result.data(), left, right, bottom, top, 0, 100.f, 0, bgfx::getCaps()->homogeneousDepth);
         return result;
     }
 
-    [[nodiscard]] static constexpr auto fromPerspective(T fovy, T aspect, T near, T far) -> std::enable_if_t<Cols==4 && Rows==4, Matrix>
+    [[nodiscard]] static constexpr auto fromPerspective(T fovy, T aspect, T near, T far) -> Matrix<T, Cols, Rows>
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         result.m_mat = glm::perspective(fovy, aspect, near, far);
         return result;
     }
 
-    [[nodiscard]] constexpr auto isNaN() const noexcept -> std::enable_if_t<std::is_base_of_v<VecBase<T, Rows>, Vec<T, Rows>>, bool>
+    [[nodiscard]] constexpr auto isNaN() const noexcept -> bool
     {
+        static_assert(std::is_base_of_v<VecBase<T, Rows>, Vec<T, Rows>>, "This function is only available if VecBase was subclassed for this template's vector columns");
         for (Size col = 0; col < Cols; ++col)
         {
             if (m_cols[col].isNaN())
@@ -123,8 +126,9 @@ struct alignas(16) Matrix {
 
     // ===== Transformation ===================================================
 
-    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 2> &v) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 2> &v) const -> Matrix<T, Cols, Rows>
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         result.m_mat = glm::translate(m_mat, glm::vec<3, T>{
             v.x,
@@ -134,8 +138,9 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 3> &v) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 3> &v) const -> Matrix<T, Cols, Rows>
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         result.m_mat = glm::translate(m_mat, glm::vec<3, T>{
             v.x,
@@ -145,8 +150,9 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto translate(const Vec<T, 2> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
+    constexpr auto translate(const Vec<T, 2> &v) -> Matrix<T, Cols, Rows> &
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::translate(m_mat, glm::vec<3, T>{
             v.x,
             v.y,
@@ -155,8 +161,9 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto translate(const Vec<T, 3> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
+    constexpr auto translate(const Vec<T, 3> &v) -> Matrix<T, Cols, Rows> &
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::translate(m_mat, glm::vec<3, T>{
             v.x,
             v.y,
@@ -165,21 +172,24 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto toInverse() const -> std::enable_if_t<Cols == Rows, Matrix>
+    constexpr auto toInverse() const -> Matrix
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         result.m_mat = glm::inverse(m_mat);
         return result;
     }
 
-    constexpr auto inverse() -> std::enable_if_t<Cols == Rows, Matrix &>
+    constexpr auto inverse() -> Matrix<T, Cols, Rows> &
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::inverse(m_mat);
         return *this;
     }
 
-    constexpr auto toScaled(const Vec<T, 3> &v) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    constexpr auto toScaled(const Vec<T, 3> &v) const -> Matrix<T, Cols, Rows>
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         result.m_mat = glm::scale(m_mat, glm::vec<3, T>{
             v.x,
@@ -190,8 +200,9 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto scale(const Vec<T, 3> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
+    constexpr auto scale(const Vec<T, 3> &v) -> Matrix<T, Cols, Rows> &
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::scale(m_mat, glm::vec<3, T>{
             v.x,
             v.y,
@@ -201,8 +212,9 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto toScaled(const Vec<T, 2> &v) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    constexpr auto toScaled(const Vec<T, 2> &v) const -> Matrix<T, Cols, Rows>
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         result.m_mat = glm::scale(m_mat, glm::vec<3, T>{
             v.x,
@@ -213,8 +225,9 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto scale(const Vec<T, 2> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
+    constexpr auto scale(const Vec<T, 2> &v) -> Matrix<T, Cols, Rows> &
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::scale(m_mat, glm::vec<3, T>{
             v.x,
             v.y,
@@ -224,8 +237,9 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto toRotated(T angle, const Vec<T, 3> &axis) const -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix>
+    constexpr auto toRotated(T angle, const Vec<T, 3> &axis) const -> Matrix<T, Cols, Rows>
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
         result.m_mat = glm::rotate(m_mat, angle, glm::vec<3, T>{
             axis.x,
@@ -236,8 +250,9 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto rotate(T angle, const Vec<T, 3> &v) -> std::enable_if_t<Cols == 4 && Rows == 4, Matrix &>
+    constexpr auto rotate(T angle, const Vec<T, 3> &v) -> Matrix<T, Cols, Rows> &
     {
+        static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::rotate(m_mat, angle, glm::vec<3, T>{
             v.x,
             v.y,
@@ -379,8 +394,11 @@ constexpr Matrix<MT, Cols, Rows> operator *(ST scalar, const Matrix<MT, Cols, Ro
     return mat * scalar;
 }
 
+using Mat3f = Matrix<Float, 3, 3>;
+using Mat3d = Matrix<Double, 3, 3>;
 using Mat4f = Matrix<Float, 4, 4>;
 using Mat4d = Matrix<Double, 4, 4>;
+
 
 KAZE_NAMESPACE_END
 

@@ -40,7 +40,10 @@ KAZE_NAMESPACE_END
 #define KAZE_CORE_LOG(...) KAZE_NOOP
 #define KAZE_CORE_WARN(...) KAZE_NOOP
 #define KAZE_CORE_ERR(...) KAZE_NAMESPACE::setError(std::format(__VA_ARGS__))
-#define KAZE_CORE_ERRCODE(code, ...) KAZE_NAMESPACE::setError(std::format(__VA_ARGS__), (code), __FILE__, __LINE__)
+#define KAZE_CORE_ERRCODE(code, ...) do { \
+    const auto kmacromessage = std::format(__VA_ARGS__); \
+    KAZE_NAMESPACE::setError(kmacromessage, (code), (__FILE__), (__LINE__)); \
+} while(0)
 
 #define KAZE_LOG(...) KAZE_NOOP
 #define KAZE_WARN(...) KAZE_NOOP

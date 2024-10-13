@@ -48,8 +48,17 @@ concept Shape2DLike =
 template <typename T>
 concept Concrete = !std::is_abstract_v<T>;
 
+template <typename T>
+concept Hashable = requires(T a) {
+    { std::hash<T>{}(a) } -> std::same_as<std::size_t>; // Must be hashable
+    { a == a } -> std::convertible_to<bool>;            // Must be equality comparable
+};
 
-
+template <typename T, typename K>
+concept LoadableAsset =
+    std::is_default_constructible_v<T> &&
+    std::is_same_v<Bool, decltype(std::declval<T>().load(std::declval<K>()))> &&
+    std::is_same_v<void, decltype(std::declval<T>().release())>;
 
 KAZE_NAMESPACE_END
 

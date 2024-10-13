@@ -40,7 +40,10 @@ struct Error
         OutOfMemory,          ///< System is out of memory
 
         ShaderCompileErr,     ///< Shader encountered an error during compilation
-        ShaderLinkErr,         ///< Shader program encountered an error during link
+        ShaderLinkErr,        ///< Shader program encountered an error during link
+
+        InvalidEnum,          ///< Invalid enum value passed to a function
+        MissingKeyErr,        ///< Dictionary/Map is missing an expected key
 
         Count                 ///< Number of error codes
     };

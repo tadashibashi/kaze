@@ -4,9 +4,51 @@ else()
     project(kaze LANGUAGES C CXX)
 endif()
 
+# Library
+
 include(kaze/dependencies)
 
 add_library(${PROJECT_NAME})
+
+# Built-in Shaders
+include(bgfxToolUtils)
+
+set(KAZE_SHADER_ROOT ${CMAKE_BINARY_DIR}/include/generated/shaders)
+if (EMSCRIPTEN)
+    set (KAZE_SHADER_INCLUDES ${KAZE_SHADER_ROOT}/essl)
+elseif(APPLE)
+    set (KAZE_SHADER_INCLUDES ${KAZE_SHADER_ROOT}/mtl)
+elseif(WINDOWS)
+    set (KAZE_SHADER_INCLUDES ${KAZE_SHADER_ROOT}/dx11)
+elseif(ANDROID) # TODO: compatibility via OpenGLES on older devices
+    set (KAZE_SHADER_INCLUDES ${KAZE_SHADER_ROOT}/spv)
+elseif(LINUX)   # TODO: compatibility via OpenGL on older devices
+    set (KAZE_SHADER_INCLUDES ${KAZE_SHADER_ROOT}/spv)
+else() # Default to OpenGL
+    set (KAZE_SHADER_INCLUDES ${KAZE_SHADER_ROOT}/glsl)
+endif()
+
+bgfx_compile_shaders(
+    TYPE VERTEX
+    SHADERS shaders/spritebatch_v.sc
+    VARYING_DEF ${CMAKE_CURRENT_SOURCE_DIR}/shaders/varying.def.sc
+    OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders
+    INCLUDE_DIRS ${BGFX_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+    AS_HEADERS
+)
+bgfx_compile_shaders(
+    TYPE FRAGMENT
+    SHADERS shaders/spritebatch_f.sc
+    VARYING_DEF ${CMAKE_CURRENT_SOURCE_DIR}/shaders/varying.def.sc
+    OUTPUT_DIR ${CMAKE_BINARY_DIR}/include/generated/shaders
+    INCLUDE_DIRS ${BGFX_DIR}/src ${CMAKE_CURRENT_SOURCE_DIR}/shaders
+    AS_HEADERS
+)
+set(KAZE_SHADER_SOURCES
+    shaders/spritebatch_v.sc
+    shaders/spritebatch_f.sc
+)
+
 target_sources(${PROJECT_NAME} PRIVATE
     kaze.h
     concepts.h
@@ -25,9 +67,12 @@ target_sources(${PROJECT_NAME} PRIVATE
     app/BackendInitGuard.cpp
     app/Camera2D.h
     app/Camera2D.cpp
+    app/InputRouter.h
+    app/InputRouter.cpp
     app/SpriteBatch.h
     app/SpriteBatch.cpp
 
+    core/AssetLoader.h
     core/Optional.h
     core/ServiceProvider.h
     core/ServiceProvider.cpp
@@ -85,6 +130,10 @@ target_sources(${PROJECT_NAME} PRIVATE
     video/Shader.cpp
     video/ShaderProgram.h
     video/ShaderProgram.cpp
+    video/Texture2D.h
+    video/Texture2D.cpp
+    video/UniformMgr.h
+    video/UniformMgr.cpp
     video/VertexLayout.h
     video/VertexLayout.cpp
     video/Window.h
@@ -92,9 +141,10 @@ target_sources(${PROJECT_NAME} PRIVATE
     video/WindowConstants.h
 
     ${KAZE_BACKEND_SOURCES}
+    ${KAZE_SHADER_SOURCES}
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${KAZE_ROOT})
+target_include_directories(${PROJECT_NAME} PUBLIC ${KAZE_ROOT} ${KAZE_SHADER_INCLUDES})
 target_compile_definitions(${PROJECT_NAME} PUBLIC
     KAZE_NAMESPACE=${KAZE_NAMESPACE}
     KAZE_DEBUG=${KAZE_DEBUG}
@@ -107,7 +157,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     glm
     nlohmann_json
     spdlog::spdlog
-    bgfx bx bimg
+    bgfx bx bimg bimg_decode
     ${KAZE_BACKEND_LIBRARIES}
 )
 target_link_options(${PROJECT_NAME} PUBLIC ${KAZE_BACKEND_LINK_FLAGS})

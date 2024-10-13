@@ -2,9 +2,10 @@
 #ifndef kaze_video_graphicsmgr_h_
 #define kaze_video_graphicsmgr_h_
 
+#include "Color.h"
+
 #include <kaze/kaze.h>
 #include <kaze/video/WindowConstants.h>
-#include "Color.h"
 
 KAZE_NAMESPACE_BEGIN
 

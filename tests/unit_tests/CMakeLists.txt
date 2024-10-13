@@ -17,6 +17,7 @@ add_executable(${PROJECT_NAME}
     kaze/math/Vec3.test.cpp
     kaze/math/Vec4.test.cpp
     tests.cpp
+        kaze/core/AssetLoader.test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE kaze doctest::doctest)

@@ -9,6 +9,7 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
+#include <map>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -67,6 +68,10 @@ using HashSet = std::unordered_set<T, Hash, Pred, Alloc>;
 
 template <typename T, typename Allocator = std::allocator<T>>
 using List = std::vector<T, Allocator>;
+
+template <typename K, typename V, typename Hash = std::hash<K>, typename Pred = std::equal_to<K>,
+          typename Alloc = std::allocator<std::pair<const K, V> >>
+using Map = std::map<K, V>;
 
 template <typename T, Uint Size>
 using Array = std::array<T, Size>;

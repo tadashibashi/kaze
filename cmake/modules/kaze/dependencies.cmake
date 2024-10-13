@@ -27,6 +27,8 @@ FetchContent_Declare(bgfx
 
 FetchContent_MakeAvailable(json gcem glm spdlog bgfx)
 
+list(APPEND CMAKE_MODULE_PATH ${bgfx_SOURCE_DIR}/cmake)
+
 # ===== Backend ===============================================================
 # Backends are fetched from a cmake module and the following variables are available to set:
 # KAZE_BACKEND_LINK_FLAGS:      C++ linker flags (passed to Kaze's target_link_options)
@@ -46,4 +48,6 @@ else()
 endif()
 
 message("Kaze Backend: ${KAZE_BACKEND}")
+
+
 

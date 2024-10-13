@@ -19,6 +19,7 @@ auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool;
 /// @param[in]  path    path to the file to write (does not need to exist yet)
 /// @param[in]  data    pointer to the source data buffer
 /// @param[in]  size    size of the data buffer in bytes
+/// @returns whether operation succeeded
 auto writeFile(Cstring path, void *data, Size size) -> Bool;
 
 KAZE_NAMESPACE_END
