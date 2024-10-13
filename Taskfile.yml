@@ -30,7 +30,7 @@ tasks:
     vars:
         TEST_NAME: "{{index .MATCH 0}}"
     cmds:
-      - build/desktop/tests/runtime/kaze_test_{{.TEST_NAME}}
+      - cd build/desktop/tests/runtime && ./kaze_test_{{.TEST_NAME}}
 
   build-sandbox-web:
     cmds:
