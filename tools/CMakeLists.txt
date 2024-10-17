@@ -1,0 +1,1 @@
+add_subdirectory(kaze_shaderc)

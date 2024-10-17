@@ -5,12 +5,14 @@
 #include <kaze/concepts.h>
 #include <kaze/debug.h>
 #include <kaze/endian.h>
+#include <kaze/core/Memory.h>
 
 #include <limits>
 #include <stdexcept>
 
+
 KAZE_NAMESPACE_BEGIN
-struct SeekBase {
+    struct SeekBase {
     enum Enum {
         Start,
         Relative,
@@ -24,21 +26,9 @@ public:
     /// Null buffer with nothing in it
     BufferView();
 
-    /// @param[in] data        pointer to the data buffer to view
-    /// @param[in] byteLength  size of the data in the buffer
-    /// @param[in] endian      expected endianness of integral types for arithmetic read overloads
-    BufferView(const void *data, Size byteLength, Endian::Type endian = Endian::Little) noexcept;
-
-    /// @tparam T  container type, which has `size` and `data` buffer getters.
-    /// @param[in] container contains the byte data to view
+    /// @param[in] mem       const memory to view
     /// @param[in] endian    expected endianness of integral types for arithmetic read overloads
-    template <typename T> requires
-        std::is_arithmetic_v< decltype(std::declval<T>().size()) > &&
-        std::is_pointer_v<    decltype(std::declval<T>().data() )>
-    BufferView(const T &container, Endian::Type endian = Endian::Little) :
-        BufferView(container.data(), container.size(), endian)
-    { }
-
+    explicit BufferView(Memory mem, Endian::Type endian = Endian::Little) noexcept;
     ~BufferView() = default;
 
     template <Arithmetic T>

@@ -9,13 +9,21 @@
 
 KAZE_NAMESPACE_BEGIN
 
+struct GraphicsInit
+{
+    WindowHandle window;  ///< A valid window that is already open
+    Color clearColor = {100, 154, 206, 235}; /// Default background clear color
+    Size maxTransientVBufferSize = 4000 * 1024; /// Max transient vertex buffer size (hard limit)
+    Size maxTransientIBufferSize = 6000 * 1024; /// Max transient index buffer size (hard limit)
+};
+
 /// Sets up graphics API functionality
 class GraphicsMgr {
 public:
     GraphicsMgr();
     ~GraphicsMgr();
 
-    auto init(WindowHandle window, Color clearColor = Color(100, 154, 206, 235)) -> Bool;
+    auto init(const GraphicsInit &initConfig) -> Bool;
     auto close() -> void;
 
     /// Reset graphics setting and backbuffer size

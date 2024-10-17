@@ -19,6 +19,8 @@ else()
     set(KAZE_IS_ROOT OFF CACHE BOOL "" FORCE)
 endif()
 
+include(kaze/utils)
+
 # ===== Options =================================================================
 include(kaze/option_defaults)
 
@@ -39,7 +41,7 @@ set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland su
 
 # ===== Projects ==============================================================
 add_subdirectory(kaze)
-
+add_subdirectory(tools)
 if (KAZE_BUILD_TESTS)
     add_subdirectory(tests)
 endif()

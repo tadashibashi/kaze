@@ -6,6 +6,7 @@
 #include "VertexLayout.h"
 
 #include <kaze/kaze.h>
+#include <kaze/core/Memory.h>
 #include <kaze/math/Matrix.h>
 #include <kaze/math/Rect.h>
 
@@ -26,12 +27,13 @@ public:
     ~Renderable();
 
     auto init(const Init &config) -> Bool;
+    auto wasInit() const -> Bool;
     auto release() -> void;
 
     template <typename T>
     auto setVertices(const List<T> &vertices) -> Renderable &
     {
-        return setVertices(vertices.data(), vertices.size() * sizeof(T));
+        return setVertices( Memory(vertices.data(), vertices.size() * sizeof(T)) );
     }
 
     auto setIndices(const List<Uint16> &indices) -> Renderable &
@@ -39,14 +41,18 @@ public:
         return setIndices(indices.data(), indices.size());
     }
 
+    auto activateVertices(Uint startVertex, Uint vertexCount) -> Renderable &;
+    auto activateIndices(Uint startIndex, Uint indexCount) -> Renderable &;
+
     auto setViewTransform(const Mat4f &view, const Mat4f &projection) -> Renderable &;
     auto setViewTransform(const Float *view, const Float *projection) -> Renderable &;
     auto setViewRect(const Recti &rect) -> Renderable &;
 
-    auto setVertices(void *data, Size byteSize) -> Renderable &;
+    auto setVertices(Memory mem) -> Renderable &;
     auto setIndices(const Uint16 *data, Size elements) -> Renderable &;
 
     auto submit() -> void;
+    auto submit(Uint vertexStart, Uint vertexCount, Uint indexStart, Uint indexCount) const -> void;
 
     auto setViewId(Int viewId) -> Renderable &;
     auto getViewId() const noexcept -> Int;

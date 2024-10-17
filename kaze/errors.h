@@ -44,6 +44,8 @@ struct Error
 
         InvalidEnum,          ///< Invalid enum value passed to a function
         MissingKeyErr,        ///< Dictionary/Map is missing an expected key
+        InvalidArgErr,        ///< Argument is not valid
+        Unsupported,          ///< Feature not supported
 
         Count                 ///< Number of error codes
     };

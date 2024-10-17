@@ -79,6 +79,10 @@ struct Rect
     constexpr T right() const noexcept { return x + w; }
     constexpr T top() const noexcept { return y; }
     constexpr T bottom() const noexcept { return y + h; }
+    constexpr Vec<T, 2> topLeft() const noexcept { return {left(), top()}; }
+    constexpr Vec<T, 2> topRight() const noexcept { return {right(), top()}; }
+    constexpr Vec<T, 2> bottomLeft() const noexcept { return {left(), bottom()}; }
+    constexpr Vec<T, 2> bottomRight() const noexcept { return {right(), bottom()}; }
 
     constexpr Rect &left(T value) noexcept
     {

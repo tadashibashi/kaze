@@ -2,37 +2,69 @@
 #include <kaze/debug.h>
 #include <kaze/memory.h>
 
+#include <bgfx/bgfx.h>
 #include <filesystem>
 #include <fstream>
 
 KAZE_NAMESPACE_BEGIN
-constexpr int BytesPerRead = 1024;
-
-auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool
+    constexpr int BytesPerRead = 1024;
+static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
 {
-    if ( !path )
-    {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `path` was null");
-        return KAZE_FALSE;
-    }
-
-    if ( !outData )
+    if ( !data )
     {
         KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outData` was null");
         return KAZE_FALSE;
     }
 
-    if ( !outSize )
+    if ( !size )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outSize` was null");
+        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outSize` was 0");
         return KAZE_FALSE;
     }
 
-    std::ifstream file(path, std::ios::binary | std::ios::in);
-
     if ( !file.is_open() )
     {
-        KAZE_CORE_ERRCODE(Error::FileOpenErr, "Failed to open file at '{}'", path);
+        KAZE_CORE_ERRCODE(Error::FileOpenErr, "std::ifstream provided was not open");
+        return KAZE_FALSE;
+    }
+
+    Size b = 0;
+    for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerRead); b <= limit; b += BytesPerRead)
+    {
+        if ( !file.read((char *)data + b, BytesPerRead) )
+        {
+            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
+            kaze::release(data);
+            return KAZE_FALSE;
+        }
+    }
+
+    // Catch leftovers
+    if (b < size)
+    {
+        if ( !file.read((char *)data + b, size - b) )
+        {
+            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
+            kaze::release(data);
+            return KAZE_FALSE;
+        }
+    }
+
+    return KAZE_TRUE;
+}
+
+auto loadFile(StringView path, Ubyte **outData, Size *outSize) -> Bool
+{
+    if ( !path.data() )
+    {
+        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `path.data()` was null");
+        return KAZE_FALSE;
+    }
+
+    std::ifstream file(path, std::ios::in | std::ios::binary);
+    if ( !file.is_open() )
+    {
+        KAZE_CORE_ERRCODE(Error::FileOpenErr, "failed to open file at: \"{}\"", path);
         return KAZE_FALSE;
     }
 
@@ -51,32 +83,22 @@ auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool
         return KAZE_FALSE;
     }
 
-    auto data = static_cast<Ubyte *>(alloc(byteLength));
+    if (byteLength == 0)
+    {
+        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Empty file: file must have more than 0 bytes");
+        return KAZE_FALSE;
+    }
+
+    auto data = kaze::alloc<Ubyte>(byteLength);
     if ( !data )
     {
         return KAZE_FALSE;
     }
 
-    Size b = 0;
-    for (const Int64 limit = static_cast<Int64>(byteLength) - static_cast<Int64>(BytesPerRead); b <= limit; b += BytesPerRead)
+    if ( !loadFile(file, data, byteLength) )
     {
-        if ( !file.read((char *)data + b, BytesPerRead) )
-        {
-            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
-            kaze::release(data);
-            return KAZE_FALSE;
-        }
-    }
-
-    // Catch leftovers
-    if (b < byteLength)
-    {
-        if ( !file.read((char *)data + b, byteLength - b) )
-        {
-            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
-            kaze::release(data);
-            return KAZE_FALSE;
-        }
+        kaze::release(data);
+        return KAZE_FALSE;
     }
 
     *outData = data;
@@ -84,8 +106,11 @@ auto loadFile(Cstring path, Ubyte **outData, Size *outSize) -> Bool
     return KAZE_TRUE;
 }
 
-auto writeFile(Cstring path, void *data, Size size) -> Bool
+auto writeFile(StringView path, const Memory mem) -> Bool
 {
+    const auto size = mem.size();
+    const auto data = (const char *)mem.data();
+
     if (const auto fsPath = std::filesystem::path(path); fsPath.has_parent_path())
     {
         if (const auto parent = fsPath.parent_path(); !std::filesystem::exists(fsPath.parent_path()))
@@ -104,7 +129,7 @@ auto writeFile(Cstring path, void *data, Size size) -> Bool
     Size b = 0;
     for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerRead); b <= limit; b += BytesPerRead)
     {
-        if ( !file.write((char *)(data) + b, BytesPerRead) )
+        if ( !file.write(data + b, BytesPerRead) )
         {
             KAZE_CORE_ERRCODE(Error::FileWriteErr, "Failed to write file for writing at: {}, byte {}", path, b);
             return KAZE_FALSE;
@@ -114,7 +139,7 @@ auto writeFile(Cstring path, void *data, Size size) -> Bool
     // Catch leftovers
     if (b < size)
     {
-        if ( !file.write((char *)(data) + b, size - b) )
+        if ( !file.write(data + b, size - b) )
         {
             KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
             return KAZE_FALSE;

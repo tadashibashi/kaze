@@ -8,11 +8,11 @@ KAZE_NAMESPACE_BEGIN
 BufferView::BufferView() : m_begin(), m_end(), m_head(), m_isEof(false), m_endian(Endian::Native)
 { }
 
-BufferView::BufferView(const void *data, Size byteLength, Endian::Type endian) noexcept :
-    m_begin(static_cast<const Ubyte *>(data)),
-    m_head(static_cast<const Ubyte *>(data)),
-    m_end(static_cast<const Ubyte *>(data ) + byteLength),
-    m_isEof(false),
+BufferView::BufferView(const Memory mem, const Endian::Type endian) noexcept :
+    m_begin(static_cast<const Ubyte *>(mem.data())),
+    m_end(static_cast<const Ubyte *>(mem.data()) + mem.byteLength()),
+    m_head(static_cast<const Ubyte *>(mem.data())),
+    m_isEof(),
     m_endian(endian)
 { }
 

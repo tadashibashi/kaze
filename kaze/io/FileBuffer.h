@@ -1,18 +1,18 @@
 #pragma once
-#ifndef kaze_io_file_h_
-#define kaze_io_file_h_
+#ifndef kaze_io_filebuffer_h_
+#define kaze_io_filebuffer_h_
 
 #include <kaze/kaze.h>
+#include <kaze/core/Memory.h>
 
 KAZE_NAMESPACE_BEGIN
-
-/// Handles file loading into memory. Loads it all at once instead of a streaming interface
+    /// Handles file loading into memory. Loads it all at once instead of a streaming interface
 class FileBuffer {
 public:
     FileBuffer();
     /// Create and open file in one go
     /// @param[in] filepath path to the file to open
-    FileBuffer(Cstring filepath);
+    explicit FileBuffer(StringView filepath);
     ~FileBuffer();
 
     // copying copies the entire internal data buffer
@@ -23,10 +23,10 @@ public:
     FileBuffer(FileBuffer &&other) noexcept;
     auto operator=(FileBuffer &&other) noexcept -> FileBuffer &;
 
-    /// Load data from the file system
+    /// Load binary data from a file
     /// @param[in] filepath   path to the file to open
     /// @returns whether operation was succeessful
-    auto open(Cstring filepath) -> Bool;
+    auto open(StringView filepath) -> Bool;
 
     /// Release file resources, called automatically on destruction
     auto close() -> void;
@@ -36,6 +36,9 @@ public:
 
     /// Internal data buffer; if not open, it will be `nullptr`
     auto data() const noexcept -> const Ubyte * { return m_data; }
+
+    /// Get a reference to the data buffer memory
+    auto ref() const noexcept -> Memory { return makeRef<void>(m_data, m_dataSize); }
 
     /// Byte size of internal data buffer
     auto size() const noexcept -> Size { return m_dataSize; }
@@ -47,4 +50,4 @@ public:
 
 KAZE_NAMESPACE_END
 
-#endif // kaze_io_file_h_
+#endif // kaze_io_filebuffer_h_

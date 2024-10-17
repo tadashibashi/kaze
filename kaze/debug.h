@@ -17,6 +17,13 @@
     KAZE_NAMESPACE::setError(message, (code), __FILE__, __LINE__); \
 } while(0)
 
+#define KAZE_CORE_FATAL(...) (code, ...) do { \
+    const auto message = std::format(__VA_ARGS__); \
+    KAZE_NAMESPACE::debug::getLogger()->critical(message); \
+    KAZE_NAMESPACE::setError(message, (code), __FILE__, __LINE__); \
+    throw std::runtime_error(message); \
+} while(0)
+
 #define KAZE_CORE_ERR(...) do { \
     const auto message = std::format(__VA_ARGS__); \
     KAZE_NAMESPACE::debug::getLogger()->error(message); \

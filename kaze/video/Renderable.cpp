@@ -4,15 +4,17 @@
 #include <kaze/debug.h>
 
 #include <bgfx/bgfx.h>
+#include <kaze/memory.h>
 
 KAZE_NAMESPACE_BEGIN
-
-struct Renderable::Impl {
+    struct Renderable::Impl {
     Int viewId{};
     ShaderProgram program{};
     bgfx::DynamicVertexBufferHandle vbh{.idx=bgfx::kInvalidHandle};
     bgfx::DynamicIndexBufferHandle ibh{.idx=bgfx::kInvalidHandle};
     VertexLayout layout{};
+
+    Memory vertexData{}, indexData{};
 };
 
 Renderable::Renderable() : m(new Impl()) {}
@@ -34,13 +36,14 @@ auto Renderable::init(const Init &config) -> Bool
 
     const auto indexBuffer = bgfx::createDynamicIndexBuffer(config.initialIndexCount,
         BGFX_BUFFER_ALLOW_RESIZE);
-    if (indexBuffer.idx == bgfx::kInvalidHandle)
+    if ( !bgfx::isValid(indexBuffer) )
     {
         KAZE_CORE_ERRCODE(Error::RuntimeErr, "bgfx::createDynamicIndexBuffer failed");
         bgfx::destroy(vertexBuffer);
         return KAZE_FALSE;
     }
 
+    release();
     m->layout = std::move(config.layout);
     m->program = std::move(program);
     m->vbh = vertexBuffer;
@@ -50,15 +53,20 @@ auto Renderable::init(const Init &config) -> Bool
     return KAZE_TRUE;
 }
 
+auto Renderable::wasInit() const -> Bool
+{
+    return m->program.isLinked() && bgfx::isValid(m->ibh) && bgfx::isValid(m->vbh);
+}
+
 auto Renderable::release() -> void
 {
-    if (m->vbh.idx != bgfx::kInvalidHandle)
+    if ( bgfx::isValid(m->vbh) )
     {
         bgfx::destroy(m->vbh);
         m->vbh.idx = bgfx::kInvalidHandle;
     }
 
-    if (m->ibh.idx != bgfx::kInvalidHandle)
+    if ( bgfx::isValid(m->ibh) )
     {
         bgfx::destroy(m->ibh);
         m->ibh.idx = bgfx::kInvalidHandle;
@@ -66,6 +74,18 @@ auto Renderable::release() -> void
 
     m->program.release();
     m->layout = {};
+}
+
+auto Renderable::activateVertices(Uint startVertex, Uint vertexCount) -> Renderable &
+{
+    bgfx::setVertexBuffer(0, m->vbh, startVertex, vertexCount);
+    return *this;
+}
+
+auto Renderable::activateIndices(Uint startIndex, Uint indexCount) -> Renderable &
+{
+    bgfx::setIndexBuffer(m->ibh, startIndex, indexCount);
+    return *this;
 }
 
 auto Renderable::setViewTransform(const Mat4f &view, const Mat4f &projection) -> Renderable &
@@ -86,22 +106,56 @@ auto Renderable::setViewRect(const Recti &rect) -> Renderable &
     return *this;
 }
 
-auto Renderable::setVertices(void *data, Size byteSize) -> Renderable &
+auto Renderable::setVertices(const Memory mem) -> Renderable &
 {
-    bgfx::update(m->vbh, 0, bgfx::makeRef(data, byteSize));
+    if (mem.byteLength() > 0)
+    {
+        m->vertexData = mem;
+    }
     return *this;
 }
 
-auto Renderable::setIndices(const Uint16 *data, Size elements) -> Renderable &
+auto Renderable::setIndices(const Uint16 *data, const Size elements) -> Renderable &
 {
-    bgfx::update(m->ibh, 0, bgfx::makeRef(data, elements * sizeof(Uint16)));
+    m->indexData = Memory(data, elements * sizeof(Uint16));
     return *this;
 }
 
 auto Renderable::submit() -> void
 {
-    bgfx::setVertexBuffer(m->viewId, m->vbh);
-    bgfx::setIndexBuffer(m->ibh);
+    if (m->vertexData.byteLength() > 0)
+    {
+        bgfx::TransientVertexBuffer tvb;
+        const auto stride = m->layout.getStride();
+        bgfx::allocTransientVertexBuffer(&tvb, m->vertexData.byteLength() / stride, m->layout.getLayout());
+        copy(tvb.data, m->vertexData.data(), m->vertexData.byteLength());
+        bgfx::setVertexBuffer(0, &tvb);
+    }
+
+    if (m->indexData.byteLength() > 0)
+    {
+        bgfx::TransientIndexBuffer tib;
+        bgfx::allocTransientIndexBuffer(&tib, m->indexData.byteLength() / sizeof(Uint16));
+        copy(tib.data, m->indexData.data(), m->indexData.byteLength());
+        bgfx::setIndexBuffer(&tib);
+    }
+
+    bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A); // todo: expose these options later?
+    m->program.submit(m->viewId);
+}
+
+auto Renderable::submit(const Uint vertexStart, const Uint vertexCount, const Uint indexStart, const Uint indexCount) const -> void
+{
+    bgfx::TransientVertexBuffer tvb;
+    bgfx::allocTransientVertexBuffer(&tvb, vertexCount, m->layout.getLayout());
+    const auto stride = m->layout.getStride();
+    copy(tvb.data, (Ubyte *)m->vertexData.data() + stride * vertexStart, stride * vertexCount);
+    bgfx::setVertexBuffer(0, &tvb);
+
+    bgfx::TransientIndexBuffer tib;
+    bgfx::allocTransientIndexBuffer(&tib, indexCount);
+    copy(tib.data, (Ubyte *)m->indexData.data() + sizeof(Uint16) * indexStart, sizeof(Uint16) * indexCount);
+    bgfx::setIndexBuffer(m->ibh, indexStart, indexCount);
     bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A); // todo: expose these options later?
     m->program.submit(m->viewId);
 }

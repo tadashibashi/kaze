@@ -29,8 +29,10 @@ GraphicsMgr::~GraphicsMgr()
     delete m;
 }
 
-auto GraphicsMgr::init(WindowHandle window, Color clearColor) -> Bool
+auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
 {
+    auto window = initConfig.window;
+
     std::lock_guard lockGuard(Impl::initLock);
     if (Impl::wasInit)
     {
@@ -56,6 +58,8 @@ auto GraphicsMgr::init(WindowHandle window, Color clearColor) -> Bool
     config.resolution.width = width;
     config.resolution.height = height;
     config.resolution.reset = BGFX_RESET_VSYNC;
+    config.limits.transientIbSize = initConfig.maxTransientIBufferSize;
+    config.limits.transientVbSize = initConfig.maxTransientVBufferSize;
 
     bgfx::renderFrame(); // necessary for single-threaded render
 
@@ -66,7 +70,7 @@ auto GraphicsMgr::init(WindowHandle window, Color clearColor) -> Bool
     }
 
     bgfx::setViewRect(0, 0, 0, static_cast<uint16_t>(width), static_cast<uint16_t>(height));
-    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, clearColor.toRGBA8(), 1.f);
+    bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, initConfig.clearColor.toRGBA8(), 1.f);
     bgfx::touch(0);
     bgfx::frame();
 

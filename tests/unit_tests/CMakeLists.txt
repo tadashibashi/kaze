@@ -1,12 +1,19 @@
 project(kaze_unit_tests)
 
 add_executable(${PROJECT_NAME}
-    kaze/core/ServiceProvider.test.cpp
+    kaze/core/AssetLoader.test.cpp
     kaze/core/Action.test.cpp
+    kaze/core/Memory.test.cpp
+    kaze/core/ServiceProvider.test.cpp
+
     kaze/debug.tests.cpp
+
     kaze/graphics/Color.test.cpp
+
     kaze/io/BufferView.test.cpp
+
     kaze/macros/enum.test.cpp
+
     kaze/math/Circle.test.cpp
     kaze/math/geometry.test.cpp
     kaze/math/mathf.test.cpp
@@ -16,8 +23,8 @@ add_executable(${PROJECT_NAME}
     kaze/math/Vec2.test.cpp
     kaze/math/Vec3.test.cpp
     kaze/math/Vec4.test.cpp
+
     tests.cpp
-        kaze/core/AssetLoader.test.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE kaze doctest::doctest)

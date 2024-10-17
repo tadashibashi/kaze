@@ -9,14 +9,13 @@
 #include <gcem.hpp>
 
 KAZE_NAMESPACE_BEGIN
-
-namespace mathf {
+    namespace mathf {
 
     // ===== Basic Math =======================================================
 
     /// Return the greatest of two numbers
     template <Arithmetic T>
-    T max(T a, T b)
+    constexpr auto max(T a, T b) noexcept -> T
     {
         return a > b ? a : b;
     }
@@ -24,9 +23,9 @@ namespace mathf {
     /// Return the greatest of a list of numbers.
     /// An empty list will result in std::numeric_limits<T>::min()
     template <Arithmetic T>
-    T max(std::initializer_list<T> list)
+    constexpr auto max(std::initializer_list<T> list) noexcept -> T
     {
-        T greatest = std::numeric_limits<T>::min();
+        auto greatest = std::numeric_limits<T>::min();
         for (auto n : list)
         {
             if (n > greatest)
@@ -38,7 +37,7 @@ namespace mathf {
 
     /// Return the smallest of two numbers
     template <Arithmetic T>
-    T min(T a, T b)
+    constexpr auto min(T a, T b) noexcept -> T
     {
         return a < b ? a : b;
     }
@@ -46,7 +45,7 @@ namespace mathf {
     /// Return the smallest number from a list.
     /// An empty list will result in std::numeric_limits<T>::max()
     template <Arithmetic T>
-    T min(std::initializer_list<T> list)
+    constexpr auto min(std::initializer_list<T> list) noexcept -> T
     {
         T least = std::numeric_limits<T>::max();
         for (auto n : list)
@@ -67,7 +66,7 @@ namespace mathf {
     /// @param[in] epsilon  smallest differing value * 100
     /// @param[in] scale    scales epsilon
     template <FloatingPoint T>
-    T approxCompare(T a, T b, T epsilon = std::numeric_limits<T>::epsilon() * 100, T scale = 1.0)
+    constexpr auto approxCompare(T a, T b, T epsilon = std::numeric_limits<T>::epsilon() * 100, T scale = 1.0) noexcept -> T
     {
         return gcem::fabs(a - b) < epsilon * (scale + mathf::max(gcem::fabs(a), gcem::fabs(b))) ? 0
             : a - b;
@@ -94,7 +93,7 @@ namespace mathf {
 
     /// Simple swap for arithmetic types (simple std::swap replacement to keep `std` out of these functions)
     template <Arithmetic T>
-    constexpr void swap(T &a, T &b) noexcept
+    constexpr auto swap(T &a, T &b) noexcept -> void
     {
         const T temp = a;
         a = b;
@@ -102,9 +101,15 @@ namespace mathf {
     }
 
     template<Arithmetic T>
-    constexpr T abs(const T x) noexcept
+    constexpr auto abs(const T x) noexcept -> T
     {
         return (x < 0) ? -x : x;
+    }
+
+    template <FloatingPoint T>
+    constexpr auto round(T x) noexcept -> T
+    {
+        return gcem::round(x);
     }
 
     /// Get 1 if `x` is positive, or -1 if negative. 0 is returned if x is 0.
@@ -123,8 +128,6 @@ namespace mathf {
     {
         return gcem::sqrt(x);
     }
-
-
 
     /// Get `x` to the p of `p`
 
@@ -145,12 +148,19 @@ namespace mathf {
     ///
     /// If `m` is zero, the answer is undefined, but it looks like most compilers will result in 0
     template <Arithmetic T>
-    constexpr T mod(const T x, const T m) noexcept
+    constexpr auto mod(const T x, const T m) noexcept -> T
     {
         if constexpr (std::is_floating_point_v<T>)
             return gcem::fmod(gcem::fmod(x, m) + m, m);
         else // integral otherwise
             return (x % m + m) % m;
+    }
+
+    /// Floating point modulo remainder operation, wraps reflectively across 0.
+    template <Arithmetic T>
+    constexpr auto fmod(const T x, const T m) noexcept
+    {
+        return gcem::fmod(x, m);
     }
 
     /// Clamp a value between a min and max value inclusively.
@@ -159,7 +169,7 @@ namespace mathf {
     /// @param[in] min lower bounds (inclusive), must be <= `max`
     /// @param[in] max upper bounds (inclusive), must be >= `min`
     template <Arithmetic T>
-    constexpr T clamp(const T x, const T min, const T max) noexcept
+    constexpr auto clamp(const T x, const T min, const T max) noexcept -> T
     {
         return (x < min) ? min
             : (x > max) ? max
@@ -169,7 +179,7 @@ namespace mathf {
     /// Clamp a value between two bounds. Either can be greater or lesser than the other.
     /// Use {@link clamp} if boundaries are guaranteed to be: `bounds0 <= bounds1`
     template <Arithmetic T>
-    constexpr T clampBounds(const T x, T bounds0, T bounds1) noexcept
+    constexpr auto clampBounds(const T x, T bounds0, T bounds1) noexcept -> T
     {
         if (bounds1 < bounds0)
             mathf::swap(bounds0, bounds1);
@@ -180,7 +190,7 @@ namespace mathf {
     /// Wrap a value, meaning that when `x` crosses the `min` or `max` boundaries, it wraps around to the other side
     /// like modulus operator, except that it does not reflect over 0.
     template <Arithmetic T>
-    constexpr T wrap(const T x, const T min, const T max) noexcept
+    constexpr auto wrap(const T x, const T min, const T max) noexcept -> T
     {
         const auto range = mathf::sub(max, min);
         return (range == 0) ? min
@@ -188,7 +198,7 @@ namespace mathf {
     }
 
     template <Arithmetic T>
-    constexpr T wrapBounds(const T x, T bounds0, T bounds1) noexcept
+    constexpr auto wrapBounds(const T x, T bounds0, T bounds1) noexcept -> T
     {
         if (bounds1 < bounds0)
             mathf::swap(bounds0, bounds1);
@@ -242,7 +252,7 @@ namespace mathf {
 
     /// Convert radians to degrees. Integral types will be returned as a `Double`.
     template <Arithmetic T>
-    constexpr auto toDegrees(const T radians)
+    constexpr auto toDegrees(const T radians) noexcept
     {
         if constexpr (std::is_integral_v<T>)
             return static_cast<Double>(radians) * static_cast<Double>(180.0 / Pi);
@@ -251,32 +261,32 @@ namespace mathf {
     }
 
     template <Arithmetic T>
-    constexpr auto sin(const T x) {
+    constexpr auto sin(const T x) noexcept {
         return gcem::sin(x);
     }
 
     template <Arithmetic T>
-    constexpr auto cos(const T x) {
+    constexpr auto cos(const T x) noexcept {
         return gcem::cos(x);
     }
 
     template <Arithmetic T>
-    constexpr auto tan(const T x) {
+    constexpr auto tan(const T x) noexcept {
         return gcem::tan(x);
     }
 
     template <Arithmetic T>
-    constexpr auto asin(const T x) {
+    constexpr auto asin(const T x) noexcept {
         return gcem::asin(x);
     }
 
     template <Arithmetic T>
-    constexpr auto acos(const T x) {
+    constexpr auto acos(const T x) noexcept {
         return gcem::acos(x);
     }
 
     template <Arithmetic T>
-    constexpr auto atan(const T x) {
+    constexpr auto atan(const T x) noexcept {
         return gcem::atan(x);
     }
 
@@ -286,7 +296,7 @@ namespace mathf {
     /// @param[in] x   x-coordinate of point to check
     /// @param[in] y   y-coordinate of point to check
     template <Arithmetic T>
-    constexpr auto coordsToAngle(const T x, const T y) {
+    constexpr auto coordsToAngle(const T x, const T y) noexcept {
         return gcem::fmod(gcem::atan2(y, x) + TwoPi, TwoPi);
     }
 
@@ -299,13 +309,13 @@ namespace mathf {
     /// @param[in] y2   y-coord of point 2
     /// @returns resultant angle from the line drawn between the two points, in radians
     template <Arithmetic T>
-    constexpr auto coordsToAngle(const T x1, const T y1, const T x2, const T y2) {
+    constexpr auto coordsToAngle(const T x1, const T y1, const T x2, const T y2) noexcept {
         return coordsToAngle( sub(x2, x1), sub(y2, y1) );
     }
 
     /// Calculate a position
     template <Arithmetic T>
-    constexpr void angleToCoords(const T angle, const T distance, T *x, T *y)
+    constexpr auto angleToCoords(const T angle, const T distance, T *x, T *y) noexcept -> void
     {
         if (x)
             *x = mathf::cos(angle) * distance;
@@ -315,7 +325,7 @@ namespace mathf {
 
     /// Rotate 2d coordinates about the origin {0, 0}
     template <Arithmetic T, Arithmetic TOut>
-    constexpr void rotateCoords(const T x, const T y, const T angle, TOut *resultX, TOut *resultY)
+    constexpr auto rotateCoords(const T x, const T y, const T angle, TOut *resultX, TOut *resultY) noexcept -> void
     {
         const auto sinAngle = mathf::sin(angle);
         const auto cosAngle = mathf::cos(angle);
@@ -326,7 +336,7 @@ namespace mathf {
     }
 
     template <Arithmetic T, Arithmetic TOut>
-    constexpr void rotateCoords(const T x, const T y, const T originX, const T originY, const T angle, TOut *resultX, TOut *resultY)
+    constexpr auto rotateCoords(const T x, const T y, const T originX, const T originY, const T angle, TOut *resultX, TOut *resultY) noexcept -> void
     {
         // Alter x and y where its origin is {0, 0}
         auto xOriginZero = mathf::sub(x, originX);
@@ -343,17 +353,16 @@ namespace mathf {
     }
 
     template <Arithmetic T, Arithmetic TOut>
-    constexpr void rotateCoordsDegrees(const T x, const T y, const T degrees, TOut *resultX, TOut *resultY)
+    constexpr auto rotateCoordsDegrees(const T x, const T y, const T degrees, TOut *resultX, TOut *resultY) noexcept -> void
     {
         mathf::rotateCoords(x, y, mathf::toRadians(degrees), resultX, resultY);
     }
 
     template <Arithmetic T, Arithmetic TOut>
-    constexpr void rotateCoordsDegrees(const T x, const T y, const T originX, const T originY, const T degrees, TOut *resultX, TOut *resultY)
+    constexpr auto rotateCoordsDegrees(const T x, const T y, const T originX, const T originY, const T degrees, TOut *resultX, TOut *resultY) noexcept -> void
     {
         mathf::rotateCoords(x, y, originX, originY, mathf::toRadians(degrees), resultX, resultY);
     }
-
 } // namespace mathf
 
 KAZE_NAMESPACE_END

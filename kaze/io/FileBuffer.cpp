@@ -10,7 +10,7 @@ FileBuffer::~FileBuffer()
     close();
 }
 
-FileBuffer::FileBuffer(Cstring filepath)  : m_data(), m_dataSize()
+FileBuffer::FileBuffer(const StringView filepath)  : m_data(), m_dataSize()
 {
     open(filepath);
 }
@@ -19,7 +19,7 @@ FileBuffer::FileBuffer(const FileBuffer &other) : m_data(alloc<Ubyte>(other.m_da
 {
     if (m_data)
     {
-        std::memcpy(m_data, other.m_data, other.m_dataSize);
+        kaze::copy(m_data, other.m_data, other.m_dataSize);
     }
 }
 
@@ -29,7 +29,7 @@ auto FileBuffer::operator=(const FileBuffer &other) -> FileBuffer &
     m_data = alloc<Ubyte>(other.m_dataSize);
     if (m_data)
     {
-        std::memcpy(m_data, other.m_data, other.m_dataSize);
+        kaze::copy(m_data, other.m_data, other.m_dataSize);
         m_dataSize =other.m_dataSize;
     }
 
@@ -55,7 +55,7 @@ auto FileBuffer::operator=(FileBuffer &&other) noexcept -> FileBuffer &
     return *this;
 }
 
-auto FileBuffer::open(Cstring filepath) -> Bool
+auto FileBuffer::open(const StringView filepath) -> Bool
 {
     Ubyte *data;
     Size dataSize;

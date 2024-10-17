@@ -5,6 +5,7 @@
 #define kaze_video_texture2d_h_
 
 #include <kaze/kaze.h>
+#include <kaze/core/Memory.h>
 #include <kaze/math/Vec/Vec2.h>
 #include <kaze/video/Color.h>
 
@@ -52,12 +53,19 @@ public:
     }
 
     /// Load texture from a list of pixels from left-to-right, top-to-bottom order.
-    /// @param[in]  pixels      pixel array, containing each Color
-    /// @param[in]  pixelCount  number of pixels in the array (must total `width * height`)
+    /// @param[in]  pixels      pixels to load
     /// @param[in]  width       pixel width of image data
     /// @param[in]  height      pixel height of image data
     /// @returns whether operation was successful
-    auto loadPixels(const Color *pixels, Size pixelCount, Size width, Size height) -> Bool;
+    auto loadPixels(Mem<Color> pixels, Size width, Size height) -> Bool;
+
+    template <typename T> requires
+        std::is_same_v<const Color *, decltype(std::declval<T>().data())> &&
+        std::is_arithmetic_v<decltype(std::size(std::declval<T>()))>
+    auto loadPixels(const T &pixels, const Size width, const Size height) -> Bool
+    {
+        return loadPixels(pixels.data(), std::size(pixels), width, height);
+    }
 
     /// Check if a texture is currently loaded and ready for use.
     [[nodiscard]]

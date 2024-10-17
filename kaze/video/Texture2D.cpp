@@ -118,19 +118,19 @@ auto Texture2D::load(const void *data, const Size size) -> Bool
     return KAZE_TRUE;
 }
 
-auto Texture2D::loadPixels(const Color *pixels, Size pixelCount, Size width, Size height) -> Bool
+auto Texture2D::loadPixels(Mem<Color> pixels, Size width, Size height) -> Bool
 {
-    if (pixelCount != width * height)
+    if (pixels.size() != width * height)
     {
         KAZE_CORE_ERRCODE(Error::LogicErr, "`width * height` must equal `pixelCount`, instead got: `{} * {} != {}`",
-            width, height, pixelCount);
+            width, height, pixels.size());
         return KAZE_FALSE;
     }
 
     bgfx::TextureHandle texture;
     try {
         texture = bgfx::createTexture2D(width, height, false, 1, bgfx::TextureFormat::RGBA8,
-            BGFX_TEXTURE_NONE | BGFX_SAMPLER_POINT, bgfx::makeRef(pixels, sizeof(Color) * pixelCount));
+            BGFX_TEXTURE_NONE | BGFX_SAMPLER_POINT, bgfx::makeRef(pixels.data(), sizeof(Color) * pixels.size()));
     }
     catch(const std::exception &e)
     {

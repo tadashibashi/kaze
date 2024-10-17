@@ -36,8 +36,7 @@ void App::run()
         return;
 
     m->isRunning = true;
-    do
-    {
+    do {
         runOneFrame();
     } while (m->isRunning);
 
@@ -94,8 +93,16 @@ auto App::preInit() -> Bool
     if ( !m->window.open(m->config.title.c_str(), m->config.size.x, m->config.size.y, m->config.flags) )
         return KAZE_FALSE;
 
-    if ( !m->graphics.init(m->window.getPtr()) )
+    if ( !m->graphics.init({
+        .window = m->window.getPtr(),
+        .clearColor = m->config.clearColor,
+        .maxTransientIBufferSize = m->config.maxTransientIBufferSize,
+        .maxTransientVBufferSize = m->config.maxTransientVBufferSize,
+    }) )
+    {
         return KAZE_FALSE;
+    }
+
 
     backend::setCallbacks(PlatformCallbacks {
         .userptr = m,
@@ -174,8 +181,10 @@ void App::runOneFrame()
 
     pollEvents();
     update();
+
     draw();
     m->graphics.frame();
+
     m->lastTime = currentTime;
 }
 

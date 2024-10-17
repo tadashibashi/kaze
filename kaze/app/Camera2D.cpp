@@ -82,7 +82,7 @@ auto Camera2D::applyChanges() const -> void
 
     m_view = Mat4f()
         .translate(m_origin * m_viewport.size)
-        .rotate(mathf::toRadians(m_rotation), {0.f, 0.f, 1.f})
+        .rotate(m_rotation, {0.f, 0.f, 1.f})
         .scale(m_scale)
         .translate(-m_position);
     m_invView = m_view.toInverse();
@@ -101,9 +101,9 @@ auto Camera2D::getPosition() const noexcept -> Vec2f
     return m_position;
 }
 
-auto Camera2D::setRotation(Float radians) noexcept -> Camera2D &
+auto Camera2D::setRotation(const Float radians) noexcept -> Camera2D &
 {
-    m_rotation = radians;
+    m_rotation = mathf::fmod(radians, static_cast<Float>(mathf::TwoPi));
     m_wasChanged = KAZE_TRUE;
     return *this;
 }
@@ -113,9 +113,9 @@ auto Camera2D::getRotation() const noexcept -> Float
     return m_rotation;
 }
 
-auto Camera2D::setRotationDegrees(Float degrees) noexcept -> Camera2D &
+auto Camera2D::setRotationDegrees(const Float degrees) noexcept -> Camera2D &
 {
-    m_rotation = mathf::toRadians(degrees);
+    m_rotation = mathf::fmod(mathf::toRadians(degrees), static_cast<Float>(mathf::TwoPi));
     m_wasChanged = KAZE_TRUE;
     return *this;
 }

@@ -1,18 +1,19 @@
 #include <kaze/kaze.h>
-#include <kaze/debug.h>
+
 #include <kaze/app/App.h>
 #include <kaze/app/Camera2D.h>
+
+#include <kaze/core/AssetLoader.h>
+#include <kaze/debug.h>
+
 #include <kaze/math/Vec/Vec3.h>
 #include <kaze/video/GraphicsMgr.h>
 #include <kaze/video/Renderable.h>
 #include <kaze/video/Texture2D.h>
-
-#include "spritebatch_f.sc.bin.h"
-#include "spritebatch_v.sc.bin.h"
+#include <kaze/video/UniformMgr.h>
 
 #include <bgfx/bgfx.h>
-#include <kaze/core/AssetLoader.h>
-#include <kaze/video/UniformMgr.h>
+#include <kaze/app/SpriteBatch.h>
 
 USING_KAZE_NAMESPACE;
 
@@ -26,21 +27,29 @@ Vertex rectVertices[] = {
     { {50, 50, 0.0f},   {0, 0},  Color::White },
     { {100, 50, 0.0f},  {1, 0},  Color::White },
     { {100, 100, 0.0f}, {1, 1},  Color::White },
-    { {50, 100, 0.0f},  {0, 1},  Color::White }
+    { {50, 100, 0.0f},  {0, 1},  Color::White },
+    { {150, 150, 0.0f}, {0, 0},  Color::White },
+    { {300, 150, 0.0f}, {1, 0},  Color::White },
+    { {300, 300, 0.0f}, {1, 1},  Color::White },
+    { {150, 300, 0.0f}, {0, 1},  Color::White },
 };
 
 Uint16 rectTriangles[] = {
     0, 1, 2,
     0, 2, 3,
+    4, 5, 6,
+    4, 6, 7,
 };
 
-class Demo : public App {
+class Demo final : public App {
 public:
     Demo() : App({
         .title = "App Demo",
         .size = {200, 200},
         .flags = WindowInit::Resizable
     }) { }
+
+    ~Demo() override { }
 private:
     Renderable renderable;
     Camera2D camera;
@@ -48,18 +57,38 @@ private:
     UniformMgr uniforms;
     AssetLoader<String, Texture2D> textures;
     const Texture2D *warioTexture{};
+    SpriteBatch batch{};
+
+    struct TestImage
+    {
+        const Texture2D *texture{};
+        Vec2f position{};
+        Float rotation{};
+        Vec2f scale{1.f, 1.f};
+
+        auto draw(SpriteBatch &batch) -> void
+        {
+            batch.drawTexture(*texture, {0, 0, texture->size().x, texture->size().y}, position, {
+                .scale = scale,
+                .anchor = {0, 0},
+                .angle = mathf::toRadians(rotation),
+            });
+        }
+    };
+
+    List<TestImage> images{};
 
     auto init() -> Bool override {
         if ( !renderable.init({
-            .vertShader = Shader(spritebatch_v_mtl, std::size(spritebatch_v_mtl)),
-            .fragShader = Shader(spritebatch_f_mtl, std::size(spritebatch_f_mtl)),
+            .viewId = 0,
+            .vertShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_v.sc.bin"))),
+            .fragShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_f.sc.bin"))),
             .layout = VertexLayout()
                 .begin()
                     .add(Attrib::Position, 3, AttribType::Float)
                     .add(Attrib::TexCoord0, 2, AttribType::Float)
                     .add(Attrib::Color0, 4, AttribType::Uint8, KAZE_TRUE)
                 .end(),
-            .viewId = 0,
             .initialVertexCount = 10000,
             .initialIndexCount = 10000
         }) )
@@ -67,17 +96,31 @@ private:
             return KAZE_FALSE;
         }
 
-        if ( !pixel.loadPixels(&Color::White, 1, 1, 1) )
+        if ( !pixel.loadPixels(makeRef(&Color::White, 1), 1, 1) )
         {
             return KAZE_FALSE;
         }
+
+        if ( !batch.init(window(), uniforms) )
+            return KAZE_FALSE;
 
         if (warioTexture = textures.load("dungeon_tiles.png"); warioTexture == nullptr)
         {
             return KAZE_FALSE;
         }
 
-        renderable.setVertices(rectVertices, sizeof(rectVertices));
+        images.reserve(15000);
+        for (Int i = 0; i < 15000; ++i)
+        {
+            images.emplace_back(TestImage{
+                .texture = warioTexture,
+                .position = {(float)(rand() % 1000), (float)(rand() % 1000) },
+                .rotation = (float)(rand() % 360),
+                .scale = {1.f, 1.f}
+            });
+        }
+
+        renderable.setVertices(makeRef(rectVertices));
         renderable.setIndices(rectTriangles, std::size(rectTriangles));
 
         const auto windowSize = window().getSize();
@@ -125,6 +168,15 @@ private:
         {
             camera.setScale(camera.getScale() + Vec2f{-.05f, -.05f});
         }
+
+        if (input().isDown(Key::R))
+        {
+            camera.setRotationDegrees(camera.getRotationDegrees() + 4);
+        }
+        if (input().isDown(Key::T))
+        {
+            camera.setRotationDegrees(camera.getRotationDegrees() - 4);
+        }
     }
 
     auto draw() -> void override {
@@ -132,16 +184,27 @@ private:
         const auto size = window().getSize();
         camera.setViewport({0, 0, size.x, size.y});
 
-        uniforms.setTexture(0, *warioTexture);
-        renderable.setViewTransform(camera.getView(), camera.getProj());
-        renderable.setViewRect({0, 0, displaySize.x, displaySize.y});
-        renderable.submit();
+        batch.begin({
+            .projMtx = camera.getProj(),
+            .viewMtx = camera.getView(),
+        });
+
+        for (auto &img : images)
+            img.draw(batch);
+
+        batch.end();
+
+        for (auto &image : images)
+        {
+            image.rotation = mathf::fmod(image.rotation + 4.f, 360.f);
+        }
     }
 
     auto close() -> void override {
         uniforms.clear();
         pixel.release();
         textures.clear();
+        batch.release();
         renderable.release();
     }
 };

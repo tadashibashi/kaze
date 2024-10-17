@@ -18,14 +18,18 @@ KAZE_NAMESPACE_BEGIN
 struct AppInit {
     String title           {String("")}; ///< App title bar text
     Vec2i size             {640, 480};   ///< Initial window size
+    Color clearColor       {100, 154, 206, 235}; ///< Default background clear color
     WindowInit::Flags flags{};           ///< Initial window attribute flags, can be or'd together
+    Size maxTransientVBufferSize {4000 * 1024};
+    Size maxTransientIBufferSize {6000 * 1024};
 };
 
 /// The App class provides a convenient framework, an optional implementation of encapsulating backend functionality.
 class App
 {
 public:
-    App(const AppInit &config);
+    explicit App(const AppInit &config);
+    virtual ~App() = default;
 
     // no copy
     KAZE_NO_COPY(App);

@@ -28,6 +28,7 @@ FetchContent_Declare(bgfx
 FetchContent_MakeAvailable(json gcem glm spdlog bgfx)
 
 list(APPEND CMAKE_MODULE_PATH ${bgfx_SOURCE_DIR}/cmake)
+include(bgfxToolUtils)
 
 # ===== Backend ===============================================================
 # Backends are fetched from a cmake module and the following variables are available to set:

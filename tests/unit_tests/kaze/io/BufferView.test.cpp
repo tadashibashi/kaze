@@ -24,7 +24,7 @@ TEST_SUITE("BufferView")
     {
         auto message = "abcdefg";
 
-        BufferView bv(message, 7);
+        BufferView bv(makeRef(message, 7));
         CHECK(bv.size() == 7);
 
         char messageBuf[8] = {0};
@@ -38,7 +38,7 @@ TEST_SUITE("BufferView")
         SUBCASE("String")
         {
             String data = "abcdefg";
-            BufferView bv(data);
+            BufferView bv(makeRef(data));
             CHECK(bv.size() == 7);
 
             char messageBuf[8] = {0};
@@ -50,7 +50,7 @@ TEST_SUITE("BufferView")
         SUBCASE("List/vector")
         {
             List<Uchar> data = { 'a', 'b', 'c', 'd', 'e', 'f', 'g' };
-            BufferView bv(data);
+            BufferView bv(makeRef(data));
             CHECK(bv.size() == 7);
 
             char messageBuf[8] = {0};
@@ -70,7 +70,7 @@ TEST_SUITE("BufferView")
     {
         int ints[] = {0, 1, 2, 3, 4, 5, 6, 7};
 
-        BufferView bv(ints, sizeof(ints));
+        BufferView bv(makeRef(ints));
         CHECK(bv.size() == sizeof(ints));
 
         for (int i = 0; i < std::size(ints); ++i)
@@ -92,7 +92,7 @@ TEST_SUITE("BufferView")
     {
         int ints[] = {0, 1, 2, 3};
 
-        BufferView bv(ints, sizeof(ints));
+        BufferView bv(makeRef(ints));
 
         int result;
         CHECK(bv.tryRead(&result));
@@ -115,7 +115,7 @@ TEST_SUITE("BufferView")
     TEST_CASE("seek")
     {
         int ints[] = {0, 1, 2, 3};
-        BufferView bv(ints, sizeof(ints));
+        BufferView bv(makeRef(ints));
 
         bv.seek(sizeof(int) * 2, SeekBase::Start);
         CHECK(bv.read<int>() == 2);
@@ -140,7 +140,7 @@ TEST_SUITE("BufferView")
             Endian::Little : Endian::Big;
 
         int ints[] = {10, 11, 12, 13};
-        BufferView bv(ints, sizeof(ints));
+        BufferView bv(makeRef(ints));
 
         int value;
         bv.read(&value, sizeof(int), endianness);
@@ -166,9 +166,9 @@ TEST_SUITE("BufferView")
     {
         SUBCASE("string")
         {
-            const char *data = "WAVElab";
+            auto data = "WAVElab";
             char header[4];
-            BufferView bv(data, 7);
+            BufferView bv(makeRef(data));
 
             CHECK(bv.read(header, 4) == 4);
             CHECK(std::strncmp(header, "WAVE", 4) == 0);
@@ -180,7 +180,7 @@ TEST_SUITE("BufferView")
         SUBCASE("numbers")
         {
             int32_t ints[] = {10, 20};
-            BufferView bv(ints, sizeof(ints));
+            BufferView bv(makeRef(ints));
 
             int value;
             CHECK(bv.read(&value, sizeof(int)) == sizeof(int));
@@ -197,7 +197,7 @@ TEST_SUITE("BufferView")
             auto str = "abcdefghijklmnop";
             auto length = std::strlen(str);
 
-            BufferView bv(str, length);
+            BufferView bv(makeRef(str, length));
 
             String readStr;
             CHECK(bv.readString(&readStr) == length);
@@ -210,7 +210,7 @@ TEST_SUITE("BufferView")
             auto str = "abcdefghijklmnop";
             auto length = std::strlen(str);
 
-            BufferView bv(str, length);
+            BufferView bv(makeRef(str, length));
 
             String value;
             CHECK(bv.readString(&value, 4) == 4);
@@ -221,7 +221,7 @@ TEST_SUITE("BufferView")
         SUBCASE("multiple strings")
         {
             auto str = "abc\0def";
-            BufferView bv(str, 7);
+            BufferView bv(makeRef(str, 7));
 
             String value;
             CHECK(bv.readString(&value) == 3);

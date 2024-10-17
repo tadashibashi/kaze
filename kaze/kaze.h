@@ -104,9 +104,21 @@ KAZE_NAMESPACE_END
 #endif
 
 #if KAZE_DEBUG
-#   define KAZE_ASSERT(statement) assert(statement)
+
+#   define KAZE__GET_ASSERT(_1, _2, NAME, ...) NAME
+#   define KAZE__ASSERT_1(statement) assert(statement)
+#   define KAZE__ASSERT_2(statement, message) do { \
+    if ( !(statement) ) \
+    { \
+        KAZE_CORE_ERR("{}", (message) ); \
+        assert(statement); \
+    } \
+} while(0)
+#   define KAZE_ASSERT(...) KAZE__GET_ASSERT(__VA_ARGS__, KAZE__ASSERT_2, KAZE__ASSERT_1)(__VA_ARGS__)
+
+#include <kaze/debug.h>
 #else
-#   define KAZE_ASSERT(statement) KAZE_NOOP
+#   define KAZE_ASSERT(...) KAZE_NOOP
 #endif
 
 #define KAZE_NO_COPY(classname) \
