@@ -1,11 +1,11 @@
-/// @file ServiceProvider.h
+/// \file ServiceProvider.h
 /// Contains ServiceProvider class declaration
 #pragma once
-#ifndef kaze_core_servicecontainer_h_
-#define kaze_core_servicecontainer_h_
+#ifndef kaze_core_serviceprovider_h_
+#define kaze_core_serviceprovider_h_
 
-#include <kaze/kaze.h>
-#include <kaze/concepts.h>
+#include <kaze/core/lib.h>
+#include <kaze/core/concepts.h>
 
 #include <typeindex>
 
@@ -25,7 +25,7 @@ public:
 
     /// Get pointer of type `T` that was previously provided to this container.
     /// @tparam T type of pointer to get from the container
-    /// @returns pointer, or `nullptr` if it doesn't exist.
+    /// \returns pointer, or `nullptr` if it doesn't exist.
     template <typename T>
     [[nodiscard]]
     T *getService()
@@ -35,7 +35,7 @@ public:
 
     /// Get pointer of type `T` that was previously provided to this container.
     /// @tparam T type of pointer to get from the container
-    /// @returns pointer, or `nullptr` if it doesn't exist.
+    /// \returns pointer, or `nullptr` if it doesn't exist.
     template <typename T>
     [[nodiscard]]
     const T *getService() const
@@ -45,8 +45,8 @@ public:
 
     /// Try to get a pointer of type `T`
     /// @tparam T type of pointer to get from the container
-    /// @param[out] outPtr pointer to receive the service object ptr
-    /// @returns whether pointer exists in the ServiceProvider:
+    /// \param[out] outPtr pointer to receive the service object ptr
+    /// \returns whether pointer exists in the ServiceProvider:
     ///     `true`  - the pointer exists and was output to `outPtr`,
     ///     `false` - `outPtr` is left unaltered
     template <typename T>
@@ -65,8 +65,8 @@ public:
 
     /// Try to get a pointer of type `T`
     /// @tparam T type of pointer to get from the container
-    /// @param[out] outPtr pointer to receive the service object ptr
-    /// @returns whether pointer exists in the ServiceProvider:
+    /// \param[out] outPtr pointer to receive the service object ptr
+    /// \returns whether pointer exists in the ServiceProvider:
     ///     `true`  - the pointer exists and was output to `outPtr`,
     ///     `false` - `outPtr` is left unaltered
     template <typename T>
@@ -93,8 +93,8 @@ public:
     }
 
     /// Try to set a service–if one already exists, it will not overwrite it.
-    /// @param[in] service the service pointer to add.
-    /// @returns `true`  - the service was set,
+    /// \param[in] service the service pointer to add.
+    /// \returns `true`  - the service was set,
     ///          `false` - the service already exists in the container and was not altered
     template <typename T>
     auto tryProvide(T *service) -> Bool
@@ -143,4 +143,4 @@ private:
 
 KAZE_NAMESPACE_END
 
-#endif // kaze_core_servicecontainer_h_
+#endif // kaze_core_serviceprovider_h_

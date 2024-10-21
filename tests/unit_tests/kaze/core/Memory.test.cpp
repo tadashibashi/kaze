@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <kaze/core/Memory.h>
+#include <kaze/core/MemView.h>
 
 USING_KAZE_NAMESPACE;
 
@@ -9,7 +9,7 @@ TEST_SUITE("Memory")
     {
         const auto mem = Memory{};
         CHECK(mem.data() == nullptr);
-        CHECK(mem.size() == 0);
+        CHECK(mem.elemCount() == 0);
     }
 
     TEST_CASE("Manual data constructor")
@@ -17,7 +17,7 @@ TEST_SUITE("Memory")
         const auto data = "abc";
         const auto mem = makeRef(data, std::strlen(data));
         CHECK(mem.data() == data);
-        CHECK(mem.size() == std::strlen(data));
+        CHECK(mem.elemCount() == std::strlen(data));
     }
 
     TEST_CASE("Cstring constructor")
@@ -25,7 +25,7 @@ TEST_SUITE("Memory")
         const auto data = "abc";
         const auto mem = makeRef(data, 3);
         CHECK(mem.data() == data);
-        CHECK(mem.size() == std::strlen(data));
+        CHECK(mem.elemCount() == std::strlen(data));
     }
 
     TEST_CASE("Array constructor")
@@ -35,7 +35,7 @@ TEST_SUITE("Memory")
             constexpr Uint8 arr[] = { 0, 1, 2, 3 };
             const auto mem = makeRef(arr);
             CHECK(mem.data() == arr);
-            CHECK(mem.size() == sizeof(arr));
+            CHECK(mem.elemCount() == sizeof(arr));
         }
 
         SUBCASE("Multiple byte-sized elements")
@@ -43,8 +43,8 @@ TEST_SUITE("Memory")
             constexpr Uint64 arr[] = { 0, 1, 2, 3 };
             const auto mem = makeRef(arr);
             CHECK(mem.data() == arr);
-            CHECK(mem.size() == std::size(arr));
-            CHECK(mem.byteLength() == sizeof(arr));
+            CHECK(mem.elemCount() == std::size(arr));
+            CHECK(mem.size() == sizeof(arr));
         }
     }
 
@@ -55,8 +55,8 @@ TEST_SUITE("Memory")
             const List<Uint8> list = {0, 1, 2, 3};
             const auto mem = makeRef(list);
             CHECK(mem.data() == list.data());
-            CHECK(mem.byteLength() == list.size());
             CHECK(mem.size() == list.size());
+            CHECK(mem.elemCount() == list.size());
         }
 
         SUBCASE("String")
@@ -64,7 +64,7 @@ TEST_SUITE("Memory")
             const String str = "abcdefg";
             const auto mem = makeRef(str);
             CHECK(mem.data() == str.data());
-            CHECK(mem.byteLength() == str.size());
+            CHECK(mem.size() == str.size());
         }
 
         SUBCASE("StringView")
@@ -72,7 +72,7 @@ TEST_SUITE("Memory")
             constexpr StringView str = "abcdefghijklmnopqrstuvwxyz1234567890";
             const auto mem = makeRef(str);
             CHECK(mem.data() == str.data());
-            CHECK(mem.byteLength() == str.size());
+            CHECK(mem.size() == str.size());
         }
 
         SUBCASE("Multiple byte-sized elements")
@@ -80,8 +80,8 @@ TEST_SUITE("Memory")
             constexpr Array<Uint64, 6> list = {0, 1, 2, 3, 4, 5};
             const auto mem = makeRef(list);
             CHECK(mem.data() == list.data());
-            CHECK(mem.byteLength() == list.size() * sizeof(Uint64));
-            CHECK(mem.size() == list.size());
+            CHECK(mem.size() == list.size() * sizeof(Uint64));
+            CHECK(mem.elemCount() == list.size());
         }
     }
 }

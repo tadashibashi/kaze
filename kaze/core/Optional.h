@@ -2,7 +2,7 @@
 #ifndef kaze_core_optional_h_
 #define kaze_core_optional_h_
 
-#include <kaze/kaze.h>
+#include <kaze/core/lib.h>
 
 KAZE_NAMESPACE_BEGIN
 

@@ -6,23 +6,22 @@ add_executable(${PROJECT_NAME}
     kaze/core/Memory.test.cpp
     kaze/core/ServiceProvider.test.cpp
 
-    kaze/debug.tests.cpp
+    kaze/core/debug.tests.cpp
+    kaze/core/graphics/Color.test.cpp
 
-    kaze/graphics/Color.test.cpp
+    kaze/core/io/BufferView.test.cpp
 
-    kaze/io/BufferView.test.cpp
+    kaze/core/macros/enum.test.cpp
 
-    kaze/macros/enum.test.cpp
-
-    kaze/math/Circle.test.cpp
-    kaze/math/geometry.test.cpp
-    kaze/math/mathf.test.cpp
-    kaze/math/Matrix.test.cpp
-    kaze/math/Rect.test.cpp
-    kaze/math/Rect3D.test.cpp
-    kaze/math/Vec2.test.cpp
-    kaze/math/Vec3.test.cpp
-    kaze/math/Vec4.test.cpp
+    kaze/core/math/Circle.test.cpp
+    kaze/core/math/geometry.test.cpp
+    kaze/core/math/mathf.test.cpp
+    kaze/core/math/Matrix.test.cpp
+    kaze/core/math/Rect.test.cpp
+    kaze/core/math/Rect3D.test.cpp
+    kaze/core/math/Vec2.test.cpp
+    kaze/core/math/Vec3.test.cpp
+    kaze/core/math/Vec4.test.cpp
 
     tests.cpp
 )

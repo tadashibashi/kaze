@@ -2,13 +2,26 @@
 #ifndef kaze_core_action_h_
 #define kaze_core_action_h_
 
-#include <kaze/kaze.h>
-#include <kaze/traits.h>
+#include <kaze/core/lib.h>
+#include <kaze/core/traits.h>
+
+#include <ranges>
 
 KAZE_NAMESPACE_BEGIN
 
+/// @description
+/// Container of callbacks with no return value.
+/// (Inspired by and similar to multi-cast Action delegates in C#)
+///
+/// \note
+/// Each callback contains a user pointer useful for providing context to the callback. This means that you
+/// must add a `void *` parameter at the end of each callback function subscribing to the event.
+/// For example an `Action<int>` must have callbacks with this signature `void(int, void *)`.
+///
+/// @tparam  Args... types of parameters for the callbacks
 template <typename... Args>
 class Action {
+    /// Individual callback container
     class Callback {
     public:
         Callback(funcptr_t<void(Args..., void *)> func, void *userptr) : func(func), userptr(userptr) {}
@@ -28,9 +41,10 @@ class Action {
         }
 
     private:
-        funcptr_t<void(Args..., void *)> func{};
-        void *userptr;
+        funcptr_t<void(Args..., void *)> func{}; ///< function pointer callback
+        void *userptr;                           ///< user pointer for context and signature
     };
+
     struct Command {
         enum Type { Remove, Add };
         Command(Type type, Callback callback) : type(type), callback(callback) { }
@@ -38,9 +52,7 @@ class Action {
         Type type;
         Callback callback;
     };
-    List<Callback> m_callbacks;
-    List<Command> m_commands;
-    Bool m_isCalling;
+
 public:
     Action() : m_callbacks(), m_commands(), m_isCalling() {}
 
@@ -48,10 +60,31 @@ public:
 
     auto operator()(Args... args) -> void
     {
-        m_isCalling = true;
-        for (const auto &func : m_callbacks)
-            func(args...);
-        m_isCalling = false;
+        if (m_isCalling) return;
+
+        if ( !m_callbacks.empty() )
+        {
+            m_isCalling = true;
+            for (const auto &callback : m_callbacks)
+                callback(args...);
+            m_isCalling = false;
+        }
+
+        processCommands();
+    }
+
+    /// Call the callbacks in reverse order
+    auto reverseInvoke(Args... args) -> void
+    {
+        if (m_isCalling) return;
+
+        if (!m_callbacks.empty())
+        {
+            m_isCalling = true;
+            for (auto &callback : std::views::reverse(m_callbacks))
+                callback(args...);
+            m_isCalling = false;
+        }
 
         processCommands();
     }
@@ -92,21 +125,27 @@ public:
         }
     }
 
-    auto empty() const noexcept -> Bool {
+    /// Whether there are no callbacks in the container
+    auto empty() const noexcept -> Bool
+    {
         return m_callbacks.empty();
     }
 
-    auto size() const noexcept -> Size {
+    /// Number of callbacks in the container
+    auto size() const noexcept -> Size
+    {
         return m_callbacks.size();
     }
 
-    auto clear() noexcept -> void {
+    /// Clear the container of all callbacks
+    auto clear() noexcept -> void
+    {
         m_callbacks.clear();
     }
 
     /// Check if a callback exists in the container
-    /// @param[in] func function pointer
-    /// @param[in] userptr associated user data context pointer
+    /// \param[in] func function pointer
+    /// \param[in] userptr associated user data context pointer
     /// @return whether callback exists in container or not
     auto contains(funcptr_t<void(Args..., void *)> func, void *userptr = nullptr) noexcept -> Bool
     {
@@ -145,6 +184,10 @@ private:
 
         m_commands.clear();
     }
+
+    List<Callback> m_callbacks;
+    List<Command> m_commands;
+    Bool m_isCalling;
 };
 
 KAZE_NAMESPACE_END

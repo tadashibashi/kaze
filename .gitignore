@@ -30,8 +30,9 @@ out/
 *.visix
 
 # ----- Sublime Text -----
-.sublime/
-*.sublime-project
+.sublime/*
+!.sublime/*.sublime-project
+!.sublime/snippets/
 *.sublime-workspace
 
 Session.sublime_session

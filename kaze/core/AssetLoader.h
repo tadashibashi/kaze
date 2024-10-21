@@ -2,11 +2,11 @@
 #ifndef kaze_core_assetloader_h_
 #define kaze_core_assetloader_h_
 
-#include <kaze/kaze.h>
-#include <kaze/concepts.h>
+#include <kaze/core/lib.h>
+#include <kaze/core/concepts.h>
 
 #include <mutex>
-#include <kaze/debug.h>
+#include <kaze/core/debug.h>
 
 KAZE_NAMESPACE_BEGIN
 
@@ -18,8 +18,8 @@ public:
 
 
     /// Load an asset from a file on disk, or pre-existing asset in cache.
-    /// @param[in]  key   path to the file
-    /// @returns pointer to the asset or nullptr on error.
+    /// \param[in]  key   path to the file
+    /// \returns pointer to the asset or nullptr on error.
     auto load(const K &key) -> const T *
     {
         std::lock_guard lockGuard(m_lock);
@@ -48,8 +48,8 @@ public:
 
 
     /// Check if the asset loader contains an asset
-    /// @param[in] key  asset path to check
-    /// @returns whether asset with `filepath` exists in this container
+    /// \param[in] key  asset path to check
+    /// \returns whether asset with `filepath` exists in this container
     auto contains(const K &key) -> Bool
     {
         return m_assets.contains(key);
@@ -57,8 +57,8 @@ public:
 
 
     /// Check if the asset loader contains an asset
-    /// @param[in] asset  asset to check
-    /// @returns whether asset exists in this container
+    /// \param[in] asset  asset to check
+    /// \returns whether asset exists in this container
     auto contains(const T *asset) -> Bool
     {
         return m_paths.contains(asset);
@@ -66,8 +66,8 @@ public:
 
 
     /// Unload an asset by filepath
-    /// @param[in]  key  - path of asset to unload
-    /// @returns `true`  - asset was released and removed from this loader;
+    /// \param[in]  key  - path of asset to unload
+    /// \returns `true`  - asset was released and removed from this loader;
     ///          `false` - asset with associated `filepath` does not belong to this loader
     auto unload(const K &key) -> Bool
     {
@@ -88,8 +88,8 @@ public:
 
 
     /// Unload an asset by pointer.
-    /// @param[in]  asset   pointer to asset to unload
-    /// @returns `true`  - asset was released and removed from this loader;
+    /// \param[in]  asset   pointer to asset to unload
+    /// \returns `true`  - asset was released and removed from this loader;
     ///          `false` - asset does not belong to this loader and is not mutated
     auto unload(const T *asset) -> Bool
     {

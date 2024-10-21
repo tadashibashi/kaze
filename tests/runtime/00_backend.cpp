@@ -1,9 +1,9 @@
-#include <kaze/kaze.h>
-#include <kaze/debug.h>
-#include <kaze/input/Gamepad.h>
-#include <kaze/video/Window.h>
+#include <kaze/core/lib.h>
+#include <kaze/core/debug.h>
+#include <kaze/core/input/Gamepad.h>
+#include <kaze/core/video/Window.h>
 
-#include <kaze/platform/backend.h>
+#include <kaze/core/platform/backend/backend.h>
 
 USING_KAZE_NAMESPACE;
 

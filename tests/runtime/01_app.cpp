@@ -1,21 +1,26 @@
-#include <kaze/kaze.h>
 
-#include <kaze/app/App.h>
-#include <kaze/app/Camera2D.h>
+#include <kaze/core/lib.h>
+
+#include <kaze/tk/App.h>
+#include <kaze/tk/Camera2D.h>
 
 #include <kaze/core/AssetLoader.h>
-#include <kaze/debug.h>
+#include <kaze/core/debug.h>
 
-#include <kaze/math/Vec/Vec3.h>
-#include <kaze/video/GraphicsMgr.h>
-#include <kaze/video/Renderable.h>
-#include <kaze/video/Texture2D.h>
-#include <kaze/video/UniformMgr.h>
+#include <kaze/core/input/CursorConstants.h>
+#include <kaze/core/platform/backend/backend.h>
+
+#include <kaze/core/math/Vec/Vec3.h>
+#include <kaze/core/video/GraphicsMgr.h>
+#include <kaze/core/video/Renderable.h>
+#include <kaze/core/video/Texture2D.h>
+#include <kaze/core/video/UniformMgr.h>
 
 #include <bgfx/bgfx.h>
-#include <kaze/app/SpriteBatch.h>
+#include <kaze/tk/SpriteBatch.h>
 
 USING_KAZE_NAMESPACE;
+USING_KAZE_TK_NAMESPACE;
 
 struct Vertex {
     Vec3f position;
@@ -45,19 +50,19 @@ class Demo final : public App {
 public:
     Demo() : App({
         .title = "App Demo",
-        .size = {200, 200},
-        .flags = WindowInit::Resizable
+        .size = {640, 480},
+        .flags = WindowInit::Resizable | WindowInit::Floating,
+        .maxTransientVBufferSize = 400,
+        .maxTransientIBufferSize = 600,
     }) { }
 
     ~Demo() override { }
 private:
-    Renderable renderable;
     Camera2D camera;
-    Texture2D pixel;
-    UniformMgr uniforms;
     AssetLoader<String, Texture2D> textures;
     const Texture2D *warioTexture{};
     SpriteBatch batch{};
+    CursorHandle cursor{};
 
     struct TestImage
     {
@@ -68,40 +73,25 @@ private:
 
         auto draw(SpriteBatch &batch) -> void
         {
-            batch.drawTexture(*texture, {0, 0, texture->size().x, texture->size().y}, position, {
-                .scale = scale,
-                .anchor = {0, 0},
-                .angle = mathf::toRadians(rotation),
-            });
+            if (texture)
+            {
+                batch.drawTexture(texture,
+                    {0, 0, static_cast<Int>(texture->size().x), static_cast<Int>(texture->size().y)},
+                    position,
+                    {
+                        .scale = scale,
+                        .anchor = {0, 0},
+                        .angle = mathf::toRadians(rotation),
+                    });
+            }
         }
     };
 
     List<TestImage> images{};
 
     auto init() -> Bool override {
-        if ( !renderable.init({
-            .viewId = 0,
-            .vertShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_v.sc.bin"))),
-            .fragShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_f.sc.bin"))),
-            .layout = VertexLayout()
-                .begin()
-                    .add(Attrib::Position, 3, AttribType::Float)
-                    .add(Attrib::TexCoord0, 2, AttribType::Float)
-                    .add(Attrib::Color0, 4, AttribType::Uint8, KAZE_TRUE)
-                .end(),
-            .initialVertexCount = 10000,
-            .initialIndexCount = 10000
-        }) )
-        {
-            return KAZE_FALSE;
-        }
 
-        if ( !pixel.loadPixels(makeRef(&Color::White, 1), 1, 1) )
-        {
-            return KAZE_FALSE;
-        }
-
-        if ( !batch.init(window(), uniforms) )
+        if ( !batch.init(graphics()) )
             return KAZE_FALSE;
 
         if (warioTexture = textures.load("dungeon_tiles.png"); warioTexture == nullptr)
@@ -109,23 +99,23 @@ private:
             return KAZE_FALSE;
         }
 
-        images.reserve(15000);
-        for (Int i = 0; i < 15000; ++i)
+        images.reserve(1000);
+        for (Int i = 0; i < 1000; ++i)
         {
             images.emplace_back(TestImage{
                 .texture = warioTexture,
-                .position = {(float)(rand() % 1000), (float)(rand() % 1000) },
+                .position = {(float)(rand() % 10000), (float)(rand() % 10000) },
                 .rotation = (float)(rand() % 360),
                 .scale = {1.f, 1.f}
             });
         }
 
-        renderable.setVertices(makeRef(rectVertices));
-        renderable.setIndices(rectTriangles, std::size(rectTriangles));
-
         const auto windowSize = window().getSize();
         camera.setViewport({0, 0, windowSize.x, windowSize.y});
         camera.setOrigin({0, 0});
+
+        backend::cursor::createStandard(CursorType::Crosshair, &cursor);
+        backend::cursor::setCursor(window().getHandle(), cursor);
         return KAZE_TRUE;
     }
 
@@ -177,35 +167,79 @@ private:
         {
             camera.setRotationDegrees(camera.getRotationDegrees() - 4);
         }
-    }
-
-    auto draw() -> void override {
-        const auto displaySize = window().getDisplaySize();
-        const auto size = window().getSize();
-        camera.setViewport({0, 0, size.x, size.y});
-
-        batch.begin({
-            .projMtx = camera.getProj(),
-            .viewMtx = camera.getView(),
-        });
-
-        for (auto &img : images)
-            img.draw(batch);
-
-        batch.end();
 
         for (auto &image : images)
         {
             image.rotation = mathf::fmod(image.rotation + 4.f, 360.f);
         }
+        Size i = 0;
+        for (; i <= images.size() - 4; i += 4)
+        {
+            images[i].rotation = mathf::fmod(images[i].rotation + 4.f, 360.f);
+            images[i+1].rotation = mathf::fmod(images[i+1].rotation + 4.f, 360.f);
+            images[i+2].rotation = mathf::fmod(images[i+2].rotation + 4.f, 360.f);
+            images[i+3].rotation = mathf::fmod(images[i+3].rotation + 4.f, 360.f);
+        }
+
+        for (; i < images.size(); ++i)
+        {
+            images[i].rotation = mathf::fmod(images[i].rotation + 4.f, 360.f);
+        }
+    }
+
+    auto render() -> void override {
+        const auto displaySize = window().getDisplaySize();
+        const auto size = window().getSize();
+        camera.setViewport({0, 0, size.x, size.y});
+
+        batch.begin({
+            .viewMtx = camera.getView(),
+            .projMtx = camera.getProj(),
+        });
+
+        Size i = 0;
+        const Size half = images.size() / 2UL;
+        for (; i <= half - 4; i += 4)
+        {
+            images[i].draw(batch);
+            images[i+1].draw(batch);
+            images[i+2].draw(batch);
+            images[i+3].draw(batch);
+        }
+
+        for (; i < half; ++i)
+        {
+            images[i].draw(batch);
+        }
+
+
+        batch.end();
+
+        batch.begin({
+            .viewMtx = camera.getView(),
+            .projMtx = camera.getProj(),
+        });
+
+        for (; i <= images.size() - 4; i += 4)
+        {
+            images[i].draw(batch);
+            images[i+1].draw(batch);
+            images[i+2].draw(batch);
+            images[i+3].draw(batch);
+        }
+
+        for (; i < images.size(); ++i)
+        {
+            images[i].draw(batch);
+        }
+
+        batch.end();
     }
 
     auto close() -> void override {
-        uniforms.clear();
-        pixel.release();
         textures.clear();
         batch.release();
-        renderable.release();
+        backend::cursor::destroy(cursor);
     }
 };
 

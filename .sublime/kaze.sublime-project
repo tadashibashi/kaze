@@ -1,0 +1,39 @@
+{
+	"folders":
+	[
+		{
+			"path": "../",
+			"folder_exclude_patterns": [
+				".cache", ".idea", ".vs", ".sublime", ".vscode", "cmake-*", "out"
+			],
+		}
+	],
+	"settings": {
+		
+		"LSP":
+		{
+			"clangd":
+			{
+				"enabled": true,
+			},
+		},
+	},
+	"debugger_configurations":
+	[
+		{
+			"name": "kaze app",
+			"request": "launch",
+			"type": "lldb",
+			"program": "$project_path/../build/desktop/tests/runtime/kaze_test_01_app",
+			"cwd": "$project_path/../build/desktop/tests/runtime",
+			"pre_debug_task": "build kaze app",
+		}
+	],
+	"debugger_tasks":
+	[
+		{
+			"name": "build kaze app",
+			"shell_cmd": "task build-01_app",
+		}
+	],
+}
