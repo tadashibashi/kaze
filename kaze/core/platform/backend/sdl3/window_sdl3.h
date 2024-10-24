@@ -3,6 +3,7 @@
 #pragma once
 #ifndef kaze_core_platform_backends_sdl3_window_sdl3_h_
 #define kaze_core_platform_backends_sdl3_window_sdl3_h_
+
 #include <kaze/core/lib.h>
 #include <kaze/core/platform/backend/backend.h>
 

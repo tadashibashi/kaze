@@ -3,8 +3,6 @@
 #define kaze_core_video_color_h_
 
 #include <kaze/core/lib.h>
-#include <bit>
-
 #include <kaze/core/endian.h>
 
 KAZE_NAMESPACE_BEGIN

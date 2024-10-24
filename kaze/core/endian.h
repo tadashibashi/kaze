@@ -14,11 +14,21 @@ struct Endian
         Unknown = 0,
         Little = static_cast<int>(std::endian::little),
         Big = static_cast<int>(std::endian::big),
-        Native = static_cast<int>(std::endian::native),
     };
+
+    /// Native platform's endian value, may be either Endian::Little or Endian::Big
+    static constexpr Type Native = static_cast<Type>(std::endian::native);
 
     static constexpr bool isBig() { return Native == Big; }
     static constexpr bool isLittle() { return Native == Little; }
+    static constexpr auto opposite(Type endian) -> Type {
+        switch(endian)
+        {
+        case Little: return Big;
+        case Big:    return Little;
+        default:     return Unknown;
+        }
+    }
 
     template <typename T>
     static constexpr T swap(T obj)

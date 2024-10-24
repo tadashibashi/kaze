@@ -9,7 +9,10 @@ add_executable(${PROJECT_NAME}
     kaze/core/debug.tests.cpp
     kaze/core/graphics/Color.test.cpp
 
+    kaze/core/io/BufferIO.test.cpp
+    kaze/core/io/BufferWriter.test.cpp
     kaze/core/io/BufferView.test.cpp
+    kaze/core/io/StructLayout.test.cpp
 
     kaze/core/macros/enum.test.cpp
 

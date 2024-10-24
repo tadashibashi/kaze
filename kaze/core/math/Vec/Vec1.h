@@ -4,7 +4,6 @@
 #ifndef kaze_core_math_vec1_h_
 #define kaze_core_math_vec1_h_
 
-#include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
 #include "VecBase.h"
 

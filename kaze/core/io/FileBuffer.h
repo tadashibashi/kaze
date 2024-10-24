@@ -3,7 +3,6 @@
 #define kaze_core_io_filebuffer_h_
 
 #include <kaze/core/lib.h>
-#include <kaze/core/MemView.h>
 
 KAZE_NAMESPACE_BEGIN
     /// Handles file loading into memory. Loads it all at once instead of a streaming interface
@@ -36,9 +35,6 @@ public:
 
     /// Internal data buffer; if not open, it will be `nullptr`
     auto data() const noexcept -> const Ubyte * { return m_data; }
-
-    /// Get a reference to the data buffer memory
-    auto ref() const noexcept -> Memory { return makeRef<void>(m_data, m_dataSize); }
 
     /// Byte size of internal data buffer
     auto size() const noexcept -> Size { return m_dataSize; }

@@ -1,4 +1,4 @@
-#include <kaze/core/lib.h>
+
 #include <kaze/core/debug.h>
 #include <kaze/core/input/Gamepad.h>
 #include <kaze/core/video/Window.h>

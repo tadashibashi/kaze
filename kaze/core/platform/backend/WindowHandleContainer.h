@@ -2,8 +2,8 @@
 #ifndef kaze_core_platform_backend_windowhandlecontainer_h_
 #define kaze_core_platform_backend_windowhandlecontainer_h_
 
-#include <kaze/core/debug.h>
 #include <kaze/core/lib.h>
+#include <kaze/core/debug.h>
 #include <kaze/core/platform/backend/backend.h>
 
 #include <mutex>

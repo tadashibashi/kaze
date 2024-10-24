@@ -86,7 +86,8 @@ using std::formatter;
 template <typename Class, typename T>
 Size byteOffsetOf(T Class::*member)
 {
-    return reinterpret_cast<Size>(&reinterpret_cast<Class *>(nullptr)->*member);
+    Class *c = nullptr;
+    return reinterpret_cast<Size>(&(c->*member));
 }
 
 KAZE_NAMESPACE_END

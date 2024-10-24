@@ -1,6 +1,4 @@
 #include <doctest/doctest.h>
-
-#include <kaze/core/lib.h>
 #include <kaze/core/math/Vec.hpp>
 
 USING_KAZE_NAMESPACE;

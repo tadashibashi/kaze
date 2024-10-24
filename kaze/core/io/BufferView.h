@@ -1,6 +1,7 @@
 #pragma once
 #ifndef kaze_core_io_bufferview_h_
 #define kaze_core_io_bufferview_h_
+
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
 #include <kaze/core/debug.h>
@@ -20,38 +21,54 @@ KAZE_NAMESPACE_BEGIN
     };
 };
 
+struct BufferViewOpts {
+    Endian::Type arithmeticEndian = Endian::Little;
+    Endian::Type stringEndian     = Endian::Big;
+};
+
+struct BufferViewReadStringOpts {
+    /// Maximum string length to read [optional, default: Int64 max]
+    Int64 maxLength = std::numeric_limits<Int64>::max();
+
+    /// Endian override [optional]
+    Endian::Type endian = Endian::Unknown;
+};
+
 /// Wraps const binary buffer data to analyze it
 class BufferView {
 public:
-    /// Null buffer with nothing in it
+    /// Create a null BufferView
     BufferView();
 
-    /// \param[in] mem       const memory to view
-    /// \param[in] endian    expected endianness of integral types for arithmetic read overloads
-    explicit BufferView(Memory mem, Endian::Type endian = Endian::Little) noexcept;
+    /// \param[in] mem     memory to view
+    /// \param[in] opts    initialization options
+    explicit BufferView(MemView<void> mem, const BufferViewOpts &opts = {}) noexcept;
+    BufferView(const void *mem, Size byteSize, const BufferViewOpts &opts = {}) noexcept;
     ~BufferView() = default;
 
     template <Arithmetic T>
     auto operator >> (T &other) -> BufferView &
     {
-        if ( !*this || read(&other, sizeof(T), m_endian) != sizeof(T))
+        if ( !*this || readNumber(&other, sizeof(T), m_arithmeticEndian) != sizeof(T))
             throw std::runtime_error("BufferView read failed");
         return *this;
     }
 
-    /// Get a null-terminated string
+    /// Get a null-terminated string. String is assumed to be in big-endian order.
     auto operator >>(String &string) -> BufferView &;
 
     /// Read string. It copies until null terminator or maxLength has been reached.
-    /// \note String is assumed to be in big-endian byte order.
-    /// \param[out] string      string to capture string.
-    /// \param[in]  maxLength   maximum number of chars to read
+    /// \param[out] string  string to populate
+    /// \param[in]  opts    maximum number of chars to read [optional] (check opts struct for defaults)
     /// \returns size of string copied, not including null terminator
-    auto readString(String *string, Int64 maxLength = std::numeric_limits<Int64>::max()) -> Int64;
+    auto read(String *string, const BufferViewReadStringOpts &opts = {}) -> Int64;
 
-    template <typename T>
-    [[nodiscard]]
-    auto read() -> T;
+    /// Read a string with a fixed length
+    auto read(String *string, Int64 length,
+                   const BufferViewReadStringOpts &opts = {}) -> Int64;
+
+    template <typename T, typename... Args>
+    auto read(Args&&... args) -> T;
 
     /// Read an arithmetic type
     template <Arithmetic T>
@@ -59,24 +76,31 @@ public:
     auto read() -> T
     {
         T value;
-        if ( !*this || read(&value, sizeof(T), m_endian) != sizeof(T))
+        if ( !*this ||
+          readNumber(&value, sizeof(T), m_arithmeticEndian) != sizeof(T) )
             throw std::runtime_error("BufferView read failed");
         return value;
     }
 
-    /// read String overload
-    template <>
+    template<>
     [[nodiscard]]
     auto read<String>() -> String
     {
         String str;
-        if ( !readString(&str) )
+        if ( !read(&str) )
             throw std::runtime_error("BufferView readString failed");
         return str;
     }
 
-    template <typename T>
-    auto tryRead(T *outValue) -> Bool;
+    template<>
+    [[nodiscard]]
+    auto read<String>(const BufferViewReadStringOpts &opts) -> String
+    {
+        String str;
+        if ( !read(&str, opts) )
+            throw std::runtime_error("BufferView readString failed");
+        return str;
+    }
 
     /// Attempt to read an arithmetic value
     /// \param[out] outValue   retrieves the arithemtic type
@@ -91,7 +115,7 @@ public:
             return KAZE_FALSE;
         }
 
-        if ( !*this || read(outValue, sizeof(T), m_endian) != sizeof(T))
+        if ( !*this || readNumber(outValue, sizeof(T), m_arithmeticEndian) != sizeof(T))
         {
             KAZE_CORE_ERRCODE(Error::FileReadErr, "Failed to read from BufferView");
             return KAZE_FALSE;
@@ -102,10 +126,10 @@ public:
 
     /// Attempt to read a string value
     /// \param[out] outValue   retreives the string value
+    /// \param[in]  opts       read options
     /// \returns whether read succeeded;
     ///          will fail the eof flag is alreay set, or `outValue` is nullptr
-    template <>
-    auto tryRead<String>(String *outValue) -> Bool
+    auto tryRead(String *outValue, const BufferViewReadStringOpts &opts = {}) -> Bool
     {
         if ( !outValue )
         {
@@ -113,7 +137,7 @@ public:
             return KAZE_FALSE;
         }
 
-        if ( !*this || !readString(outValue) )
+        if ( !*this || !read(outValue, opts) )
         {
             KAZE_CORE_ERRCODE(Error::FileReadErr, "Failed to read from BufferView");
             return KAZE_FALSE;
@@ -122,11 +146,20 @@ public:
         return KAZE_TRUE;
     }
 
-    /// Read bytes with target endianness of binary data into account
+    /// Read bytes
     /// \param[in]  data    data buffer to copy data to
     /// \param[in]  bytes   number of bytes to read
-    /// \param[in]  endian  expected endianness of the target data
-    auto read(void *data, Int64 bytes, Endian::Type endian = Endian::Native) noexcept -> Int64;
+    /// \param[in]  reverse reverse byte order
+    auto read(void *data, Int64 bytes, Bool reverse = KAZE_FALSE) noexcept -> Int64;
+
+    /// Read numeric type
+    /// \param[inout] data   buffer to populate with data
+    /// \param[in]    bytes  number of bytes to read
+    /// \param[in]    endian target endianness of the numeric type [optional, default: arithmeticEndian set in ctor]
+    auto readNumber(void *data, Int64 bytes, Endian::Type endian = Endian::Unknown) noexcept -> Int64
+    {
+        return read(data, bytes, (endian == Endian::Unknown ? m_arithmeticEndian : endian) != Endian::Native);
+    }
 
     /// Get the size of the const buffer
     [[nodiscard]]
@@ -158,7 +191,8 @@ public:
   private:
     const Ubyte *m_begin{}, *m_end{}, *m_head{};
     bool m_isEof {false};
-    Endian::Type m_endian;
+    Endian::Type m_arithmeticEndian;
+    Endian::Type m_stringEndian;
 };
 
 KAZE_NAMESPACE_END

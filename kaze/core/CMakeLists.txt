@@ -36,12 +36,17 @@ add_library(${PROJECT_NAME}
         input/Mouse.cpp
         input/MouseConstants.h
 
+        io/BufferIO.h
+        io/BufferIO.cpp
         io/BufferView.h
         io/BufferView.cpp
+        io/BufferWriter.h
+        io/BufferWriter.cpp
         io/FileBuffer.h
         io/FileBuffer.cpp
         io/io.h
         io/io.cpp
+        io/StructLayout.h
 
         macros/enum.h
         macros/map.h
@@ -128,4 +133,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     bgfx bx bimg bimg_decode
 )
 
+target_precompile_headers(${PROJECT_NAME} PUBLIC lib.pch)
 kaze_target_plugin(${PROJECT_NAME} "${KAZE_BACKEND_ROOT}/${KAZE_BACKEND}")
+

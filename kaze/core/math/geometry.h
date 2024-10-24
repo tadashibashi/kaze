@@ -5,7 +5,6 @@
 #define kaze_core_math_geometry_h_
 
 #include <kaze/core/lib.h>
-
 #include <kaze/core/math/mathf.h>
 #include <kaze/core/math/Circle.h>
 #include <kaze/core/math/Rect.h>

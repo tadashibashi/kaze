@@ -1,5 +1,5 @@
 
-#include <kaze/core/lib.h>
+
 
 #include <kaze/tk/App.h>
 #include <kaze/tk/Camera2D.h>

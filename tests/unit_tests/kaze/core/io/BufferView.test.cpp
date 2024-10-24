@@ -136,30 +136,43 @@ TEST_SUITE("BufferView")
 
     TEST_CASE("endianness")
     {
-        Endian::Type endianness = (Endian::Native == Endian::Big) ?
+        SUBCASE("Integral types")
+        {
+            Endian::Type endianness = (Endian::Native == Endian::Big) ?
             Endian::Little : Endian::Big;
 
-        int ints[] = {10, 11, 12, 13};
-        BufferView bv(makeRef(ints));
+            int ints[] = {10, 11, 12, 13};
+            BufferView bv(makeRef(ints));
 
-        int value;
-        bv.read(&value, sizeof(int), endianness);
-        CHECK(value != 10);
+            int value;
+            bv.readNumber(&value, sizeof(int), endianness);
+            CHECK(value != 10);
 
-        value = Endian::swap(value);
-        CHECK(value == 10);
+            value = Endian::swap(value);
+            CHECK(value == 10);
 
-        bv.read(&value, sizeof(int), endianness);
-        CHECK(Endian::swap(value) == 11);
+            bv.readNumber(&value, sizeof(int), endianness);
+            CHECK(Endian::swap(value) == 11);
 
-        bv.read(&value, sizeof(int), endianness);
-        CHECK(Endian::swap(value) == 12);
+            bv.readNumber(&value, sizeof(int), endianness);
+            CHECK(Endian::swap(value) == 12);
 
-        bv.read(&value, sizeof(int), endianness);
-        CHECK(Endian::swap(value) == 13);
+            bv.readNumber(&value, sizeof(int), endianness);
+            CHECK(Endian::swap(value) == 13);
 
-        CHECK(bv.read(&value, sizeof(int), endianness) == 0);
-        CHECK(bv.eof());
+            CHECK(bv.readNumber(&value, sizeof(int), endianness) == 0);
+            CHECK(bv.eof());
+        }
+
+        SUBCASE("Strings")
+        {
+            auto data = "hello world";
+            auto view = BufferView(makeRef(data));
+
+            String value;
+            CHECK(view.read(&value, {.endian = Endian::Little}) == std::strlen(data));
+            CHECK(value == "dlrow olleh");
+        }
     }
 
     TEST_CASE("overreads")
@@ -200,7 +213,7 @@ TEST_SUITE("BufferView")
             BufferView bv(makeRef(str, length));
 
             String readStr;
-            CHECK(bv.readString(&readStr) == length);
+            CHECK(bv.read(&readStr) == length);
             CHECK(readStr == str);
             CHECK(bv.tell() == length);
         }
@@ -213,7 +226,7 @@ TEST_SUITE("BufferView")
             BufferView bv(makeRef(str, length));
 
             String value;
-            CHECK(bv.readString(&value, 4) == 4);
+            CHECK(bv.read(&value, {.maxLength = 4}) == 4);
             CHECK(value == "abcd");
             CHECK(bv.tell() == 4);
         }
@@ -224,11 +237,11 @@ TEST_SUITE("BufferView")
             BufferView bv(makeRef(str, 7));
 
             String value;
-            CHECK(bv.readString(&value) == 3);
+            CHECK(bv.read(&value) == 3);
             CHECK(value == "abc");
             CHECK(bv.tell() == 4); // +1 due to null terminator
 
-            CHECK(bv.readString(&value) == 3);
+            CHECK(bv.read(&value) == 3);
             CHECK(value == "def");
             CHECK(bv.tell() == 7);
         }

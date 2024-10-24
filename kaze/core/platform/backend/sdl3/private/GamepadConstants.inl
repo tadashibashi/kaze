@@ -3,6 +3,7 @@
 #pragma once
 #ifndef kaze_core_platform_backends_sdl3_gamepadconstants_inl_
 #define kaze_core_platform_backends_sdl3_gamepadconstants_inl_
+
 #include <kaze/core/lib.h>
 #include <kaze/core/input/GamepadConstants.h>
 

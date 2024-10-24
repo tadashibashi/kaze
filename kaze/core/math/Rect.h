@@ -27,8 +27,8 @@ struct Rect
 
         struct
         {
-            Vec<T, 2> position;
-            Vec<T, 2> size;
+            Vec2<T> position;
+            Vec2<T> size;
         };
     };
 

@@ -1,6 +1,5 @@
 #include <doctest/doctest.h>
 
-#include <kaze/core/lib.h>
 #include <kaze/core/macros/enum.h>
 
 #include <sstream>

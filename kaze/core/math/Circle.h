@@ -2,7 +2,6 @@
 #ifndef kaze_core_math_circle_h_
 #define kaze_core_math_circle_h_
 
-#include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
 #include <kaze/core/math/mathf.h>
 #include "Vec/Vec2.h"

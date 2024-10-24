@@ -27,6 +27,14 @@
 			"program": "$project_path/../build/desktop/tests/runtime/kaze_test_01_app",
 			"cwd": "$project_path/../build/desktop/tests/runtime",
 			"pre_debug_task": "build kaze app",
+		},
+		{
+			"name": "kaze unit tests",
+			"request": "launch",
+			"type": "lldb",
+			"program": "$project_path/../build/desktop/tests/unit_tests/kaze_unit_tests",
+			"cwd": "$project_path/../build/desktop/tests/unit_tests",
+			"pre_debug_task": "build kaze unit tests",
 		}
 	],
 	"debugger_tasks":
@@ -34,6 +42,10 @@
 		{
 			"name": "build kaze app",
 			"shell_cmd": "task build-01_app",
+		},
+		{
+			"name": "build kaze unit tests",
+			"shell_cmd": "task build-unittests",
 		}
 	],
 }

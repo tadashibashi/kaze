@@ -8,7 +8,6 @@
 
 #include <kaze/core/lib.h>
 #include <kaze/core/debug.h>
-
 #include <kaze/core/input/GamepadConstants.h>
 #include <kaze/core/input/KeyboardConstants.h>
 #include <kaze/core/platform/backend/WindowHandleContainer.h>
