@@ -6,7 +6,8 @@
 #include <kaze/core/platform/BackendInitGuard.h>
 
 KAZE_TK_NAMESPACE_BEGIN
-    struct App::Impl
+
+struct App::Impl
 {
     explicit Impl(const AppInit &config, App *app) : config(config), app(app) { }
 
@@ -36,12 +37,15 @@ void App::run()
     if ( !init() )
         return;
 
+    m->plugins.init(this);
+
     m->isRunning = true;
     do {
         runOneFrame();
     } while (m->isRunning);
 
     close();
+    m->plugins.close(this);
     postClose();
 }
 
@@ -174,8 +178,9 @@ auto App::preInit() -> Bool
         },
         .windowCallback = [] (const WindowEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->app->processWindowEvent(e, timestamp);
+
             impl->plugins.windowEvent(e, impl->app);
+            impl->app->processWindowEvent(e, timestamp);
         }
     });
 
@@ -198,7 +203,7 @@ auto App::processWindowEvent(const WindowEvent &e, const Double timestamp) -> vo
         if (m->window.getHandle() == e.window)
         {
             m->graphics.reset(e.data0, e.data1);
-            render();
+            renderAll();
             m->graphics.frame();
             m->graphics.renderFrame();
         }
@@ -215,6 +220,17 @@ void App::pollEvents()
     m->input.postProcessEvents();
 }
 
+auto App::renderAll() -> void
+{
+    m->plugins.preRender(this);
+    render();
+    m->plugins.postRender.reverseInvoke(this);
+
+    m->plugins.preRenderUI(this);
+    renderUI();
+    m->plugins.postRenderUI.reverseInvoke(this);
+}
+
 void App::runOneFrame()
 {
     double currentTime = 0;
@@ -228,13 +244,7 @@ void App::runOneFrame()
     update();
     m->plugins.postUpdate.reverseInvoke(this);
 
-    m->plugins.preRender(this);
-    render();
-    m->plugins.postRender.reverseInvoke(this);
-
-    m->plugins.preRenderUI(this);
-    renderUI();
-    m->plugins.postRenderUI.reverseInvoke(this);
+    renderAll();
 
     m->graphics.frame();
     m->plugins.postFrame.reverseInvoke(this);

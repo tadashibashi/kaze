@@ -1,30 +1,22 @@
 #include "imgui_plugin.h"
+#include "imgui_bgfx.h"
+#include "imgui_kaze.h"
+
+#include <imgui/imgui.h>
+
+#include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/video/Color.h>
-#include "imgui/imgui.h"
 
 KAZE_TK_NAMESPACE_BEGIN
-#define CONTEXT_CAST(userptr) static_cast<Context *>(userptr)
 
 namespace imgui {
-    struct Context {
-        InitConfig config;
-        ImGuiContext *context;
-    };
+
 
     static auto toImGuiColor(const Color &c) -> Uint
     {
         return c.toABGR8();
     }
 
-    static auto imguiCreate(const InitConfig &config) -> void
-    {
-
-    }
-
-    static auto imguiDestroy(Context *context) -> void
-    {
-        ImGui::DestroyContext(context->context);
-    }
 
     static Array<ImGuiKey, static_cast<Int>(Key::Count)> s_keyToImGuiKey = {
         ImGuiKey_Escape,
@@ -138,31 +130,42 @@ namespace imgui {
 
     auto createPlugin(const InitConfig &config) -> AppPlugin
     {
-        auto context = new Context {
-            .config = config
+        auto context = new ImGuiKazeContext {
+            .context = nullptr,
+            .window = config.window,
+            .fontSize = config.fontSize,
         };
 
         const AppPlugin plugin ("kaze.tk.imgui", AppPlugin::Callbacks {
             .userptr = context,
             .init = [](App *app, void *userdata)
             {
-                auto &io = ImGui::GetIO();
-                IMGUI_CHECKVERSION();
-
-                io.BackendPlatformName = "kaze_tk";
-                io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-                io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+                ImGui_ImplKaze_Init(CONTEXT_CAST(userdata));
+                ImGui_Implbgfx_Init(0);
 
                 auto &platformIo = ImGui::GetPlatformIO();
             },
+            .preFrame = [](App *app, void *userdata)
+            {
+                ImGui_Implbgfx_NewFrame();
+                ImGui_ImplKaze_NewFrame(CONTEXT_CAST(userdata));
+                ImGui::NewFrame();
+            },
+            .postRenderUI = [](App *app, void *userdata)
+            {
+                ImGui::Render();
+                ImGui_Implbgfx_RenderDrawLists(ImGui::GetDrawData());
+            },
             .close = [](App *app, void *userdata)
             {
+                ImGui_Implbgfx_Shutdown();
+                ImGui_ImplKaze_Shutdown(CONTEXT_CAST(userdata));
                 delete CONTEXT_CAST(userdata);
             },
             .keyboardEvent = [](const KeyboardEvent &e, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
-                if (ctx->config.window != e.window)
+                if (ctx->window != e.window)
                     return;
                 auto &io = ImGui::GetIO();
                 io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)],
@@ -171,7 +174,7 @@ namespace imgui {
             .mouseButtonEvent = [](const MouseButtonEvent &e, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
-                if (ctx->config.window != e.window)
+                if (ctx->window != e.window)
                     return;
 
                 auto &io = ImGui::GetIO();
@@ -194,25 +197,51 @@ namespace imgui {
             .mouseMotionEvent = [](const MouseMotionEvent &e, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
-                if (ctx->config.window != e.window)
+                if (ctx->window != e.window)
                     return;
                 ImGui::GetIO().AddMousePosEvent(e.position.x, e.position.y);
             },
             .mouseScrollEvent = [](const MouseScrollEvent &e, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
-                if (ctx->config.window != e.window)
+                if (ctx->window != e.window)
                     return;
                 ImGui::GetIO().AddMouseWheelEvent(e.offset.x, e.offset.y);
             },
             .windowEvent = [](const WindowEvent &e, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
-                if (ctx->config.window != e.window)
+                auto &io = ImGui::GetIO();
+                if (ctx->window != e.window)
                     return;
-                if (e.type == WindowEvent::MouseEntered)
+                switch(e.type)
                 {
+                case WindowEvent::ResizedFramebuffer:
+                    {
+                        int fw, fh;
+                        backend::window::getFramebufferSize(e.window, &fw, &fh);
 
+                        int w, h;
+                        backend::window::getSize(e.window, &w, &h);
+
+                        io.DisplaySize = ImVec2(w, h);
+                        if (w > 0 && h > 0)
+                        {
+                           io.DisplayFramebufferScale = ImVec2((float)fw / w, (float)fh / h);
+                        }
+                    } break;
+
+                case WindowEvent::FocusGained:
+                    {
+                        io.AddFocusEvent(true);
+                    } break;
+
+                case WindowEvent::FocusLost:
+                    {
+                        io.AddFocusEvent(false);
+                    } break;
+
+                default: break;
                 }
             }
         });

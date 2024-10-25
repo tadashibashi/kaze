@@ -810,12 +810,7 @@ namespace backend {
         RETURN_IF_NULL(window);
         RETURN_IF_NULL(outValue);
 
-        if ( !SDL_GetWindowRelativeMouseMode( WIN_CAST(window) ) )
-        {
-            KAZE_CORE_ERR("Failed to get window relative mouse mode: {}", SDL_GetError());
-            return false;
-        }
-
+        *outValue = SDL_GetWindowRelativeMouseMode( WIN_CAST(window) );
         return true;
     }
 

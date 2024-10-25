@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_tk_apppluginmgr_h_
-#define kaze_tk_apppluginmgr_h_
-
 #include <kaze/tk/lib.h>
 #include <kaze/tk/AppPlugin.h>
 #include <kaze/core/Action.h>

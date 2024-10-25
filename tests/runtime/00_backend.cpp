@@ -25,6 +25,25 @@ int main(int argc, const char *argv[])
 
     backend::setCallbacks({
         .userptr = &app,
+        .fileDropCallback = [](const FileDropEvent &e, Double timestamp, void *userptr) {
+            KAZE_LOG("File dropped: \"{}\", at: {}, {}", e.path, e.position.x, e.position.y);
+        },
+        .gamepadAxisCallback = [](const GamepadAxisEvent &e, Double timestamp, void *userptr) {
+            KAZE_LOG("Controller {}, axis {} moved: {}", e.controllerIndex, (int)e.axis, e.value);
+        },
+        .gamepadButtonCallback = [](const GamepadButtonEvent &e, Double timestamp, void *userptr) {
+            KAZE_LOG("Controller button {} was {}", (int)e.button, e.type == GamepadButtonEvent::Down ? "pressed" : "released");
+        },
+        .gamepadConnectCallback = [](const GamepadConnectEvent &e, auto timestamp, auto userptr) {
+            if (e.type == GamepadConnectEvent::Connected)
+            {
+                KAZE_LOG("Gamepad connected: {}", e.id);
+            }
+            else
+            {
+                KAZE_LOG("Gamepad disconnected: {}", e.id);
+            }
+        },
         .keyCallback = [](const KeyboardEvent &e, Double timestamp, void *userptr) {
             const auto app = static_cast<AppData *>(userptr);
             if (e.type == KeyboardEvent::Down && !e.isRepeat)
@@ -72,13 +91,13 @@ int main(int argc, const char *argv[])
             if (e.type == MouseButtonEvent::Down)
                 KAZE_LOG("Mouse button pressed: {}", static_cast<Uint>(e.button));
         },
-        .mouseScrollCallback = [](const MouseScrollEvent &e, Double timestamp, void *userptr) {
-            KAZE_LOG("Scrolled: {}, {}", e.offset.x, e.offset.y);
-        },
         .mouseMotionCallback = [](const MouseMotionEvent &e, Double timestamp, void *userptr) {
             const auto app = static_cast<AppData *>(userptr);
             if (app->logMousePos)
                 KAZE_LOG("Mouse moved: {{{}, {}}}", e.position.x, e.position.y);
+        },
+        .mouseScrollCallback = [](const MouseScrollEvent &e, Double timestamp, void *userptr) {
+            KAZE_LOG("Scrolled: {}, {}", e.offset.x, e.offset.y);
         },
         .windowCallback = [](const WindowEvent &e, Double timestamp, void *userptr) {
             const auto app = static_cast<AppData *>(userptr);
@@ -144,25 +163,6 @@ int main(int argc, const char *argv[])
                 KAZE_WARN("Warning: unknown window event was passed.");
                 break;
             }
-        },
-        .gamepadConnectCallback = [](const GamepadConnectEvent &e, auto timestamp, auto userptr) {
-            if (e.type == GamepadConnectEvent::Connected)
-            {
-                KAZE_LOG("Gamepad connected: {}", e.id);
-            }
-            else
-            {
-                KAZE_LOG("Gamepad disconnected: {}", e.id);
-            }
-        },
-        .gamepadAxisCallback = [](const GamepadAxisEvent &e, Double timestamp, void *userptr) {
-            KAZE_LOG("Controller {}, axis {} moved: {}", e.controllerIndex, (int)e.axis, e.value);
-        },
-        .gamepadButtonCallback = [](const GamepadButtonEvent &e, Double timestamp, void *userptr) {
-            KAZE_LOG("Controller button {} was {}", (int)e.button, e.type == GamepadButtonEvent::Down ? "pressed" : "released");
-        },
-        .fileDropCallback = [](const FileDropEvent &e, Double timestamp, void *userptr) {
-            KAZE_LOG("File dropped: \"{}\", at: {}, {}", e.path, e.position.x, e.position.y);
         },
     });
 

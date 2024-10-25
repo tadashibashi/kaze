@@ -1,9 +1,6 @@
 /// \file Camera2D.h
 /// Camera2D class
 #pragma once
-#ifndef kaze_tk_camera2d_h_
-#define kaze_tk_camera2d_h_
-
 #include <kaze/tk/lib.h>
 #include <kaze/core/math/Matrix.h>
 #include <kaze/core/math/Rect.h>

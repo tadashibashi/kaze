@@ -225,14 +225,14 @@ function(kaze_target_plugin TARGET PATH)
     # Add include directories
     if (DEFINED ${NAME}_INCLUDE_DIRS_PUBLIC)
         kaze_make_paths_absolute(
-                PATHS ${NAME}_INCLUDE_DIRS_PUBLIC
+                PATHS ${${NAME}_INCLUDE_DIRS_PUBLIC}
                 ROOT_DIR ${PLUGIN_ROOT}
                 OUT_VAR INCLUDE_ABS)
         target_include_directories(${TARGET} PUBLIC ${INCLUDE_ABS})
     endif()
     if (DEFINED ${NAME}_INCLUDE_DIRS_PRIVATE)
         kaze_make_paths_absolute(
-                PATHS ${NAME}_INCLUDE_DIRS_PRIVATE
+                PATHS ${${NAME}_INCLUDE_DIRS_PRIVATE}
                 ROOT_DIR ${PLUGIN_ROOT}
                 OUT_VAR INCLUDE_ABS)
         target_include_directories(${TARGET} PRIVATE ${INCLUDE_ABS})

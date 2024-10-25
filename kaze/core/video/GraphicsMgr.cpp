@@ -45,18 +45,18 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
     if (GraphicsMgr::Impl::wasInit)
     {
         KAZE_CORE_ERRCODE(Error::GR_InitErr, "bgfx was already initialized");
-        return KAZE_FALSE;
+        return False;
     }
     if ( !window )
     {
         KAZE_CORE_ERRCODE(Error::NullArgErr, "`window` was null");
-        return KAZE_FALSE;
+        return False;
     }
 
     int width, height;
     if ( !backend::window::getFramebufferSize(window, &width, &height) )
     {
-        return KAZE_FALSE;
+        return False;
     }
 
     const auto platformData = backend::window::getNativeInfo(window);

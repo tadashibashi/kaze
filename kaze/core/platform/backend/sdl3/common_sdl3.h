@@ -67,5 +67,3 @@ namespace backend {
 }
 
 KAZE_NAMESPACE_END
-
-#endif

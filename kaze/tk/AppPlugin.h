@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_tk_appplugin_h_
-#define kaze_tk_appplugin_h_
-
 #include <kaze/core/input/InputEvents.h>
 #include <kaze/core/traits.h>
 
@@ -31,7 +28,6 @@ public:
         funcptr_t<void (App *app, void *userptr)> close{};          ///< occurs right before the app closes or disposes of this plugin: clean up resources here, e.g. userptr.
 
         // ----- Input and System events -----
-        funcptr_t<void (const WindowEvent &e, App *app, void *userptr)>         windowEvent{};
         funcptr_t<void (const GamepadAxisEvent &e, App *app, void *userptr)>    gamepadAxisEvent{};
         funcptr_t<void (const GamepadButtonEvent &e, App *app, void *userptr)>  gamepadButtonEvent{};
         funcptr_t<void (const GamepadConnectEvent &e, App *app, void *userptr)> gamepadConnectEvent{};
@@ -39,6 +35,7 @@ public:
         funcptr_t<void (const MouseButtonEvent &e, App *app, void *userptr)>    mouseButtonEvent{};
         funcptr_t<void (const MouseMotionEvent &e, App *app, void *userptr)>    mouseMotionEvent{};
         funcptr_t<void (const MouseScrollEvent &e, App *app, void *userptr)>    mouseScrollEvent{};
+        funcptr_t<void (const WindowEvent &e, App *app, void *userptr)>         windowEvent{};
     };
 
     AppPlugin(StringView name, const Callbacks &callbacks) noexcept :

@@ -1,8 +1,4 @@
 #pragma once
-
-#ifndef kaze_tk_spritebatch_h_
-#define kaze_tk_spritebatch_h_
-
 #include <kaze/tk/lib.h>
 #include <kaze/core/math/Rect.h>
 #include <kaze/core/math/Vec/Vec2.h>

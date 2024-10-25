@@ -116,6 +116,15 @@ auto InputMgr::isJustUp(Key key) const noexcept -> Bool
     return m->keyboard.isJustUp(key);
 }
 
+auto InputMgr::getAxes(Key left, Key right, Key up, Key down) -> Vec2f
+{
+    Float hAxis = static_cast<Float>(isDown(right) - isDown(left));
+    Float vAxis = static_cast<Float>(isDown(down) - isDown(up));
+    if (hAxis == 0 && vAxis == 0) return {};
+
+    return Vec2f{hAxis, vAxis}.normalize();
+}
+
 // ----- Gamepad -----
 
 auto InputMgr::isDown(Int index, GamepadBtn button) const noexcept -> Bool

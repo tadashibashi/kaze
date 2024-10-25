@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_tk_plugins_imgui_imgui_plugin_h_
-#define kaze_tk_plugins_imgui_imgui_plugin_h_
-
 #include <kaze/tk/lib.h>
 #include <kaze/tk/AppPlugin.h>
 
@@ -16,7 +13,6 @@ namespace imgui {
     };
 
     auto createPlugin(const InitConfig &config) -> AppPlugin;
-    auto destroyPlugin(const AppPlugin &plugin) -> void;
 }
 
 

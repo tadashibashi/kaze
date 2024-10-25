@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_tk_lib_h_
-#define kaze_tk_lib_h_
-
 #include <kaze/core/lib.h>
 
 #if KAZE_NO_NAMESPACE

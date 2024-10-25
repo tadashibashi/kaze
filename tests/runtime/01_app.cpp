@@ -14,6 +14,9 @@
 
 #include <bgfx/bgfx.h>
 #include <kaze/tk/SpriteBatch.h>
+#include <kaze/tk/plugins/imgui/imgui_plugin.h>
+
+#include <imgui/imgui.h>
 
 USING_KAZE_NAMESPACE;
 USING_KAZE_TK_NAMESPACE;
@@ -53,8 +56,8 @@ public:
     ~Demo() override { }
 private:
     Camera2D camera;
-    AssetLoader<String, Texture2D> textures;
-    const Texture2D *warioTexture{};
+    //AssetLoader<String, Texture2D> textures;
+    Texture2D testTexture{};
     SpriteBatch batch{};
 
     struct TestImage
@@ -85,20 +88,22 @@ private:
     auto init() -> Bool override {
 
         if ( !batch.init(graphics()) )
-            return KAZE_FALSE;
+            return False;
 
-        cursors().set(CursorType::NotAllowed);
+        Image image;
+        if ( !image.load("dungeon_tiles.png") )
+            return False;
 
-        if (warioTexture = textures.load("dungeon_tiles.png"); warioTexture == nullptr)
-        {
-            return KAZE_FALSE;
-        }
+        if ( !testTexture.loadImage(image) )
+            return False;
+
+        cursors().set(CursorType::Pointer);
 
         images.reserve(1000);
         for (Int i = 0; i < 1000; ++i)
         {
             images.emplace_back(TestImage{
-                .texture = warioTexture,
+                .texture = &testTexture,
                 .position = {(float)(rand() % 10000), (float)(rand() % 10000) },
                 .rotation = (float)(rand() % 360),
                 .scale = {1.f, 1.f}
@@ -109,7 +114,11 @@ private:
         camera.setViewport({0, 0, windowSize.x, windowSize.y});
         camera.setOrigin({0, 0});
 
-        return KAZE_TRUE;
+        addPlugin(imgui::createPlugin({
+            .window = window().getHandle()
+        }));
+
+        return True;
     }
 
     auto update() -> void override {
@@ -183,9 +192,12 @@ private:
         {
             images[i].rotation = mathf::fmod(images[i].rotation + 4.f, 360.f);
         }
+
+        ImGui::ShowDemoWindow();
     }
 
     auto render() -> void override {
+
         const auto displaySize = window().getDisplaySize();
         const auto size = window().getSize();
         camera.setViewport({0, 0, size.x, size.y});
@@ -235,7 +247,7 @@ private:
     }
 
     auto close() -> void override {
-        textures.clear();
+        testTexture.release();
         batch.release();
     }
 };

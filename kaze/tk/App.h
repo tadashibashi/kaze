@@ -1,9 +1,6 @@
 /// \file App.h
 /// Application class
 #pragma once
-#ifndef kaze_tk_app_h_
-#define kaze_tk_app_h_
-
 #include <kaze/tk/lib.h>
 #include <kaze/tk/AppPlugin.h>
 #include <kaze/core/Action.h>
@@ -99,11 +96,10 @@ private:
     auto pollEvents() -> void;
     auto runOneFrame() -> void;
     auto postClose() -> void;
+    auto renderAll() -> void;
 
     struct Impl;
     Impl *m;
 };
 
 KAZE_TK_NAMESPACE_END
-
-#endif // kaze_tk_app_h_

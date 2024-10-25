@@ -47,6 +47,9 @@ public:
     [[nodiscard]]
     auto isJustUp(Key key) const noexcept -> Bool;
 
+    [[nodiscard]]
+    auto getAxes(Key left, Key right, Key up, Key down) -> Vec2f;
+
     // ----- Gamepad -----
 
     [[nodiscard]]
