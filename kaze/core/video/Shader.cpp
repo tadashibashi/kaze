@@ -16,7 +16,7 @@ Shader::Shader() : m(new Impl())
 
 }
 
-Shader::Shader(const Memory mem) : Shader()
+Shader::Shader(const Mem mem) : Shader()
 {
     compile(mem);
 }
@@ -75,7 +75,7 @@ String Shader::makePath(const StringView folder, const StringView shaderName)
     return (std::filesystem::path(folder) / subFolder / shaderName).string();
 }
 
-auto Shader::compile(const Memory mem) -> Bool
+auto Shader::compile(const Mem mem) -> Bool
 {
     const auto handle = bgfx::createShader( bgfx::makeRef(mem.data(), mem.size()) );
     if ( !bgfx::isValid(handle) )

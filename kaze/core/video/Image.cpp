@@ -64,7 +64,7 @@ auto Image::isLoaded() const noexcept -> Bool
 auto Image::load(StringView filepath) -> Bool
 {
     Ubyte *data; Size size;
-    if ( !kaze::loadFile(filepath, &data, &size) )
+    if ( !file::load(filepath, &data, &size) )
     {
         return KAZE_FALSE;
     }

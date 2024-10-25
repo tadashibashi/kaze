@@ -6,7 +6,7 @@
 
 #include <kaze/core/lib.h>
 #include <kaze/core/input/GamepadConstants.h>
-#include <kaze/core/platform/backend/PlatformCallbacks.h>
+#include <kaze/core/platform/backend/backend.h>
 
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_gamepad.h>

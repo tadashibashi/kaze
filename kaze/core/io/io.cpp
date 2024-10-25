@@ -2,12 +2,16 @@
 #include <kaze/core/debug.h>
 #include <kaze/core/memory.h>
 
-#include <bgfx/bgfx.h>
 #include <filesystem>
 #include <fstream>
 
 KAZE_NAMESPACE_BEGIN
-    constexpr int BytesPerRead = 1024;
+
+/// Number of bytes read in iterations, as opposed to all at once
+constexpr int BytesPerRead = 1024;
+/// Number of bytes written in iterations, as opposed to all at once
+constexpr int BytesPerWrite = 1024;
+
 static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
 {
     if ( !data )
@@ -53,7 +57,7 @@ static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
     return KAZE_TRUE;
 }
 
-auto loadFile(StringView path, Ubyte **outData, Size *outSize) -> Bool
+auto file::load(StringView path, Ubyte **outData, Size *outSize) -> Bool
 {
     if ( !path.data() )
     {
@@ -106,7 +110,7 @@ auto loadFile(StringView path, Ubyte **outData, Size *outSize) -> Bool
     return KAZE_TRUE;
 }
 
-auto writeFile(StringView path, const Memory mem) -> Bool
+auto file::write(StringView path, const Mem mem) -> Bool
 {
     const auto size = mem.elemCount();
     const auto data = (const char *)mem.data();
@@ -127,9 +131,11 @@ auto writeFile(StringView path, const Memory mem) -> Bool
     }
 
     Size b = 0;
-    for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerRead); b <= limit; b += BytesPerRead)
+    for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerWrite);
+        b <= limit;
+        b += BytesPerWrite)
     {
-        if ( !file.write(data + b, BytesPerRead) )
+        if ( !file.write(data + b, BytesPerWrite) )
         {
             KAZE_CORE_ERRCODE(Error::FileWriteErr, "Failed to write file for writing at: {}, byte {}", path, b);
             return KAZE_FALSE;

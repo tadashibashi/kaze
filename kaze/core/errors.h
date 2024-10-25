@@ -44,6 +44,7 @@ struct Error
 
         InvalidEnum,          ///< Invalid enum value passed to a function
         MissingKeyErr,        ///< Dictionary/Map is missing an expected key
+        DuplicateKey,         ///< Attempted to add a duplicate key into a Dictionary/Map when not permitted
         InvalidArgErr,        ///< Argument is not valid
         Unsupported,          ///< Feature not supported
 

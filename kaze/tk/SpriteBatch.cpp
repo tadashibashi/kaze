@@ -9,7 +9,7 @@
 
 KAZE_TK_NAMESPACE_BEGIN
 
-auto SpriteBatch::Shader::load(StringView fragmentPath) -> Bool
+auto SpriteBatch::SubShader::load(StringView fragmentPath) -> Bool
 {
     // TODO: Implement this!
     throw std::runtime_error("Not implemented");
@@ -59,13 +59,13 @@ struct SpriteBatch::Impl
             return KAZE_FALSE;
         }
 
-        if ( !m_pixelTexture.loadPixels(makeRef(&Color::White, 1), 1, 1) )
+        if ( !m_pixelTexture.loadPixels(makeRef(&Color::White, 1), {1, 1}) )
             return KAZE_FALSE;
 
         const auto result = m_renderable.init({
             .viewId = 0,
-            .vertShader = std::move(kaze::Shader(kaze::Shader::makePath("kaze/shaders", "spritebatch_v.sc.bin"))),
-            .fragShader = std::move(kaze::Shader(kaze::Shader::makePath("kaze/shaders", "spritebatch_f.sc.bin"))),
+            .vertShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_v.sc.bin"))),
+            .fragShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_f.sc.bin"))),
             .layout = VertexLayout()
                 .begin()
                     .add(Attrib::Position, 3, AttribType::Float)

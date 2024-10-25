@@ -467,7 +467,7 @@ namespace backend {
         return true;
     }
 
-    auto mouse::getRelativePosition(const WindowHandle window, float *outX, float *outY) noexcept -> bool
+    auto cursor::getRelativePosition(const WindowHandle window, float *outX, float *outY) noexcept -> bool
     {
         RETURN_IF_NULL(window);
 
@@ -483,7 +483,7 @@ namespace backend {
         return true;
     }
 
-    auto mouse::getGlobalPosition(float *outX, float *outY) noexcept -> bool
+    auto cursor::getGlobalPosition(float *outX, float *outY) noexcept -> bool
     {
         double tempX=0, tempY=0;
         if (const auto window = static_cast<GLFWwindow *>(windows.getMainWindow()))
@@ -510,7 +510,7 @@ namespace backend {
         return true;
     }
 
-    auto mouse::isDown(WindowHandle window, MouseBtn button, bool *outDown) noexcept -> bool
+    auto cursor::isDown(WindowHandle window, MouseBtn button, bool *outDown) noexcept -> bool
     {
         RETURN_IF_NULL(window);
         RETURN_IF_NULL(outDown);

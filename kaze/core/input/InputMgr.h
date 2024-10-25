@@ -1,7 +1,6 @@
 #pragma once
 #ifndef kaze_core_input_inputmgr_h_
 #define kaze_core_input_inputmgr_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/Action.h>
 #include <kaze/core/input/GamepadConstants.h>
@@ -33,14 +32,6 @@ public:
     auto processEvent(const GamepadAxisEvent &e, Double timestamp) noexcept -> void;
     auto processEvent(const GamepadButtonEvent &e, Double timestamp) noexcept -> void;
     auto processEvent(const GamepadConnectEvent &e, Double timestamp) noexcept -> void;
-
-    Action<const KeyboardEvent &, Double> onKeyboard;              ///< occurs on a keyup or keydown; 2nd argument is seconds since app start
-    Action<const MouseMotionEvent &, Double> onMouseMotion;        ///< occurs on mouse move; 2nd argument is seconds since app start
-    Action<const MouseScrollEvent &, Double> onMouseScroll;        ///<
-    Action<const MouseButtonEvent &, Double> onMouseButton;
-    Action<const GamepadButtonEvent &, Double> onGamepadButton;
-    Action<const GamepadAxisEvent &, Double> onGamepadAxis;
-    Action<const GamepadConnectEvent &, Double> onGamepadConnect;
 
     // ----- Keyboard -----
 
@@ -117,11 +108,14 @@ public:
 
     /// Get mouse position relative to the provided window
     [[nodiscard]]
-    auto mouseCoords() const noexcept -> Vec2f;
+    auto pointerCoords() const noexcept -> Vec2f;
 
     /// Get the global mouse position
     [[nodiscard]]
-    auto mouseGlobalCoords() const noexcept -> Vec2f;
+    auto pointerCoordsGlobal() const noexcept -> Vec2f;
+
+    [[nodiscard]]
+    auto getScroll() const noexcept -> Vec2f;
 
 private:
     struct Impl;

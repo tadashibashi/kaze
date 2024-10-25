@@ -12,11 +12,11 @@ tasks:
       - cmake -B build/web -S . -G Ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DCMAKE_BUILD_TYPE=Debug -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
       - cmake -E create_hardlink build/web/compile_commands.json build/compile_commands.json
 
-  build-unittests:
+  build-tests:
     cmds:
       - cmake --build build/desktop --target kaze_unit_tests
-  run-unittests:
-    deps: [build-unittests]
+  run-tests:
+    deps: [build-tests]
     cmds:
       - build/desktop/tests/unit_tests/kaze_unit_tests
 

@@ -1,3 +1,5 @@
+/// \file BufferIO.h
+/// Contains static functions for serialization and deserialization of binary data
 #pragma once
 #ifndef kaze_core_io_bufferio_h_
 #define kaze_core_io_bufferio_h_
@@ -10,6 +12,8 @@
 
 KAZE_NAMESPACE_BEGIN
 
+/// For now this object just contains static functions for conversion
+/// between binary and structs
 class BufferIO {
 public:
     BufferIO() { }

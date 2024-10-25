@@ -10,7 +10,8 @@
 #include <kaze/core/debug.h>
 #include <kaze/core/input/GamepadConstants.h>
 #include <kaze/core/input/KeyboardConstants.h>
-#include <kaze/core/platform/backend/WindowHandleContainer.h>
+#include <kaze/core/memory.h>
+#include <kaze/core/platform/backend/helpers/WindowHandleContainer.h>
 
 #include <GLFW/glfw3.h>
 
@@ -73,8 +74,8 @@ namespace backend {
         {
             for (auto &state : states)
             {
-                std::memory::set(state.axes, 0, sizeof(state.axes));
-                std::memory::set(state.buttons, 0, sizeof(state.buttons));
+                memory::set(state.axes, 0, sizeof(state.axes));
+                memory::set(state.buttons, 0, sizeof(state.buttons));
             }
 
             currentState = 0;

@@ -566,7 +566,7 @@ namespace backend {
         return true;
     }
 
-    auto mouse::getRelativePosition(const WindowHandle window, float *x, float *y) noexcept -> bool
+    auto cursor::getRelativePosition(const WindowHandle window, float *x, float *y) noexcept -> bool
     {
         RETURN_IF_NULL(window);
 
@@ -588,13 +588,13 @@ namespace backend {
         return true;
     }
 
-    auto mouse::getGlobalPosition(float *x, float *y) noexcept -> bool
+    auto cursor::getGlobalPosition(float *x, float *y) noexcept -> bool
     {
         SDL_GetGlobalMouseState(x, y);
         return true;
     }
 
-    auto mouse::isDown(const WindowHandle window, kaze::MouseBtn button, bool *outDown) noexcept -> bool
+    auto cursor::isDown(const WindowHandle window, kaze::MouseBtn button, bool *outDown) noexcept -> bool
     {
         RETURN_IF_NULL(window);
         RETURN_IF_NULL(outDown);

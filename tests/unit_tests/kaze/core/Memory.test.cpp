@@ -7,7 +7,7 @@ TEST_SUITE("Memory")
 {
     TEST_CASE("Default constructor")
     {
-        const auto mem = Memory{};
+        const auto mem = Mem{};
         CHECK(mem.data() == nullptr);
         CHECK(mem.elemCount() == 0);
     }

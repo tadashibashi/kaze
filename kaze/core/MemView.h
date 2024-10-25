@@ -19,7 +19,7 @@ public:
     [[nodiscard]]
     auto data() const noexcept { return m_data; }
 
-    /// Get the number of elements
+    /// \returns the number of elements (or bytes if `T` is void)
     [[nodiscard]]
     auto elemCount() const noexcept
     {
@@ -29,7 +29,7 @@ public:
             return m_size / sizeof(T);
     }
 
-    /// Get the number of bytes of the data
+    /// \returns the number of bytes of the data
     [[nodiscard]]
     auto size() const noexcept { return m_size; }
 
@@ -43,8 +43,7 @@ private:
     Size m_size{};
 };
 
-using Memory = MemView<void>;
-
+using Mem = MemView<void>;
 
 inline auto makeRef(Cstring cstr) -> MemView<char>
 {

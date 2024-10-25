@@ -31,7 +31,7 @@
 KAZE_NAMESPACE_BEGIN
 
 namespace backend {
-    NativePlatformData window::getNativeInfo(const WindowHandle window) noexcept
+    window::NativePlatformData window::getNativeInfo(const WindowHandle window) noexcept
     {
     #if   KAZE_TARGET_WINDOWS
         return {
@@ -98,11 +98,11 @@ namespace backend {
     static void glfwScrollCallback(GLFWwindow *window, const double xoffset, const double yoffset)
     {
         events.emit(MouseScrollEvent {
-        .offset = {
-            static_cast<float>(xoffset),
-            static_cast<float>(yoffset)
-        },
-        .window = window,
+            .offset = {
+                static_cast<float>(xoffset),
+                static_cast<float>(yoffset)
+            },
+            .window = window,
         });
     }
 
@@ -939,7 +939,8 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
-        glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR_CAPTURED, capture);
+        const auto lastMode = glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR);
+        glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR, capture ? GLFW_CURSOR_CAPTURED : lastMode);
         ERR_CHECK(Error::BE_RuntimeErr, "set cursor captured mode");
 
         return true;
@@ -950,11 +951,12 @@ namespace backend {
         RETURN_IF_NULL(window);
         RETURN_IF_NULL(outCapture);
 
-        const auto capture = static_cast<bool>(glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR_CAPTURED));
+        const auto capture = glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR) == GLFW_CURSOR_CAPTURED;
         ERR_CHECK(Error::BE_RuntimeErr, "get cursor captured mode");
 
         *outCapture = capture;
         return true;
     }
 } // namespace backend
+
 KAZE_NAMESPACE_END

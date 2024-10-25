@@ -14,6 +14,8 @@
 
 KAZE_NAMESPACE_BEGIN
 
+class Image;
+
 /// RAII container around a GPU texture
 class Texture2D
 {
@@ -58,18 +60,21 @@ public:
 
     /// Load texture from pixel data
     /// \param[in]  pixels      pixels to load
-    /// \param[in]  width       pixel width of image data
-    /// \param[in]  height      pixel height of image data
+    /// \param[in]  dimensions  pixel dimensions of image data
     /// \returns whether operation was successful
-    auto loadPixels(MemView<Color> pixels, Size width, Size height) -> Bool;
+    auto loadPixels(MemView<Color> pixels, Vec2<Uint> dimensions) -> Bool;
 
     /// Load texture from pixel data
-    /// \param[in]  data     pixel data to load
-    /// \param[in]  width      width of the target image
-    /// \param[in]  height     height of the target image
-    /// \param[in]  srcFormat  format of the data in `data`
+    /// \param[in]  data        pixel data to load
+    /// \param[in]  dimensions  pixel dimensions of image data
+    /// \param[in]  srcFormat   format of the data in `data`
     /// \returns whether operation was successful
-    auto loadPixels(MemView<void> data, Size width, Size height, PixelFormat::Enum srcFormat) -> Bool;
+    auto loadPixels(MemView<void> data, Vec2<Uint> dimensions, PixelFormat::Enum srcFormat) -> Bool;
+
+    /// Load texture from an Image container
+    /// \param[in]  image   container with pixel data to load
+    /// \returns whether operation was successful
+    auto loadImage(const Image &image) -> Bool;
 
     /// Check if a texture is currently loaded and ready for use.
     [[nodiscard]]

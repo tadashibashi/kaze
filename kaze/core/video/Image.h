@@ -92,6 +92,8 @@ public:
     /// Whether image data is a cube map
     [[nodiscard]]
     auto isCubeMap() const noexcept -> Bool;
+
+    auto handle() const noexcept -> const ImageHandle { return m_image; }
 private:
     ImageHandle m_image;
 };

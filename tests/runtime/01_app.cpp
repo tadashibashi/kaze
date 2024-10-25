@@ -1,6 +1,3 @@
-
-
-
 #include <kaze/tk/App.h>
 #include <kaze/tk/Camera2D.h>
 
@@ -52,8 +49,6 @@ public:
         .title = "App Demo",
         .size = {640, 480},
         .flags = WindowInit::Resizable | WindowInit::Floating,
-        .maxTransientVBufferSize = 400,
-        .maxTransientIBufferSize = 600,
     }) { }
 
     ~Demo() override { }
@@ -151,12 +146,19 @@ private:
 
         if (input().isDown(Key::Z))
         {
-            camera.setScale(camera.getScale() + Vec2f{.05f, .05f});
+            camera.setScale(camera.getScale() * Vec2f{1.05f, 1.05f});
         }
 
         if (input().isDown(Key::X))
         {
-            camera.setScale(camera.getScale() + Vec2f{-.05f, -.05f});
+            camera.setScale(camera.getScale() * Vec2f{.95f, .95f});
+        }
+
+        KAZE_LOG("{} x {}", input().getScroll().x, input().getScroll().y);
+
+        if (const auto scroll = input().getScroll(); scroll.y != 0)
+        {
+            camera.setScale(camera.getScale() * (Vec2f::One + Vec2f(scroll.y * .05f, scroll.y * .05f)));
         }
 
         if (input().isDown(Key::R))

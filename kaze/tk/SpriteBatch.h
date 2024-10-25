@@ -42,11 +42,11 @@ public:
 
     /// TODO: probably just use a normal shader, don't make a new class.
     /// SpriteBatch should have a createShaderProgram() function that returns a SpriteBatch-flavored shader.
-    class Shader
+    class SubShader
     {
     public:
-        Shader() = default;
-        ~Shader() = default;
+        SubShader() = default;
+        ~SubShader() = default;
 
         auto load(StringView fragmentPath) -> Bool;
 

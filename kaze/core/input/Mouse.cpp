@@ -36,6 +36,7 @@ auto Mouse::processEvent(const MouseScrollEvent &e) -> void
 {
     if (e.window == m_window)
     {
+        KAZE_LOG("{}, {}", e.offset.x, e.offset.y);
         m_scroll += e.offset;
     }
 }
@@ -73,7 +74,7 @@ auto Mouse::postProcessEvents() -> void
             --button.interactions;
             if (button.interactions == 0)
             {
-                backend::mouse::isDown(m_window, static_cast<MouseBtn>(i), &button.value[0]);
+                backend::cursor::isDown(m_window, static_cast<MouseBtn>(i), &button.value[0]);
             }
             else
             {
@@ -97,7 +98,7 @@ auto Mouse::getPosition() const noexcept -> Vec2f
 auto Mouse::getGlobalPosition() const noexcept -> Vec2f
 {
     Vec2f position;
-    backend::mouse::getGlobalPosition(&position.x, &position.y);
+    backend::cursor::getGlobalPosition(&position.x, &position.y);
     return position;
 }
 

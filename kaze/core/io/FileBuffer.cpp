@@ -25,6 +25,8 @@ FileBuffer::FileBuffer(const FileBuffer &other) : m_data(memory::alloc<Ubyte>(ot
 
 auto FileBuffer::operator=(const FileBuffer &other) -> FileBuffer &
 {
+    if (this == &other) return *this;
+
     close();
     m_data = memory::alloc<Ubyte>(other.m_dataSize);
     if (m_data)
@@ -59,7 +61,7 @@ auto FileBuffer::open(const StringView filepath) -> Bool
 {
     Ubyte *data;
     Size dataSize;
-    if ( !loadFile(filepath, &data, &dataSize) )
+    if ( !file::load(filepath, &data, &dataSize) )
     {
         return KAZE_FALSE;
     }

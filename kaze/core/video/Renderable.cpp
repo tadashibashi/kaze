@@ -14,7 +14,7 @@ KAZE_NAMESPACE_BEGIN
     bgfx::DynamicIndexBufferHandle ibh{.idx=bgfx::kInvalidHandle};
     VertexLayout layout{};
 
-    Memory vertexData{}, indexData{};
+    Mem vertexData{}, indexData{};
 };
 
 Renderable::Renderable() : m(new Impl()) {}
@@ -106,7 +106,7 @@ auto Renderable::setViewRect(const Recti &rect) -> Renderable &
     return *this;
 }
 
-auto Renderable::setVertices(const Memory mem) -> Renderable &
+auto Renderable::setVertices(const Mem mem) -> Renderable &
 {
     if (mem.size() > 0)
     {
@@ -117,7 +117,7 @@ auto Renderable::setVertices(const Memory mem) -> Renderable &
 
 auto Renderable::setIndices(const Uint16 *data, const Size elements) -> Renderable &
 {
-    m->indexData = Memory(data, elements * sizeof(Uint16));
+    m->indexData = Mem(data, elements * sizeof(Uint16));
     return *this;
 }
 

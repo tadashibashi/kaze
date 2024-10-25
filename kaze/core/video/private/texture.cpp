@@ -56,7 +56,7 @@ auto texture::fromImage(ImageHandle image, Bool freeImage) -> TextureHandle
     return TextureHandle{ texture.idx };
 }
 
-auto texture::fromPixels(MemView<void> data, Size width, Size height,
+auto texture::fromPixels(MemView<void> data, Vec2<Uint> dimensions,
     PixelFormat::Enum srcFormat) -> TextureHandle
 {
     if (data.size() == 0) // memory must have substance: no empty textures
@@ -73,10 +73,10 @@ auto texture::fromPixels(MemView<void> data, Size width, Size height,
     }
 
     const auto pixelCount = data.size() / srcStride;
-    if (pixelCount != width * height)
+    if (pixelCount != dimensions.x * dimensions.y)
     {
         KAZE_CORE_ERRCODE(Error::InvalidArgErr, "calculated invalid image size to pixel count: "
-            "{} * {} != {}", width, height, pixelCount);
+            "{} * {} != {}", dimensions.x, dimensions.y, pixelCount);
         return {};
     }
 
@@ -91,8 +91,13 @@ auto texture::fromPixels(MemView<void> data, Size width, Size height,
         return {};
     }
 
-    const auto texture = bgfx::createTexture2D(width, height, false, 1,
-        bgfx::TextureFormat::RGBA8, BGFX_SAMPLER_POINT,
+    const auto texture = bgfx::createTexture2D(
+        static_cast<uint16_t>(dimensions.x),
+        static_cast<uint16_t>(dimensions.y),
+        false,
+        1,
+        bgfx::TextureFormat::RGBA8,
+        BGFX_SAMPLER_POINT,
         bgfx::makeRef(dest, destMemSize,
             [](void *ptr, void *userptr) {
                 memory::free(userptr);

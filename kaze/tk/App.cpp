@@ -2,7 +2,7 @@
 #include "AppPluginMgr.h"
 
 #include <kaze/core/platform/backend/backend.h>
-#include <kaze/core/platform/backend/BackendInitGuard.h>
+#include <kaze/core/platform/BackendInitGuard.h>
 
 KAZE_TK_NAMESPACE_BEGIN
     struct App::Impl
@@ -117,8 +117,7 @@ auto App::preInit() -> Bool
         return KAZE_FALSE;
     }
 
-
-    backend::setCallbacks(PlatformCallbacks {
+    backend::setCallbacks({
         .userptr = m,
         .gamepadAxisCallback = [] (const GamepadAxisEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
@@ -161,6 +160,8 @@ auto App::preInit() -> Bool
             impl->plugins.windowEvent(e, impl->app);
         }
     });
+
+    m->input.setWindow(window().getHandle());
     return KAZE_TRUE;
 }
 

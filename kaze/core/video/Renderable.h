@@ -33,7 +33,7 @@ public:
     template <typename T>
     auto setVertices(const List<T> &vertices) -> Renderable &
     {
-        return setVertices( Memory(vertices.data(), vertices.size() * sizeof(T)) );
+        return setVertices( Mem(vertices.data(), vertices.size() * sizeof(T)) );
     }
 
     auto setIndices(const List<Uint16> &indices) -> Renderable &
@@ -48,7 +48,7 @@ public:
     auto setViewTransform(const Float *view, const Float *projection) -> Renderable &;
     auto setViewRect(const Recti &rect) -> Renderable &;
 
-    auto setVertices(Memory mem) -> Renderable &;
+    auto setVertices(Mem mem) -> Renderable &;
     auto setIndices(const Uint16 *data, Size elements) -> Renderable &;
 
     auto submit() -> void;

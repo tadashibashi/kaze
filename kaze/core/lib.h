@@ -90,6 +90,9 @@ Size byteOffsetOf(T Class::*member)
     return reinterpret_cast<Size>(&(c->*member));
 }
 
+constexpr Bool True = static_cast<Bool>(1);
+constexpr Bool False = static_cast<Bool>(0);
+
 KAZE_NAMESPACE_END
 
 #if KAZE_COMPILER_CLANG || KAZE_COMPILER_GCC
@@ -100,8 +103,8 @@ KAZE_NAMESPACE_END
 #   define KAZE_PACKED
 #endif
 
-#define KAZE_TRUE static_cast<Bool>(true)
-#define KAZE_FALSE static_cast<Bool>(false)
+#define KAZE_TRUE static_cast<Bool>(1)
+#define KAZE_FALSE static_cast<Bool>(0)
 
 // No-op
 #if KAZE_COMPILER_MSVC

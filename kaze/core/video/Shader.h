@@ -20,7 +20,7 @@ public:
     Shader();
     /// Create and load shader from const memory
     /// \param[in]  mem   memory containing shader file data
-    explicit Shader(Memory mem);
+    explicit Shader(Mem mem);
     /// Create and load shader from file
     /// \param[in]  filepath  path to the shader to load
     explicit Shader(StringView filepath);
@@ -34,7 +34,7 @@ public:
     /// Compile a shader from const data buffer
     /// \param[in]  mem     data to load
     /// @return whether compilation succeeded or not
-    auto compile(Memory mem) -> Bool;
+    auto compile(Mem mem) -> Bool;
 
     /// Load and compile a shader from a file
     /// \param[in] path   path to the shader file

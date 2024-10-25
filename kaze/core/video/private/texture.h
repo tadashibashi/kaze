@@ -1,8 +1,8 @@
 #pragma once
 #ifndef kaze_core_video_private_texture_h_
 #define kaze_core_video_private_texture_h_
-
 #include <kaze/core/lib.h>
+#include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/MemView.h>
 #include <kaze/core/video/ImageHandle.h>
 #include <kaze/core/video/PixelFormat.h>
@@ -20,7 +20,7 @@ namespace texture {
     auto fromImage(ImageHandle image, Bool freeImage) -> TextureHandle;
 
     /// Create a GPU texture from pixel data
-    auto fromPixels(MemView<void> data, Size width, Size height,
+    auto fromPixels(MemView<void> data, Vec2<Uint> dimensions,
         PixelFormat::Enum srcFormat) -> TextureHandle;
 
     /// Free a GPU texture

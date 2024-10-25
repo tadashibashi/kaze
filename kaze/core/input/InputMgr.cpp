@@ -49,41 +49,37 @@ auto InputMgr::getWindow() const noexcept -> ConstWindowHandle
 
 auto InputMgr::processEvent(const KeyboardEvent &e, Double timestamp) noexcept -> void
 {
-    this->onKeyboard(e, timestamp);
     m->keyboard.processEvent(e);
 }
 
 auto InputMgr::processEvent(const MouseMotionEvent &e, Double timestamp) noexcept -> void
 {
-    this->onMouseMotion(e, timestamp);
     m->mouse.processEvent(e);
 }
 
 auto InputMgr::processEvent(const MouseScrollEvent &e, Double timestamp) noexcept -> void
 {
-    this->onMouseScroll(e, timestamp);
     m->mouse.processEvent(e);
 }
 
 auto InputMgr::processEvent(const MouseButtonEvent &e, Double timestamp) noexcept-> void
 {
-    this->onMouseButton(e, timestamp);
     m->mouse.processEvent(e);
 }
 
 auto InputMgr::processEvent(const GamepadAxisEvent &e, Double timestamp) noexcept -> void
 {
-    this->onGamepadAxis(e, timestamp);
+
 }
 
 auto InputMgr::processEvent(const GamepadButtonEvent &e, Double timestamp) noexcept -> void
 {
-    this->onGamepadButton(e, timestamp);
+
 }
 
 auto InputMgr::processEvent(const GamepadConnectEvent &e, Double timestamp) noexcept -> void
 {
-    this->onGamepadConnect(e, timestamp);
+
 }
 
 auto InputMgr::preProcessEvents() noexcept -> void
@@ -192,20 +188,25 @@ auto InputMgr::isJustUp(MouseBtn button) const noexcept -> Bool
     return m->mouse.isJustUp(button);
 }
 
-auto InputMgr::mouseCoords() const noexcept -> Vec2f
+auto InputMgr::pointerCoords() const noexcept -> Vec2f
 {
     KAZE_ASSERT(m->window);
 
     Vec2f position;
-    backend::mouse::getRelativePosition(m->window, &position.x, &position.y);
+    backend::cursor::getRelativePosition(m->window, &position.x, &position.y);
     return position;
 }
 
-auto InputMgr::mouseGlobalCoords() const noexcept -> Vec2f
+auto InputMgr::pointerCoordsGlobal() const noexcept -> Vec2f
 {
     Vec2f position;
-    backend::mouse::getGlobalPosition(&position.x, &position.y);
+    backend::cursor::getGlobalPosition(&position.x, &position.y);
     return position;
+}
+
+auto InputMgr::getScroll() const noexcept -> Vec2f
+{
+    return m->mouse.getScroll();
 }
 
 KAZE_NAMESPACE_END

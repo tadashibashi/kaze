@@ -67,11 +67,8 @@ add_library(${PROJECT_NAME}
 
         platform/backend/backend.h
         platform/backend/backend.cpp
-        platform/backend/BackendInitGuard.h
-        platform/backend/BackendInitGuard.cpp
-        platform/backend/PlatformCallbacks.h
-        platform/backend/PlatformCallbacks.cpp
-        platform/backend/WindowHandleContainer.h
+        platform/BackendInitGuard.h
+        platform/BackendInitGuard.cpp
         platform/defines.h
 
         video/Color.h
