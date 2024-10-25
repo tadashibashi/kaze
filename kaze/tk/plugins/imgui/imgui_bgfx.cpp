@@ -86,11 +86,14 @@ void ImGui_Implbgfx_RenderDrawLists(ImDrawData* draw_data)
                 pcmd->UserCallback(cmd_list, pcmd);
             } else {
                 // Clip rect to image
-                // const uint16_t xx = (uint16_t)bx::max(pcmd->ClipRect.x, 0.0f);
-                // const uint16_t yy = (uint16_t)bx::max(pcmd->ClipRect.y, 0.0f);
-                // bgfx::setScissor(
-                //     xx, yy, (uint16_t)bx::min(pcmd->ClipRect.z, 65535.0f) - xx,
-                //     (uint16_t)bx::min(pcmd->ClipRect.w, 65535.0f) - yy);
+                const uint16_t xx = (uint16_t)bx::max(pcmd->ClipRect.x, 0.0f);
+                const uint16_t yy = (uint16_t)bx::max(pcmd->ClipRect.y, 0.0f);
+                bgfx::setScissor(
+                    xx,
+                    yy,
+                    (uint16_t)bx::min(pcmd->ClipRect.z, 65535.0f) - xx,
+                    (uint16_t)bx::min(pcmd->ClipRect.w, 65535.0f) - yy
+                );
 
                 bgfx::setState(state);
                 bgfx::TextureHandle texture = {

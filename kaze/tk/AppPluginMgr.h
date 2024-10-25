@@ -41,7 +41,6 @@ public:
     Action<App *> postFrame{};
     Action<App *> close{};
 
-    Action<const WindowEvent &, App *> windowEvent{};
     Action<const GamepadAxisEvent &, App *> gamepadAxisEvent{};
     Action<const GamepadButtonEvent &, App *> gamepadButtonEvent{};
     Action<const GamepadConnectEvent &, App *> gamepadConnectEvent{};
@@ -49,6 +48,8 @@ public:
     Action<const MouseButtonEvent &, App *> mouseButtonEvent {};
     Action<const MouseMotionEvent &, App *> mouseMotionEvent {};
     Action<const MouseScrollEvent &, App *> mouseScrollEvent {};
+    Action<const TextInputEvent &, App *> textInputEvent{};
+    Action<const WindowEvent &, App *> windowEvent{};
 private:
     auto removePluginCallbacks(const AppPlugin &plugin) -> void;
     auto addPluginCallbacks(const AppPlugin &plugin) -> void;

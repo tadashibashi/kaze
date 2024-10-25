@@ -1,6 +1,7 @@
 /// \file Window_sdl3.h
 /// SDL3 implementation for functions in the backend::window namespace
 #include "window_sdl3.h"
+#include "SDL3/SDL_keyboard.h"
 #include "common_sdl3.h"
 
 #include <kaze/core/errors.h>
@@ -811,6 +812,23 @@ namespace backend {
         RETURN_IF_NULL(outValue);
 
         *outValue = SDL_GetWindowRelativeMouseMode( WIN_CAST(window) );
+        return true;
+    }
+
+    auto window::setTextInputMode(WindowHandle window, bool yes) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        return (yes) ?
+            SDL_StartTextInput(WIN_CAST(window)) :
+            SDL_StopTextInput(WIN_CAST(window));
+    }
+
+    auto window::isTextInputActive(WindowHandle window, bool *outValue) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outValue);
+        *outValue = SDL_TextInputActive(WIN_CAST(window));
         return true;
     }
 

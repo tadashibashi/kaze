@@ -1,4 +1,5 @@
 #include "imgui_plugin.h"
+#include "bgfx/bgfx.h"
 #include "imgui_bgfx.h"
 #include "imgui_kaze.h"
 
@@ -10,8 +11,6 @@
 KAZE_TK_NAMESPACE_BEGIN
 
 namespace imgui {
-
-
     static auto toImGuiColor(const Color &c) -> Uint
     {
         return c.toABGR8();
@@ -168,8 +167,12 @@ namespace imgui {
                 if (ctx->window != e.window)
                     return;
                 auto &io = ImGui::GetIO();
-                io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)],
-                    e.type == KeyboardEvent::Down);
+                if (!e.isRepeat)
+                {
+                    KAZE_CORE_LOG("KEY: {}", (Int)e.key);
+                    io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)],
+                        e.type == KeyboardEvent::Down);
+                }
             },
             .mouseButtonEvent = [](const MouseButtonEvent &e, App *app, void *userdata)
             {
@@ -206,7 +209,15 @@ namespace imgui {
                 auto ctx = CONTEXT_CAST(userdata);
                 if (ctx->window != e.window)
                     return;
-                ImGui::GetIO().AddMouseWheelEvent(e.offset.x, e.offset.y);
+                ImGui::GetIO().AddMouseWheelEvent(-e.offset.x, -e.offset.y);
+            },
+            .textInputEvent = [](const TextInputEvent &e, App *app, void *userdata)
+            {
+                KAZE_CORE_LOG("Text: {}", e.codepoint);
+                auto ctx = CONTEXT_CAST(userdata);
+                if (ctx->window != e.window)
+                    return;
+                ImGui::GetIO().AddInputCharacter(e.codepoint);
             },
             .windowEvent = [](const WindowEvent &e, App *app, void *userdata)
             {
@@ -218,17 +229,11 @@ namespace imgui {
                 {
                 case WindowEvent::ResizedFramebuffer:
                     {
-                        int fw, fh;
-                        backend::window::getFramebufferSize(e.window, &fw, &fh);
-
-                        int w, h;
-                        backend::window::getSize(e.window, &w, &h);
-
-                        io.DisplaySize = ImVec2(w, h);
-                        if (w > 0 && h > 0)
+                        if (e.window == ctx->window)
                         {
-                           io.DisplayFramebufferScale = ImVec2((float)fw / w, (float)fh / h);
+                            ImGui_ImplKaze_SetViewportSize(e.window);
                         }
+
                     } break;
 
                 case WindowEvent::FocusGained:

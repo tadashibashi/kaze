@@ -82,6 +82,11 @@ auto InputMgr::processEvent(const GamepadConnectEvent &e, Double timestamp) noex
 
 }
 
+auto InputMgr::processEvent(const TextInputEvent &e, Double timestamp) noexcept -> void
+{
+
+}
+
 auto InputMgr::preProcessEvents() noexcept -> void
 {
     m->keyboard.preProcessEvents();

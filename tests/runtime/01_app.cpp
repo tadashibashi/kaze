@@ -50,7 +50,7 @@ public:
     Demo() : App({
         .title = "App Demo",
         .size = {640, 480},
-        .flags = WindowInit::Resizable | WindowInit::Floating,
+        .flags = WindowInit::Resizable,
     }) { }
 
     ~Demo() override { }

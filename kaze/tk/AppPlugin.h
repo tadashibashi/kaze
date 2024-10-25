@@ -35,6 +35,7 @@ public:
         funcptr_t<void (const MouseButtonEvent &e, App *app, void *userptr)>    mouseButtonEvent{};
         funcptr_t<void (const MouseMotionEvent &e, App *app, void *userptr)>    mouseMotionEvent{};
         funcptr_t<void (const MouseScrollEvent &e, App *app, void *userptr)>    mouseScrollEvent{};
+        funcptr_t<void (const TextInputEvent &e, App *app, void *userptr)>      textInputEvent{};
         funcptr_t<void (const WindowEvent &e, App *app, void *userptr)>         windowEvent{};
     };
 

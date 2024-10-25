@@ -126,7 +126,7 @@ auto App::quit() -> void
 
 auto App::preInit() -> Bool
 {
-    if ( !m->window.open(m->config.title.c_str(), m->config.size.x, m->config.size.y, m->config.flags) )
+    if ( !m->window.open(m->config.title.c_str(), m->config.size.x, m->config.size.y, m->config.flags | WindowInit::Hidden) )
         return KAZE_FALSE;
 
     if ( !m->graphics.init({
@@ -138,6 +138,8 @@ auto App::preInit() -> Bool
     {
         return KAZE_FALSE;
     }
+
+    m->window.setHidden(false);
 
     backend::setCallbacks({
         .userptr = m,
@@ -175,6 +177,11 @@ auto App::preInit() -> Bool
             const auto impl = static_cast<Impl *>(userdata);
             impl->input.processEvent(e, timestamp);
             impl->plugins.mouseScrollEvent(e, impl->app);
+        },
+        .textInputCallback = [] (const TextInputEvent &e, const Double timestamp, void *userdata) {
+            const auto impl = static_cast<Impl *>(userdata);
+            impl->input.processEvent(e, timestamp);
+            impl->plugins.textInputEvent(e, impl->app);
         },
         .windowCallback = [] (const WindowEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);

@@ -182,6 +182,31 @@ namespace backend {
         return true;
     }
 
+    static auto utf8ToUint32(const char *bytes) -> Uint
+    {
+        uint32_t codepoint = 0;
+
+        if ((bytes[0] & 0x80) == 0) { // 1-byte sequence (ASCII)
+            codepoint = bytes[0];
+        } else if ((bytes[0] & 0xE0) == 0xC0) { // 2-byte sequence
+            codepoint = ((bytes[0] & 0x1F) << 6) |
+                        (bytes[1] & 0x3F);
+        } else if ((bytes[0] & 0xF0) == 0xE0) { // 3-byte sequence
+            codepoint = ((bytes[0] & 0x0F) << 12) |
+                        ((bytes[1] & 0x3F) << 6) |
+                        (bytes[2] & 0x3F);
+        } else if ((bytes[0] & 0xF8) == 0xF0) { // 4-byte sequence
+            codepoint = ((bytes[0] & 0x07) << 18) |
+                        ((bytes[1] & 0x3F) << 12) |
+                        ((bytes[2] & 0x3F) << 6) |
+                        (bytes[3] & 0x3F);
+        } else {
+            throw std::runtime_error("Invalid UTF-8 encoding");
+        }
+
+        return codepoint;
+    }
+
     auto pollEvents() noexcept -> bool
     {
         gamepads.preProcessEvents();
@@ -194,10 +219,12 @@ namespace backend {
             case SDL_EVENT_KEY_UP:
             case SDL_EVENT_KEY_DOWN:
                 {
+                    const auto window = SDL_GetWindowFromID(e.wheel.windowID);
                     events.emit(KeyboardEvent {
                         .type     = e.key.down ? KeyboardEvent::Down : KeyboardEvent::Up,
                         .key      = backend::toKey(e.key.scancode),
                         .isRepeat = e.key.repeat,
+                        .window = window,
                     });
                 } break;
 
@@ -319,7 +346,14 @@ namespace backend {
                         .window = window,
                     });
                 } break;
-
+            case SDL_EVENT_TEXT_INPUT:
+                {
+                    const auto window = SDL_GetWindowFromID(e.text.windowID);
+                    events.emit(TextInputEvent {
+                        .codepoint = utf8ToUint32(e.text.text),
+                        .window = window,
+                    });
+                } break;
             case SDL_EVENT_GAMEPAD_ADDED:
                 {
                     const auto index = gamepads.connect(e.gdevice.which);

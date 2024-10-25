@@ -101,4 +101,9 @@ struct GamepadAxisEvent {
     Float value;
 };
 
+struct TextInputEvent {
+    Uint codepoint;
+    WindowHandle window;
+};
+
 KAZE_NAMESPACE_END

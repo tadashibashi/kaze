@@ -87,7 +87,7 @@ namespace backend {
 
     // ===== Window Callbacks =====
 
-    static void glfwWindowCloseCallback(GLFWwindow *window)
+    static auto glfwWindowCloseCallback(GLFWwindow *window) -> void
     {
         events.emit(WindowEvent {
             .type = WindowEvent::Closed,
@@ -95,7 +95,7 @@ namespace backend {
         });
     }
 
-    static void glfwScrollCallback(GLFWwindow *window, const double xoffset, const double yoffset)
+    static auto glfwScrollCallback(GLFWwindow *window, const double xoffset, const double yoffset) -> void
     {
         events.emit(MouseScrollEvent {
             .offset = {
@@ -106,7 +106,7 @@ namespace backend {
         });
     }
 
-    static void glfwCursorPosCallback(GLFWwindow *window, const double x, const double y)
+    static auto glfwCursorPosCallback(GLFWwindow *window, const double x, const double y) -> void
     {
         events.emit(MouseMotionEvent {
            .position = {
@@ -117,7 +117,7 @@ namespace backend {
         });
     }
 
-    static void glfwKeyCallback(GLFWwindow *window, const int key, const int scancode, const int action, const int mods)
+    static auto glfwKeyCallback(GLFWwindow *window, const int key, const int scancode, const int action, const int mods) -> void
     {
         events.emit(KeyboardEvent {
             .type = (action == GLFW_RELEASE ? KeyboardEvent::Up : KeyboardEvent::Down),
@@ -128,7 +128,7 @@ namespace backend {
     }
 
 
-    static void glfwWindowSizeCallback(GLFWwindow *window, const int x, const int y)
+    static auto glfwWindowSizeCallback(GLFWwindow *window, const int x, const int y) -> void
     {
         events.emit(WindowEvent {
             .type = WindowEvent::Resized,
@@ -138,7 +138,7 @@ namespace backend {
         });
     }
 
-    static void glfwFramebufferSize(GLFWwindow *window, const int x, const int y)
+    static auto glfwFramebufferSize(GLFWwindow *window, const int x, const int y) -> void
     {
         events.emit(WindowEvent {
             .type = WindowEvent::ResizedFramebuffer,
@@ -148,7 +148,7 @@ namespace backend {
         });
     }
 
-    static void glfwWindowPosCallback(GLFWwindow *window, const int x, const int y)
+    static auto glfwWindowPosCallback(GLFWwindow *window, const int x, const int y) -> void
     {
         events.emit(WindowEvent {
             .type = WindowEvent::Moved,
@@ -158,7 +158,7 @@ namespace backend {
         });
     }
 
-    static void glfwWindowFocusCallback(GLFWwindow *window, const int focus)
+    static auto glfwWindowFocusCallback(GLFWwindow *window, const int focus) -> void
     {
         events.emit(WindowEvent {
             .type = focus == 0 ? WindowEvent::FocusLost : WindowEvent::FocusGained,
@@ -166,7 +166,7 @@ namespace backend {
         });
     }
 
-    static void glfwWindowMaximizeCallback(GLFWwindow *window, const int maximize)
+    static auto glfwWindowMaximizeCallback(GLFWwindow *window, const int maximize) -> void
     {
         events.emit(WindowEvent {
             .type = maximize == 0 ? WindowEvent::Restored : WindowEvent::Maximized,
@@ -174,7 +174,7 @@ namespace backend {
         });
     }
 
-    static void glfwWindowIconifyCallback(GLFWwindow *window, const int iconify)
+    static auto glfwWindowIconifyCallback(GLFWwindow *window, const int iconify) -> void
     {
         events.emit(WindowEvent {
             .type = iconify == 0 ? WindowEvent::Restored : WindowEvent::Minimized,
@@ -182,7 +182,7 @@ namespace backend {
         });
     }
 
-    static void glfwDropCallback(GLFWwindow *window, int count, const char **paths)
+    static auto glfwDropCallback(GLFWwindow *window, int count, const char **paths) -> void
     {
         for (int i = 0; i < count; ++i)
         {
@@ -204,14 +204,14 @@ namespace backend {
     }
 
 
-    static MouseBtn toMouseBtn(Uint button)
+    static auto toMouseBtn(Uint button) -> MouseBtn
     {
         if (button > GLFW_MOUSE_BUTTON_LAST)
             return MouseBtn::Count;
         return static_cast<MouseBtn>(button);
     }
 
-    static void glfwMouseButtonCallback(GLFWwindow *window, const int button, const int action, const int mods)
+    static auto glfwMouseButtonCallback(GLFWwindow *window, const int button, const int action, const int mods) -> void
     {
         events.emit(MouseButtonEvent {
             .type = action == GLFW_RELEASE ? MouseButtonEvent::Up : MouseButtonEvent::Down,
@@ -220,7 +220,7 @@ namespace backend {
         });
     }
 
-    static void glfwCursorEnterCallback(GLFWwindow *window, const int entered)
+    static auto glfwCursorEnterCallback(GLFWwindow *window, const int entered) -> void
     {
         events.emit(WindowEvent {
             .type = entered == 0 ? WindowEvent::MouseExited : WindowEvent::MouseEntered,
@@ -228,6 +228,13 @@ namespace backend {
         });
     }
 
+    static auto glfwTextInputCallback(GLFWwindow *window, const uint32_t codepoint) -> void
+    {
+        events.emit(TextInputEvent {
+            .codepoint = codepoint,
+            .window = window,
+        });
+    }
 
     auto window::open(const char *title, const int width, const int height, const WindowInit::Flags flags,
                       WindowHandle *outWindow) noexcept -> bool
@@ -261,6 +268,7 @@ namespace backend {
         glfwSetWindowMaximizeCallback ( window, glfwWindowMaximizeCallback ); WARN_CHECK("set window maximize callback");
         glfwSetWindowIconifyCallback  ( window, glfwWindowIconifyCallback ); WARN_CHECK("set window iconify/minimize callback");
         glfwSetDropCallback           ( window, glfwDropCallback );        WARN_CHECK("set window drop callback");
+        glfwSetCharCallback           ( window, glfwTextInputCallback );   WARN_CHECK("set window char callback");
 
 
         if (flags & WindowInit::Fullscreen)
@@ -957,6 +965,26 @@ namespace backend {
         *outCapture = capture;
         return true;
     }
+
+    auto window::setTextInputMode(WindowHandle window, bool yes) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        // does nothing right now (when IME is supported initiate it here)
+
+        return true;
+    }
+
+    auto window::isTextInputActive(WindowHandle window, bool *outValue) noexcept -> bool
+    {
+        // not implemented yet, always on
+        RETURN_IF_NULL(window);
+        RETURN_IF_NULL(outValue);
+
+        *outValue = true;
+        return true;
+    }
+
 } // namespace backend
 
 KAZE_NAMESPACE_END

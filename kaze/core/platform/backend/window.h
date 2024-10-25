@@ -293,6 +293,19 @@ namespace backend::window {
     /// \returns whether the retrieval succeeded.
     auto getCaptureCursorMode(WindowHandle window, bool *outCapture) noexcept -> bool;
 
+    /// Set whether text input events are enabled for a window.
+    /// \note When active, IME keyboard should be opened if supported on the platform,
+    ///       and when not it should disengage (Unsupported on GLFW3!)
+    /// \param[in]  window   window to set text input mode on
+    /// \param[in]  active   `true` makes text input events active, `false` turns them off.
+    /// \returns whether operation succeeded
+    auto setTextInputMode(WindowHandle window, bool active) noexcept -> bool;
+
+    /// Check if text input events are enabled for a window
+    /// \param[in]   window    window to check
+    /// \param[out]  outValue  retrieves whether text input events are enabled
+    /// \returns whether the retrieval succeeded
+    auto isTextInputActive(WindowHandle window, bool *outValue) noexcept -> bool;
 }
 
 KAZE_NAMESPACE_END

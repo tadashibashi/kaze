@@ -93,8 +93,6 @@ auto AppPluginMgr::removePluginCallbacks(const AppPlugin &plugin) -> void
     if (cb.close)
         close.remove(cb.close, cb.userptr);
 
-    if (cb.windowEvent)
-        windowEvent.remove(cb.windowEvent, cb.userptr);
     if (cb.gamepadAxisEvent)
         gamepadAxisEvent.remove(cb.gamepadAxisEvent, cb.userptr);
     if (cb.gamepadButtonEvent)
@@ -109,6 +107,10 @@ auto AppPluginMgr::removePluginCallbacks(const AppPlugin &plugin) -> void
         mouseMotionEvent.remove(cb.mouseMotionEvent, cb.userptr);
     if (cb.mouseScrollEvent)
         mouseScrollEvent.remove(cb.mouseScrollEvent, cb.userptr);
+    if (cb.textInputEvent)
+        textInputEvent.remove(cb.textInputEvent, cb.userptr);
+    if (cb.windowEvent)
+        windowEvent.remove(cb.windowEvent, cb.userptr);
 }
 
 auto AppPluginMgr::addPluginCallbacks(const AppPlugin &plugin) -> void
@@ -133,8 +135,6 @@ auto AppPluginMgr::addPluginCallbacks(const AppPlugin &plugin) -> void
     if (cb.close)
         close.add(cb.close, cb.userptr);
 
-    if (cb.windowEvent)
-        windowEvent.add(cb.windowEvent, cb.userptr);
     if (cb.gamepadAxisEvent)
         gamepadAxisEvent.add(cb.gamepadAxisEvent, cb.userptr);
     if (cb.gamepadButtonEvent)
@@ -149,6 +149,10 @@ auto AppPluginMgr::addPluginCallbacks(const AppPlugin &plugin) -> void
         mouseMotionEvent.add(cb.mouseMotionEvent, cb.userptr);
     if (cb.mouseScrollEvent)
         mouseScrollEvent.add(cb.mouseScrollEvent, cb.userptr);
+    if (cb.textInputEvent)
+        textInputEvent.add(cb.textInputEvent, cb.userptr);
+    if (cb.windowEvent)
+        windowEvent.add(cb.windowEvent, cb.userptr);
 }
 
 KAZE_TK_NAMESPACE_END

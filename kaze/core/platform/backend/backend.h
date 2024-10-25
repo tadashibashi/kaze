@@ -35,8 +35,8 @@ namespace backend {
         funcptr_t<void(const MouseButtonEvent &e, double timestamp, void *userptr)>   mouseButtonCallback{[](auto...){}};
         funcptr_t<void(const MouseMotionEvent &e, double timestamp, void *userptr)>   mouseMotionCallback{[](auto...){}};
         funcptr_t<void(const MouseScrollEvent &e, double timestamp, void *userptr)>   mouseScrollCallback{[](auto...){}};
+        funcptr_t<void(const TextInputEvent &e, double timestamp, void *userptr)>     textInputCallback{[](auto...){}};
         funcptr_t<void(const WindowEvent &e, double timestamp, void *userptr)>        windowCallback{[](auto...){}};
-
 
         auto emit(const KeyboardEvent &e, double timestamp = 0) const -> void;
         auto emit(const MouseButtonEvent &e, double timestamp = 0) const -> void;
@@ -46,6 +46,7 @@ namespace backend {
         auto emit(const GamepadButtonEvent &e, double timestamp = 0) const -> void;
         auto emit(const GamepadAxisEvent &e, double timestamp = 0) const -> void;
         auto emit(const WindowEvent &e, double timestamp = 0) const -> void;
+        auto emit(const TextInputEvent &e, double timestamp = 0) const -> void;
         auto emit(const FileDropEvent &e, double timestamp = 0) const -> void;
     };
     extern PlatformCallbacks events;

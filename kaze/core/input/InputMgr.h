@@ -32,6 +32,7 @@ public:
     auto processEvent(const GamepadAxisEvent &e, Double timestamp) noexcept -> void;
     auto processEvent(const GamepadButtonEvent &e, Double timestamp) noexcept -> void;
     auto processEvent(const GamepadConnectEvent &e, Double timestamp) noexcept -> void;
+    auto processEvent(const TextInputEvent &e, Double timestamp) noexcept -> void;
 
     // ----- Keyboard -----
 
