@@ -2,8 +2,6 @@
 /// VecBase is a zero-cost CRTP (curiously recurring template pattern) base class for vectors,
 /// containing common shared utilities.
 #pragma once
-#ifndef kaze_core_math_vec_vecbase_h_
-#define kaze_core_math_vec_vecbase_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/math/mathf.h>
@@ -534,5 +532,3 @@ template <Arithmetic T, Arithmetic U, Size S>
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_math_vec_vecbase_h_

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_input_inputevents_h_
-#define kaze_core_input_inputevents_h_
 
 #include "GamepadConstants.h"
 #include "KeyboardConstants.h"
@@ -104,5 +102,3 @@ struct GamepadAxisEvent {
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_input_inputevents_h_

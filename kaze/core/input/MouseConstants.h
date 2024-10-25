@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_input_mouseconstants_h_
-#define kaze_core_input_mouseconstants_h_
 
 #include <kaze/core/lib.h>
 
@@ -27,5 +25,3 @@ enum class MouseBtn
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_input_mouseconstants_h_

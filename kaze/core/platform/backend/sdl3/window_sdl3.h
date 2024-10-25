@@ -1,8 +1,6 @@
 /// \file Window_sdl3.h
 /// Contains SDL3 implementation window-specific data types and functions
 #pragma once
-#ifndef kaze_core_platform_backends_sdl3_window_sdl3_h_
-#define kaze_core_platform_backends_sdl3_window_sdl3_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/platform/backend/backend.h>

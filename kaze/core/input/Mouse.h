@@ -1,8 +1,6 @@
 /// \file Mouse.h
 /// Contains Mouse class
 #pragma once
-#ifndef kaze_core_input_mouse_h_
-#define kaze_core_input_mouse_h_
 
 #include "InputEvents.h"
 #include "MouseConstants.h"
@@ -61,5 +59,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_input_mouse_h_

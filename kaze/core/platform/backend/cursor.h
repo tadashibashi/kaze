@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_platform_backend_cursor_h_
-#define kaze_core_platform_backend_cursor_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/input/CursorConstants.h>
@@ -65,5 +63,3 @@ namespace backend::cursor {
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backend_cursor_h_

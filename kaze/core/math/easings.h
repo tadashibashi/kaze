@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_math_easings_h_
-#define kaze_core_math_easings_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
@@ -202,4 +200,3 @@ namespace easings {
 KAZE_NAMESPACE_END
 
 #pragma clang diagnostic pop
-#endif // kaze_core_math_easings_h_

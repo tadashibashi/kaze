@@ -1,8 +1,6 @@
 /// \file BufferIO.h
 /// Contains static functions for serialization and deserialization of binary data
 #pragma once
-#ifndef kaze_core_io_bufferio_h_
-#define kaze_core_io_bufferio_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/debug.h>
@@ -78,5 +76,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_io_bufferio_h_

@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_color_h_
-#define kaze_core_video_color_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/endian.h>
 
@@ -205,5 +202,3 @@ public:
 using Colour = Color;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_color_h_

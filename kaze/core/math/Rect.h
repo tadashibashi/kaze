@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_math_rect_h_
-#define kaze_core_math_rect_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
@@ -165,5 +163,3 @@ using Rectf = Rect<Float>;
 using Rectd = Rect<Double>;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_math_rect_h_

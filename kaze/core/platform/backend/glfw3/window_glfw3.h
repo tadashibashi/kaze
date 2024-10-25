@@ -1,8 +1,6 @@
 /// \file Window_glfw3.h
 /// Contains GLFW3 window-handling functionality
 #pragma once
-#ifndef kaze_core_platform_backends_glfw3_window_glfw3_h_
-#define kaze_core_platform_backends_glfw3_window_glfw3_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/input/CursorConstants.h>
@@ -48,5 +46,3 @@ namespace backend {
 } // namespace backend
 
 KAZE_NAMESPACE_END
-
-#endif

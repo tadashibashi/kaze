@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_private_texture_h_
-#define kaze_core_video_private_texture_h_
 #include <kaze/core/lib.h>
 #include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/MemView.h>
@@ -31,5 +29,3 @@ namespace texture {
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_private_texture_h_

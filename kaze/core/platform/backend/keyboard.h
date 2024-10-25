@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_platform_backend_keyboard_h_
-#define kaze_core_platform_backend_keyboard_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/input/KeyboardConstants.h>
@@ -17,5 +15,3 @@ namespace backend::keyboard {
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backend_keyboard_h_

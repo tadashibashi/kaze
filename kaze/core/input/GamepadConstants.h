@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_input_gamepadconstants_h_
-#define kaze_core_input_gamepadconstants_h_
 #include <kaze/core/lib.h>
 
 KAZE_NAMESPACE_BEGIN
@@ -42,4 +40,3 @@ enum class GamepadAxis {
 
 KAZE_NAMESPACE_END
 
-#endif // kaze_core_input_gamepadconstants_h_

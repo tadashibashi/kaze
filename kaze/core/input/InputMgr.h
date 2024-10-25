@@ -1,8 +1,8 @@
 #pragma once
-#ifndef kaze_core_input_inputmgr_h_
-#define kaze_core_input_inputmgr_h_
+
 #include <kaze/core/lib.h>
 #include <kaze/core/Action.h>
+#include <kaze/core/input/CursorMgr.h>
 #include <kaze/core/input/GamepadConstants.h>
 #include <kaze/core/input/KeyboardConstants.h>
 #include <kaze/core/input/MouseConstants.h>
@@ -117,11 +117,13 @@ public:
     [[nodiscard]]
     auto getScroll() const noexcept -> Vec2f;
 
+    [[nodiscard]]
+    auto cursors() const noexcept -> const CursorMgr &;
+    [[nodiscard]]
+    auto cursors() noexcept -> CursorMgr &;
 private:
     struct Impl;
     Impl *m;
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_input_inputmgr_h_

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_input_cursorconstants_h_
-#define kaze_core_input_cursorconstants_h_
 
 #include <kaze/core/lib.h>
 
@@ -25,6 +23,3 @@ enum class CursorType {
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_input_cursorconstants_h_
-

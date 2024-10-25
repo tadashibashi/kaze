@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_platform_backend_sdl3_common_sdl3_h_
-#define kaze_core_platform_backend_sdl3_common_sdl3_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/debug.h>

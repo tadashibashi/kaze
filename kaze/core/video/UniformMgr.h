@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_uniformmgr_h_
-#define kaze_core_video_uniformmgr_h_
-
 #include "Uniform.h"
 
 #include <kaze/core/lib.h>
@@ -67,5 +64,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_uniformmgr_h_

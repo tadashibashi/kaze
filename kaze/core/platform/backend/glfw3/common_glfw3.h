@@ -1,8 +1,6 @@
 /// \file common_glfw3.h
 /// Contains common macros, functions and data types for the GLFW3 backend
 #pragma once
-#ifndef kaze_core_platform_backends_glf3_common_glfw3_h_
-#define kaze_core_platform_backends_glf3_common_glfw3_h_
 
 #include "window_glfw3.h"
 
@@ -146,4 +144,3 @@ namespace backend {
 }
 
 KAZE_NAMESPACE_END
-#endif

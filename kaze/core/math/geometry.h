@@ -1,9 +1,7 @@
-/// Contains functions that pertain to math template classes, this prevents circular dependencies, since these
-/// functions usually include the mathf header.
 #pragma once
-#ifndef kaze_core_math_geometry_h_
-#define kaze_core_math_geometry_h_
-
+/// \file geometry.h
+/// Contains functions that pertain to math template classes, this prevents circular dependencies,
+/// since these functions usually include the `mathf` header.
 #include <kaze/core/lib.h>
 #include <kaze/core/math/mathf.h>
 #include <kaze/core/math/Circle.h>
@@ -92,5 +90,3 @@ namespace mathf
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_math_geometry_h_

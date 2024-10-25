@@ -1,9 +1,6 @@
 /// \file image.h
 /// Contains low-level functions for handling loading images
 #pragma once
-#ifndef kaze_core_video_private_image_h_
-#define kaze_core_video_private_iamge_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/video/ImageHandle.h>
 #include <kaze/core/video/PixelFormat.h>
@@ -40,5 +37,3 @@ namespace image {
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_private_iamge_h_

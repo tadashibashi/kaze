@@ -1,9 +1,6 @@
 /// \file Texture2D
 /// Texture2D class
 #pragma once
-#ifndef kaze_core_video_texture2d_h_
-#define kaze_core_video_texture2d_h_
-
 #include "PixelFormat.h"
 #include "TextureHandle.h"
 
@@ -97,5 +94,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_texture2d_h_

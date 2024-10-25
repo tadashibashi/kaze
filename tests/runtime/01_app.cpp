@@ -5,7 +5,6 @@
 #include <kaze/core/debug.h>
 
 #include <kaze/core/input/CursorConstants.h>
-#include <kaze/core/platform/backend/backend.h>
 
 #include <kaze/core/math/Vec/Vec3.h>
 #include <kaze/core/video/GraphicsMgr.h>
@@ -57,7 +56,6 @@ private:
     AssetLoader<String, Texture2D> textures;
     const Texture2D *warioTexture{};
     SpriteBatch batch{};
-    CursorHandle cursor{};
 
     struct TestImage
     {
@@ -89,6 +87,8 @@ private:
         if ( !batch.init(graphics()) )
             return KAZE_FALSE;
 
+        cursors().set(CursorType::NotAllowed);
+
         if (warioTexture = textures.load("dungeon_tiles.png"); warioTexture == nullptr)
         {
             return KAZE_FALSE;
@@ -109,8 +109,6 @@ private:
         camera.setViewport({0, 0, windowSize.x, windowSize.y});
         camera.setOrigin({0, 0});
 
-        backend::cursor::createStandard(CursorType::Crosshair, &cursor);
-        backend::cursor::setCursor(window().getHandle(), cursor);
         return KAZE_TRUE;
     }
 
@@ -153,8 +151,6 @@ private:
         {
             camera.setScale(camera.getScale() * Vec2f{.95f, .95f});
         }
-
-        KAZE_LOG("{} x {}", input().getScroll().x, input().getScroll().y);
 
         if (const auto scroll = input().getScroll(); scroll.y != 0)
         {
@@ -241,7 +237,6 @@ private:
     auto close() -> void override {
         textures.clear();
         batch.release();
-        backend::cursor::destroy(cursor);
     }
 };
 

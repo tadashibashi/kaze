@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_io_structlayout_h_
-#define kaze_core_io_structlayout_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
@@ -565,5 +563,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_io_structlayout_h_

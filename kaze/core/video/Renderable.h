@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_renderable_h_
-#define kaze_core_video_renderable_h_
-
 #include "Shader.h"
 #include "VertexLayout.h"
 
@@ -64,5 +61,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_renderable_h_

@@ -21,5 +21,3 @@ namespace imgui {
 
 
 KAZE_TK_NAMESPACE_END
-
-#endif // kaze_tk_plugins_imgui_imgui_plugin_h_

@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_uniform_h_
-#define kaze_core_video_uniform_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/math/Matrix.h>
 #include <kaze/core/math/Vec/Vec4.h>
@@ -88,5 +85,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_uniform_h_

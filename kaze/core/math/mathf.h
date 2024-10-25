@@ -1,8 +1,4 @@
 #pragma once
-
-#ifndef kaze_core_math_mathf_h_
-#define kaze_core_math_mathf_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
 
@@ -366,5 +362,3 @@ KAZE_NAMESPACE_BEGIN
 } // namespace mathf
 
 KAZE_NAMESPACE_END
-
-#endif

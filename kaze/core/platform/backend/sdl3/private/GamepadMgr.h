@@ -1,8 +1,6 @@
 /// \file Gamepad_sdl3.h
 /// Contains classes and functions related to backend SDL3 Gamepad handling
 #pragma once
-#ifndef kaze_core_platform_backends_sdl3_gamepad_sdl3_h_
-#define kaze_core_platform_backends_sdl3_gamepad_sdl3_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/input/GamepadConstants.h>
@@ -81,5 +79,3 @@ namespace backend
 
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backends_sdl3_gamepad_sdl3_h_

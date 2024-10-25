@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_mem_h_
-#define kaze_core_mem_h_
 
 #include <kaze/core/lib.h>
 #include <type_traits>
@@ -77,5 +75,3 @@ auto makeRef(const ContainerType &container)
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_mem_h_

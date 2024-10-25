@@ -50,5 +50,3 @@ public:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_optional_h_

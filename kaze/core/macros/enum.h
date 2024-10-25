@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_macros_enum_h_
-#define kaze_core_macros_enum_h_
 
 #include <kaze/core/lib.h>
 #include "map.h"
@@ -148,5 +146,3 @@ KAZE_DEFINE_FLAGOPS(Name)
     KAZE_DEFINE_FLAGS_WITH_NAMES(Name, __VA_ARGS__); \
     KAZE_DEFINE_FLAGOPS(Name) \
     KAZE_DEFINE_FLAGOPS_WITH_NAMES(Name)
-
-#endif // kaze_core_macros_enum_h_

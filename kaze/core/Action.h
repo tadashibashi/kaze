@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_action_h_
-#define kaze_core_action_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/traits.h>
 
@@ -191,5 +188,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_action_h_

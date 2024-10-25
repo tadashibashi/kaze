@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_traits_h_
-#define kaze_core_traits_h_
 
 #include <kaze/core/lib.h>
 
@@ -18,5 +16,3 @@ template <typename T>
 using funcptr_t = typename funcptr<T>::type;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_traits_h_

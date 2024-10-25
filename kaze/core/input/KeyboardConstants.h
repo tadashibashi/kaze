@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_input_keyboardconstants_h_
-#define kaze_core_input_keyboardconstants_h_
 
 #include <kaze/core/lib.h>
 
@@ -141,5 +139,3 @@ enum class Key {
 Cstring toCstring(Key key);
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_key_h_

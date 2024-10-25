@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_platform_backend_gamepad_h_
-#define kaze_core_platform_backend_gamepad_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/input/GamepadConstants.h>
@@ -68,5 +66,3 @@ namespace backend::gamepad {
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backend_gamepad_h_

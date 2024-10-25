@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_graphicsmgr_h_
-#define kaze_core_video_graphicsmgr_h_
-
 #include "Color.h"
 
 #include <kaze/core/lib.h>
@@ -43,7 +40,5 @@ private:
     struct Impl;
     Impl *m;
 };
-
-#endif // kaze_core_video_graphicsmgr_h_
 
 KAZE_NAMESPACE_END

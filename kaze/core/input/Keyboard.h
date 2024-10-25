@@ -1,8 +1,6 @@
 /// \file Keyboard.h
 /// Keyboard class
 #pragma once
-#ifndef kaze_core_input_keyboard_h_
-#define kaze_core_input_keyboard_h_
 
 #include "KeyboardConstants.h"
 
@@ -62,5 +60,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_input_keyboard_h_

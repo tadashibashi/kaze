@@ -4,24 +4,28 @@
 
 KAZE_NAMESPACE_BEGIN
 
-auto CursorMgr::create(StringView key, const Image &image, Int hotX, Int hotY) -> Bool
+CursorMgr::~CursorMgr()
 {
-    String cursorKey(key);
-    if (m_customCursors.contains(cursorKey)) // guard against duplicates
+    clear();
+}
+
+auto CursorMgr::create(const String &key, const Image &image, Vec2i anchor) -> Bool
+{
+    if (m_customCursors.contains(key)) // guard against duplicates
     {
         KAZE_CORE_ERRCODE(Error::DuplicateKey, "Key \"{}\" already exists in CursorMgr", key);
         return False;
     }
 
     CursorHandle handle;
-    if ( !backend::cursor::createCustom(image.handle(), hotX, hotY, &handle) )
+    if ( !backend::cursor::createCustom(image.handle(), anchor.x, anchor.y, &handle) )
         return False;
 
-    m_customCursors[cursorKey] = handle;
+    m_customCursors[key] = handle;
     return True;
 }
 
-auto CursorMgr::set(StringView key) -> Bool
+auto CursorMgr::set(const String &key) -> Bool
 {
     if ( !m_window )
     {
@@ -38,9 +42,7 @@ auto CursorMgr::set(StringView key) -> Bool
         return False;
     }
 
-    backend::cursor::setCursor(const_cast<WindowHandle>(m_window->getHandle()), it->second);
-
-    return True;
+    return backend::cursor::setCursor(m_window, it->second);
 }
 
 auto CursorMgr::set(CursorType type) -> Bool
@@ -51,35 +53,62 @@ auto CursorMgr::set(CursorType type) -> Bool
         return False;
     }
 
-    auto it = m_systemCursors.find(type);
+    CursorHandle cursor;
 
+    // Get cursor if it exists
+    if (auto it = m_systemCursors.find(type); it != m_systemCursors.end())
+    {
+        cursor = it->second;
+    }
+    else
+    {
+        // Otherwise, create and cache it
+        if ( !backend::cursor::createStandard(type, &cursor) )
+        {
+            return False;
+        }
+
+        m_systemCursors[type] = cursor;
+    }
+
+    return backend::cursor::setCursor(
+        m_window,
+        cursor);
+}
+
+auto CursorMgr::erase(const String &key) -> Bool
+{
+    auto it = m_customCursors.find(key);
     if (it == m_customCursors.end())
     {
-        KAZE_CORE_ERRCODE(Error::MissingKeyErr,
-            "Attempted to set cursor with key \"{}\", but it does not exist.", key);
+        KAZE_CORE_ERRCODE(Error::MissingKeyErr, "Cursor::erase: key \"{}\" does not exist in container", key);
         return False;
     }
 
-    backend::cursor::setCursor(const_cast<WindowHandle>(m_window->getHandle()), it->second);
-
+    backend::cursor::destroy(it->second);
+    m_customCursors.erase(it);
     return True;
 }
 
-auto CursorMgr::createImpl(const Image &image, Vec2i anchor) -> CursorHandle
+auto CursorMgr::clear() -> void
 {
-    
-}
-auto CursorMgr::setImpl(CursorType type) -> Bool
-{
-    
-}
-auto CursorMgr::setImpl(CursorHandle handle) -> Bool
-{
-    
-}
-auto CursorMgr::destroyImpl(CursorHandle handle) -> Bool
-{
-    
+    if ( !m_customCursors.empty() )
+    {
+        for (auto &[key, cursor] : m_customCursors)
+        {
+            backend::cursor::destroy(cursor);
+        }
+        m_customCursors.clear();
+    }
+
+    if ( !m_systemCursors.empty() )
+    {
+        for (auto &[key, cursor] : m_systemCursors)
+        {
+            backend::cursor::destroy(cursor);
+        }
+        m_systemCursors.clear();
+    }
 }
 
 KAZE_NAMESPACE_END

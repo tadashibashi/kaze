@@ -67,6 +67,11 @@ public:
     [[nodiscard]]
     auto graphics() noexcept -> GraphicsMgr &;
 
+    [[nodiscard]]
+    auto cursors() const noexcept -> const CursorMgr &;
+    [[nodiscard]]
+    auto cursors() noexcept -> CursorMgr &;
+
     /// Inject plugin to the app
     /// \param[in] name  plugin id
     /// \returns this object
@@ -93,6 +98,7 @@ private:
     auto preInit() -> Bool;
     auto pollEvents() -> void;
     auto runOneFrame() -> void;
+    auto postClose() -> void;
 
     struct Impl;
     Impl *m;

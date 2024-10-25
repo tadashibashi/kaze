@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_pixelformat_h_
-#define kaze_core_video_pixelformat_h_
-
 #include <kaze/core/lib.h>
 
 KAZE_NAMESPACE_BEGIN
@@ -37,5 +34,3 @@ struct PixelFormat {
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_pixelformat_h_

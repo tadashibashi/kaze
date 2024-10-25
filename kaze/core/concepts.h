@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_concepts_h_
-#define kaze_concepts_h_
 
 #include <kaze/core/lib.h>
 #include <type_traits>
@@ -61,5 +59,3 @@ concept LoadableAsset =
     std::is_same_v<void, decltype(std::declval<T>().release())>;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_concepts_h_

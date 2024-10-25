@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_io_bufferwriter_h_
-#define kaze_core_io_bufferwriter_h_
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
 #include <kaze/core/endian.h>
@@ -181,5 +179,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_io_bufferwriter_h_

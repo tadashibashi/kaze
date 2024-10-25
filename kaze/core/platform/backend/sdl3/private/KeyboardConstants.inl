@@ -1,8 +1,6 @@
 /// \file KeyboardConstants.inl
 /// Contains keyboard constants, which map SDL constants with kaze constants
 #pragma once
-#ifndef kaze_core_platform_backends_sdl3_keyboardconstants_inl_
-#define kaze_core_platform_backends_sdl3_keyboardconstants_inl_
 #include <kaze/core/lib.h>
 #include <kaze/core/input/KeyboardConstants.h>
 
@@ -123,5 +121,3 @@ static constexpr Array<Uint16, static_cast<Size>(Key::Count)> s_keyToSdlKey = {
 static Array<Uint16, SDL_SCANCODE_COUNT> s_sdlKeyToKey = {0};
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backends_sdl3_keyboardconstants_inl_

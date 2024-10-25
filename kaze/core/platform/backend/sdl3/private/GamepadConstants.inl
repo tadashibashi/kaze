@@ -1,8 +1,6 @@
 /// \file GamepadConstants.inl
 /// Contains gamepad constants, which map SDL constants with kaze constants
 #pragma once
-#ifndef kaze_core_platform_backends_sdl3_gamepadconstants_inl_
-#define kaze_core_platform_backends_sdl3_gamepadconstants_inl_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/input/GamepadConstants.h>
@@ -42,5 +40,3 @@ static Array<int, SDL_GAMEPAD_BUTTON_COUNT> s_sdlToGamepadButton = {};
 static Array<int, SDL_GAMEPAD_AXIS_COUNT> s_sdlToGamepadAxis = {};
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backends_sdl3_gamepadconstants_inl_

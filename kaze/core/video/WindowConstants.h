@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_windowconstants_h_
-#define kaze_core_video_windowconstants_h_
 
 #include <kaze/core/lib.h>
 
@@ -36,5 +34,3 @@ constexpr WindowInit::Flags operator |(const WindowInit::Flags a, const WindowIn
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_windowconstants_h_

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_io_io_h_
-#define kaze_core_io_io_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/memory.h>
@@ -25,5 +23,3 @@ namespace file {
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_io_io_h_

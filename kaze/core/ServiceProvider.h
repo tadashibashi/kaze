@@ -1,9 +1,6 @@
 /// \file ServiceProvider.h
 /// Contains ServiceProvider class declaration
 #pragma once
-#ifndef kaze_core_serviceprovider_h_
-#define kaze_core_serviceprovider_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
 
@@ -142,5 +139,3 @@ private:
 
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_serviceprovider_h_

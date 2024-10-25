@@ -1,6 +1,7 @@
 #include "App.h"
 #include "AppPluginMgr.h"
 
+#include <kaze/core/input/CursorMgr.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/BackendInitGuard.h>
 
@@ -14,6 +15,7 @@ KAZE_TK_NAMESPACE_BEGIN
     InputMgr input{};
     GraphicsMgr graphics{};
     AppPluginMgr plugins{};
+    CursorMgr cursors{};
 
     AppInit config;
     Window window;
@@ -40,6 +42,12 @@ void App::run()
     } while (m->isRunning);
 
     close();
+    postClose();
+}
+
+auto App::postClose() -> void
+{
+    m->cursors.clear();
     m->graphics.close();
     m->window.close();
 }
@@ -80,6 +88,16 @@ auto App::graphics() const noexcept -> const GraphicsMgr &
 auto App::graphics() noexcept -> GraphicsMgr &
 {
     return m->graphics;
+}
+
+auto App::cursors() const noexcept -> const CursorMgr &
+{
+    return m->cursors;
+}
+
+auto App::cursors() noexcept -> CursorMgr &
+{
+    return m->cursors;
 }
 
 auto App::addPlugin(const AppPlugin &plugin) -> App &
@@ -162,6 +180,7 @@ auto App::preInit() -> Bool
     });
 
     m->input.setWindow(window().getHandle());
+    m->cursors.setWindow(window().getHandle());
     return KAZE_TRUE;
 }
 

@@ -13,5 +13,3 @@
 #define KAZE_TK_NAMESPACE_BEGIN namespace KAZE_TK_NAMESPACE {
 #define KAZE_TK_NAMESPACE_END }
 #define USING_KAZE_TK_NAMESPACE using namespace KAZE_TK_NAMESPACE
-
-#endif // kaze_tk_lib_h_

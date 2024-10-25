@@ -6,7 +6,8 @@ add_executable(${PROJECT_NAME}
     kaze/core/Memory.test.cpp
     kaze/core/ServiceProvider.test.cpp
 
-    kaze/core/debug.tests.cpp
+    kaze/core/debug.test.cpp
+    kaze/core/endian.test.cpp
     kaze/core/graphics/Color.test.cpp
 
     kaze/core/io/BufferIO.test.cpp

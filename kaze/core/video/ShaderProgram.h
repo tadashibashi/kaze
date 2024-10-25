@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_shaderprogram_h_
-#define kaze_core_video_shaderprogram_h_
 
 #include <kaze/core/lib.h>
 #include "Shader.h"
@@ -41,5 +39,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_shaderprogram_h_

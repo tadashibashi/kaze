@@ -100,5 +100,3 @@ private:
 };
 
 KAZE_TK_NAMESPACE_END
-
-#endif // kaze_tk_spritebatch_h_

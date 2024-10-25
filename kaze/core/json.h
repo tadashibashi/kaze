@@ -12,5 +12,3 @@ KAZE_NAMESPACE_BEGIN
 using json = nlohmann::json;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_json_h_

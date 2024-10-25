@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_math_circle_h_
-#define kaze_core_math_circle_h_
 
 #include <kaze/core/concepts.h>
 #include <kaze/core/math/mathf.h>
@@ -81,5 +79,3 @@ using Circf = Circle<Float>;
 using Circi = Circle<Int>;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_math_circle_h_

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_io_bufferview_h_
-#define kaze_core_io_bufferview_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
@@ -196,5 +194,3 @@ public:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_io_bufferview_h_

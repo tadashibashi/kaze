@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_input_gamepad_h_
-#define kaze_core_input_gamepad_h_
 
 #include "GamepadConstants.h"
 
@@ -46,5 +44,3 @@ private:
 
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_input_gamepad_h_

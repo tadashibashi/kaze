@@ -1,7 +1,6 @@
+/// \file endian.h
+/// Contains definitions for checking endianness and related functionality
 #pragma once
-#ifndef kaze_core_endian_h_
-#define kaze_core_endian_h_
-
 #include <kaze/core/lib.h>
 #include <bit>
 
@@ -11,7 +10,7 @@ struct Endian
 {
     enum Type
     {
-        Unknown = 0,
+        Unknown = -1,
         Little = static_cast<int>(std::endian::little),
         Big = static_cast<int>(std::endian::big),
     };
@@ -19,8 +18,16 @@ struct Endian
     /// Native platform's endian value, may be either Endian::Little or Endian::Big
     static constexpr Type Native = static_cast<Type>(std::endian::native);
 
-    static constexpr bool isBig() { return Native == Big; }
-    static constexpr bool isLittle() { return Native == Little; }
+    /// \returns `true` if the system's endianness is big-endian
+    static constexpr Bool isBig() { return Native == Big; }
+
+    /// \returns if the system's endianness is little-endian
+    static constexpr Bool isLittle() { return Native == Little; }
+
+    /// Get the opposite of an `Endian::Type`
+    /// \param[in] endian  endianness to get the opposite of
+    /// \returns the swapped endianness from an Endian enum
+    ///          or `Endian::Unknown` if value is unrecognized
     static constexpr auto opposite(Type endian) -> Type {
         switch(endian)
         {
@@ -30,6 +37,10 @@ struct Endian
         }
     }
 
+    /// Reverse an object's byte order
+    /// \tparam     T     type of the object to swap
+    /// \param[in]  obj   object to swap endianness of
+    /// \returns a copy of the object in reverse byte order
     template <typename T>
     static constexpr T swap(T obj)
     {
@@ -62,5 +73,3 @@ struct Endian
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_endian_h_

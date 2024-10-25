@@ -1,7 +1,4 @@
 #pragma once
-#ifndef kaze_core_debug_h_
-#define kaze_core_debug_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/errors.h>
 
@@ -63,5 +60,3 @@ KAZE_NAMESPACE_BEGIN
 
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_debug_h_

@@ -1,8 +1,6 @@
 /// \file WindowHandleContainer.h
 /// Usable by backends to conveniently manage multiple windows
 #pragma once
-#ifndef kaze_core_platform_backend_helpers_windowhandlecontainer_h_
-#define kaze_core_platform_backend_helpers_windowhandlecontainer_h_
 #include <kaze/core/lib.h>
 #include <kaze/core/debug.h>
 #include <kaze/core/platform/backend/backend.h>
@@ -187,5 +185,3 @@ namespace backend
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backend_helpers_windowhandlecontainer_h_

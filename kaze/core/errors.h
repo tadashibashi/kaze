@@ -2,8 +2,6 @@
 /// Conatains error codes and struct with static functionality to get the last error
 /// that occurred on the thread.
 #pragma once
-#ifndef kaze_core_errors_h_
-#define kaze_core_errors_h_
 
 #include <kaze/core/lib.h>
 
@@ -94,5 +92,3 @@ auto clearError() noexcept -> void;
 auto hasError() noexcept -> Bool;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_errors_h_

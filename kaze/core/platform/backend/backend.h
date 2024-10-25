@@ -1,12 +1,5 @@
 #pragma once
 
-
-#ifndef kaze_core_platform_backend_backend_h_
-#define kaze_core_platform_backend_backend_h_
-
-
-
-
 #include <kaze/core/lib.h>
 #include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/input/GamepadConstants.h>
@@ -92,5 +85,3 @@ namespace backend {
 
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backend_backend_h_

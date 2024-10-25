@@ -36,7 +36,6 @@ auto Mouse::processEvent(const MouseScrollEvent &e) -> void
 {
     if (e.window == m_window)
     {
-        KAZE_LOG("{}, {}", e.offset.x, e.offset.y);
         m_scroll += e.offset;
     }
 }

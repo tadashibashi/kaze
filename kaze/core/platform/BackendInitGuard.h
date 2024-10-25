@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_tk_backendinitguard_h_
-#define kaze_tk_backendinitguard_h_
 
 #include <kaze/core/lib.h>
 
@@ -16,5 +14,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_tk_backendinitguard_h_

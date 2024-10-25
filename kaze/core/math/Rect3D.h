@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_math_cube_h_
-#define kaze_core_math_cube_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
@@ -78,5 +76,3 @@ using Rect3Df = Rect3D<Float>;
 using Rect3Dd = Rect3D<Double>;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_math_cube_h_

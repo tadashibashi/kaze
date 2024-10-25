@@ -1,8 +1,6 @@
 /// \file lib.h
 /// Contains type aliases for primitives and common utility types, and basic engine defines
 #pragma once
-#ifndef kaze_core_lib_h_
-#define kaze_core_lib_h_
 
 #include <kaze/core/platform/defines.h>
 
@@ -143,5 +141,3 @@ KAZE_NAMESPACE_END
 #define KAZE_NO_COPY(classname) \
     classname(const classname &) = delete; \
     auto operator=(const classname &)->classname & = delete
-
-#endif // kaze_core_lib_h_

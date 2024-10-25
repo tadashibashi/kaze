@@ -1,9 +1,6 @@
 /// \file VertexLayout.h
 /// VertexLayout class and contants
 #pragma once
-#ifndef kaze_core_video_vertexlayout_h_
-#define kaze_core_video_vertexlayout_h_
-
 #include <kaze/core/lib.h>
 
 namespace bgfx {
@@ -93,5 +90,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_vertexlayout_h_

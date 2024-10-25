@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_platform_backend_window_h_
-#define kaze_core_platform_backend_window_h_
 #include <kaze/core/lib.h>
 #include <kaze/core/video/WindowConstants.h>
 
@@ -298,5 +296,3 @@ namespace backend::window {
 }
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_platform_backend_window_h_

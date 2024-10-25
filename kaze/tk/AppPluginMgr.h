@@ -60,5 +60,3 @@ private:
 
 
 KAZE_TK_NAMESPACE_END
-
-#endif // kaze_tk_apppluginmgr_h_

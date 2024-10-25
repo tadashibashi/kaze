@@ -1,8 +1,3 @@
 #pragma once
-#ifndef kaze_core_lib_pch_
-#define kaze_core_lib_pch_
 
 #include "lib.h"
-
-
-#endif // kaze_core_lib_pch_

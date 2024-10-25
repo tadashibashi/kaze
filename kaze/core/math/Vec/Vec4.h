@@ -1,8 +1,6 @@
 /// \file Vec4.h
 /// Vec4 math class specialization
 #pragma once
-#ifndef kaze_core_math_vec_vec4_h_
-#define kaze_core_math_vec_vec4_h_
 
 #include <kaze/core/lib.h>
 #include "VecBase.h"
@@ -140,5 +138,3 @@ template <Arithmetic T>
 using Vec4 = Vec<T, 4>;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_math_vec_vec4_h_

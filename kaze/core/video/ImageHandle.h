@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_video_imagehandle_h_
-#define kaze_core_video_imagehandle_h_
 
 #include <kaze/core/lib.h>
 
@@ -55,5 +53,3 @@ struct ImageHandle {
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_imagehandle_h_

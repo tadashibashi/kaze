@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_macros_map_h_
-#define kaze_core_macros_map_h_
 
 #define KAZE_EVAL0(...) __VA_ARGS__
 #define KAZE_EVAL1(...) KAZE_EVAL0(KAZE_EVAL0(KAZE_EVAL0(__VA_ARGS__)))
@@ -39,5 +37,3 @@
  * inserts commas between the results.
  */
 #define KAZE_MAP_LIST(f, ...) KAZE_EVAL(KAZE_MAP_LIST1(f, __VA_ARGS__, ()()(), ()()(), ()()(), 0))
-
-#endif // kaze_core_macros_map_h_

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef kaze_core_io_filebuffer_h_
-#define kaze_core_io_filebuffer_h_
 
 #include <kaze/core/lib.h>
 
@@ -45,5 +43,3 @@ public:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_io_filebuffer_h_

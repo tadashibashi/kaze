@@ -2,9 +2,6 @@
 /// Contains Window class, which wraps a backend window for convenience and ease of use
 /// via object-oriented encapsulation/RAII.
 #pragma once
-#ifndef kaze_core_platform_window_h_
-#define kaze_core_platform_window_h_
-
 #include "WindowConstants.h"
 
 #include <kaze/core/lib.h>
@@ -251,5 +248,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_video_window_h_

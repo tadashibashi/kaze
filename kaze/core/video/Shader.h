@@ -1,13 +1,11 @@
 #pragma once
-#ifndef kaze_core_video_shader_h_
-#define kaze_core_video_shader_h_
-
 #include <kaze/core/lib.h>
 #include <kaze/core/MemView.h>
 
 KAZE_NAMESPACE_BEGIN
 
-class Shader {
+class Shader
+{
 public:
     /// Inserts shader language subpath based on the current gpu renderer
     /// These paths align with those exported via shaderc.
@@ -55,5 +53,3 @@ private:
 };
 
 KAZE_NAMESPACE_END
-
-#endif

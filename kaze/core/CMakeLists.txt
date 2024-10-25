@@ -24,6 +24,8 @@ add_library(${PROJECT_NAME}
         ServiceProvider.h
         ServiceProvider.cpp
 
+        input/CursorMgr.h
+        input/CursorMgr.cpp
         input/Gamepad.h
         input/Gamepad.cpp
         input/InputMgr.h

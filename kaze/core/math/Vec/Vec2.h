@@ -1,8 +1,6 @@
 /// \file Vec2.h
 /// Vec2 math class specialization
 #pragma once
-#ifndef kaze_core_math_vec_vec2_h_
-#define kaze_core_math_vec_vec2_h_
 
 #include <kaze/core/lib.h>
 #include <kaze/core/math/mathf.h>
@@ -125,5 +123,3 @@ template <Arithmetic T>
 using Vec2 = Vec<T, 2>;
 
 KAZE_NAMESPACE_END
-
-#endif // kaze_core_math_vec_vec2_h_
