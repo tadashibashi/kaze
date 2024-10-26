@@ -769,7 +769,7 @@ namespace backend {
         return true;
     }
 
-    auto window::setShowCursorMode(const WindowHandle window, bool value) noexcept -> bool
+    auto window::setCursorMode(const WindowHandle window, const CursorMode mode) noexcept -> bool
     {
         RETURN_IF_NULL(window);
 
@@ -777,41 +777,45 @@ namespace backend {
         if ( !getWindowData(window, &data) )
             return false;
 
-        data->cursorVisibleMode = value;
-        return true;
-    }
-
-    auto window::getShowCursorMode(const WindowHandle window, bool *outMode) noexcept -> bool
-    {
-        RETURN_IF_NULL(window);
-
-        WindowData *data;
-        if ( !getWindowData(window, &data) )
-            return false;
-
-        *outMode = data->cursorVisibleMode;
-        return true;
-    }
-
-    auto window::setCaptureCursorMode(const WindowHandle window, bool value) noexcept -> bool
-    {
-        RETURN_IF_NULL(window);
-
-        if ( !SDL_SetWindowRelativeMouseMode( WIN_CAST(window), value ) )
+        switch(mode)
         {
-            KAZE_CORE_ERR("Failed to set window relative mouse mode: {}", SDL_GetError());
+        case CursorMode::Visible:
+            data->cursorVisibleMode = true;
+            return SDL_SetWindowRelativeMouseMode(WIN_CAST(window), false);
+        case CursorMode::Hidden:
+            data->cursorVisibleMode = false;
+            return SDL_SetWindowRelativeMouseMode(WIN_CAST(window), false);
+        case CursorMode::Capture:
+            data->cursorVisibleMode = false;
+            return SDL_SetWindowRelativeMouseMode(WIN_CAST(window), true);
+        default:
+            KAZE_CORE_ERRCODE(Error::InvalidEnum, "Invalid CursorMode passed to window::setCursorMode");
             return false;
         }
-
-        return true;
     }
 
-    auto window::getCaptureCursorMode(const WindowHandle window, bool *outValue) noexcept -> bool
+    auto window::getCursorMode(const WindowHandle window, CursorMode *outMode) noexcept -> bool
     {
         RETURN_IF_NULL(window);
-        RETURN_IF_NULL(outValue);
+        RETURN_IF_NULL(outMode);
 
-        *outValue = SDL_GetWindowRelativeMouseMode( WIN_CAST(window) );
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+
+        if (data->cursorVisibleMode)
+        {
+            *outMode = CursorMode::Visible;
+        }
+        else if (SDL_GetWindowRelativeMouseMode(WIN_CAST(window)))
+        {
+            *outMode = CursorMode::Capture;
+        }
+        else
+        {
+            *outMode = CursorMode::Hidden;
+        }
+
         return true;
     }
 

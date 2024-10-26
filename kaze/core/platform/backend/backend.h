@@ -1,22 +1,20 @@
 #pragma once
-
 #include <kaze/core/lib.h>
+#include <kaze/core/input/InputEvents.h>
 #include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/input/GamepadConstants.h>
 #include <kaze/core/input/KeyboardConstants.h>
 #include <kaze/core/input/MouseConstants.h>
-
-#include <kaze/core/input/InputEvents.h>
 
 #include <kaze/core/video/ImageHandle.h>
 #include <kaze/core/video/WindowConstants.h>
 
 #include <kaze/core/traits.h>
 
-#include "cursor.h"
-#include "gamepad.h"
-#include "keyboard.h"
-#include "window.h"
+#include "cursor.h"   // IWYU pragma: export
+#include "gamepad.h"  // IWYU pragma: export
+#include "keyboard.h" // IWYU pragma: export
+#include "window.h"   // IWYU pragma: export
 
 KAZE_NAMESPACE_BEGIN
 

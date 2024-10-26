@@ -303,32 +303,18 @@ auto Window::isFocused() const noexcept -> Bool
     return focused;
 }
 
-auto Window::setCursorCaptureMode(const Bool value) noexcept -> Window &
+auto Window::setCursorMode(CursorMode mode) noexcept -> Window &
 {
-    backend::window::setCaptureCursorMode(m_window, value);
+    backend::window::setCursorMode(m_window, mode);
     return *this;
 }
 
-auto Window::getCursorCaptureMode() const noexcept -> Bool
+auto Window::getCursorMode() const noexcept -> CursorMode
 {
-    bool capture;
-    if ( !backend::window::getCaptureCursorMode(m_window, &capture) )
-        return KAZE_FALSE;
-    return capture;
-}
+    auto mode = CursorMode::Count;
+    backend::window::getCursorMode(m_window, &mode);
 
-auto Window::setCursorVisibleMode(Bool value) noexcept -> Window &
-{
-    backend::window::setShowCursorMode(m_window, value);
-    return *this;
-}
-
-auto Window::getCursorVisibleMode() const noexcept -> Bool
-{
-    bool visible;
-    if ( !backend::window::getShowCursorMode(m_window, &visible) )
-        return KAZE_FALSE;
-    return visible;
+    return mode;
 }
 
 auto Window::getHandle() const -> ConstWindowHandle

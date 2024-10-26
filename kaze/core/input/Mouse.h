@@ -5,6 +5,7 @@
 #include "InputEvents.h"
 #include "MouseConstants.h"
 
+#include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/lib.h>
 #include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/video/WindowConstants.h>
@@ -44,8 +45,8 @@ public:
     auto getGlobalPosition() const noexcept -> Vec2f;
     auto getMotion() const noexcept -> Vec2f; ///< if relative mode is on it will be the last amt
 
-    auto setCaptureMode(bool captureMode) noexcept -> Mouse &;
-    auto getCaptureMode() const noexcept -> Bool;
+    auto setMode(CursorMode mode) noexcept -> Mouse &;
+    auto getMode() const noexcept -> CursorMode;
 private:
     struct ButtonData {
         Bool value[2]{};

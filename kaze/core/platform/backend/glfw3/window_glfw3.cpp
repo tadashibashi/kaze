@@ -4,6 +4,7 @@
 #include "common_glfw3.h"
 
 #include <kaze/core/platform/backend/backend.h>
+#include <kaze/core/platform/backend/window.h>
 #include <kaze/core/platform/defines.h>
 
 #include <GLFW/glfw3.h>
@@ -108,20 +109,26 @@ namespace backend {
 
     static auto glfwCursorPosCallback(GLFWwindow *window, const double x, const double y) -> void
     {
-        events.emit(MouseMotionEvent {
-           .position = {
-               static_cast<Float>(x),
-               static_cast<Float>(y),
-           },
-           .window = window,
-        });
+        int w, h;
+        glfwGetWindowSize(window, &w, &h);
+
+        if (x >= 0 && x < w && y >= 0 && y < h)
+        {
+            events.emit(MouseMotionEvent {
+               .position = {
+                   static_cast<Float>(x),
+                   static_cast<Float>(y),
+               },
+               .window = window,
+            });
+        }
     }
 
     static auto glfwKeyCallback(GLFWwindow *window, const int key, const int scancode, const int action, const int mods) -> void
     {
         events.emit(KeyboardEvent {
-            .type = (action == GLFW_RELEASE ? KeyboardEvent::Up : KeyboardEvent::Down),
             .key = backend::toKey(key),
+            .isDown = (action == GLFW_PRESS),
             .isRepeat = (action == GLFW_REPEAT),
             .window = static_cast<void *>(window)
         });
@@ -214,8 +221,8 @@ namespace backend {
     static auto glfwMouseButtonCallback(GLFWwindow *window, const int button, const int action, const int mods) -> void
     {
         events.emit(MouseButtonEvent {
-            .type = action == GLFW_RELEASE ? MouseButtonEvent::Up : MouseButtonEvent::Down,
             .button = toMouseBtn(button),
+            .isDown = action == GLFW_PRESS,
             .window = window,
         });
     }
@@ -921,48 +928,45 @@ namespace backend {
         return true;
     }
 
-    auto window::setShowCursorMode(const WindowHandle window, const bool show) noexcept -> bool
+    auto window::setCursorMode(WindowHandle window, CursorMode mode) noexcept -> bool
     {
         RETURN_IF_NULL(window);
 
-        glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR_HIDDEN, !show);
-        ERR_CHECK(Error::BE_RuntimeErr, "set cursor hidden mode");
+        int glfwCursorMode = GLFW_CURSOR_NORMAL;
+        switch(mode)
+        {
+        case CursorMode::Visible: glfwCursorMode = GLFW_CURSOR_NORMAL; break;
+        case CursorMode::Hidden:  glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
+        case CursorMode::Capture: glfwCursorMode = GLFW_CURSOR_CAPTURED; break;
+        default:
+            KAZE_CORE_ERRCODE(Error::InvalidEnum, "Unknown `CursorMode` passed to `window::setCurosrMode`");
+            return false;
+        }
+
+        glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR, glfwCursorMode);
+        ERR_CHECK(Error::BE_RuntimeErr, "set cursor mode");
 
         return true;
     }
 
-    auto window::getShowCursorMode(const WindowHandle window, bool *outShow) noexcept -> bool
+    auto window::getCursorMode(WindowHandle window, CursorMode *outMode) noexcept -> bool
     {
         RETURN_IF_NULL(window);
-        RETURN_IF_NULL(outShow);
+        RETURN_IF_NULL(outMode);
 
-        const auto showCursor = !static_cast<bool>(glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR_HIDDEN));
-        ERR_CHECK(Error::BE_RuntimeErr, "get cursor hidden mode");
+        const auto glfwCursorMode = glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR);
+        switch(glfwCursorMode)
+        {
+        case GLFW_CURSOR_NORMAL: *outMode = CursorMode::Visible; break;
+        case GLFW_CURSOR_HIDDEN: *outMode = CursorMode::Hidden; break;
+        case GLFW_CURSOR_CAPTURED: *outMode = CursorMode::Capture; break;
+        default:
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr,
+                "Internal error: unsupported or unknown cursor mode retrieved from window: {}",
+                glfwCursorMode);
+            return false;
+        }
 
-        *outShow = showCursor;
-        return true;
-    }
-
-    auto window::setCaptureCursorMode(const WindowHandle window, const bool capture) noexcept -> bool
-    {
-        RETURN_IF_NULL(window);
-
-        const auto lastMode = glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR);
-        glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR, capture ? GLFW_CURSOR_CAPTURED : lastMode);
-        ERR_CHECK(Error::BE_RuntimeErr, "set cursor captured mode");
-
-        return true;
-    }
-
-    auto window::getCaptureCursorMode(const WindowHandle window, bool *outCapture) noexcept -> bool
-    {
-        RETURN_IF_NULL(window);
-        RETURN_IF_NULL(outCapture);
-
-        const auto capture = glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR) == GLFW_CURSOR_CAPTURED;
-        ERR_CHECK(Error::BE_RuntimeErr, "get cursor captured mode");
-
-        *outCapture = capture;
         return true;
     }
 

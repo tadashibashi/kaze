@@ -38,8 +38,7 @@ auto Keyboard::processEvent(const KeyboardEvent &e) -> void
     if (m_window && e.window != m_window) return;
     ASSERT_KEY_RANGE(e.key);
 
-    if ( (e.type == KeyboardEvent::Down && !e.isRepeat) ||
-        e.type == KeyboardEvent::Up )
+    if ( (e.isDown && !e.isRepeat) || !e.isDown )
     {
         ++m_keyData[ static_cast<Int>(e.key) ].interactions;
     }

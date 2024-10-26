@@ -1,4 +1,5 @@
 #pragma once
+#include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/lib.h>
 #include <kaze/core/video/WindowConstants.h>
 
@@ -265,33 +266,17 @@ namespace backend::window {
     /// \returns whether the retrieval succeeded.
     auto getMaxSize(WindowHandle window, int *outMaxWidth, int *outMaxHeight) noexcept -> bool;
 
-    /// Set whether to show cursor in window
+    /// Set the cursor mode of the window.
     /// \param[in] window   window to affect
-    /// \param[in] show     `true` shows the cursor when it hovers over the window,
-    ///                 `false` hides the cursor when it hovers over the window.
+    /// \param[in] mode     cursor mode, see `CursorMode` for more info
     /// \returns whether the operation succeeded.
-    auto setShowCursorMode(WindowHandle window, bool show) noexcept -> bool;
+    auto setCursorMode(WindowHandle window, CursorMode mode) noexcept -> bool;
 
-    /// Get cursor visibility mode–whether the mouse cursor is shown when hovering over the window
-    /// \param[in]  window   window to check
-    /// \param[out] outShow  retrieves the mode
+    /// Get the cursor mode of the window.
+    /// \param[in]  window   window to get value from
+    /// \param[out] outMode  retrieves the cursor mode
     /// \returns whether the retrieval succeeded.
-    auto getShowCursorMode(WindowHandle window, bool *outShow) noexcept -> bool;
-
-    /// Set the cursor capture mode of the window.
-    /// Capture mode hides the cursor, keeps it centered on screen, and processes mouse motion events relatively.
-    /// When set to false, mouse motion events are processed positionally, relative to the window position.
-    /// \param[in] window   window to affect
-    /// \param[in] capture  whether to set capture mode for the window
-    /// \returns whether the operation succeeded.
-    auto setCaptureCursorMode(WindowHandle window, bool capture) noexcept -> bool;
-
-    /// Get the cursor capture mode of the window.
-    /// See {@link setCaptureCursorMode} for more info on capture mode.
-    /// \param[in]  window      window to check
-    /// \param[out] outCapture  retrieves current capture mode.
-    /// \returns whether the retrieval succeeded.
-    auto getCaptureCursorMode(WindowHandle window, bool *outCapture) noexcept -> bool;
+    auto getCursorMode(WindowHandle window, CursorMode *outMode) noexcept -> bool;
 
     /// Set whether text input events are enabled for a window.
     /// \note When active, IME keyboard should be opened if supported on the platform,

@@ -4,6 +4,7 @@
 #pragma once
 #include "WindowConstants.h"
 
+#include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/lib.h>
 #include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/math/Rect.h>
@@ -208,29 +209,18 @@ public:
     [[nodiscard]]
     auto isFocused() const noexcept -> Bool;
 
-    /// Set whether the window is in cursor capture mode
-    /// \param[in] value `true` - cursor is centered in screen, and values received
-    ///                           from the cursor motion event are relative;
+    /// Set cursor mode for window.
+    /// \param[in] mode  `CursorMode::Visible` - normal visibility
+    ///                  `CursorMode::Hidden`  - hidden cursor
+    ///                  `CursorMode::Capture` - cursor centered in screen, and values received
+    ///                           from the MouseMotionEvent are relative;
     ///                  `false` - cursor is free to move, and values received from
     ///                       the cursor are positional (not relative)
     /// \returns reference to this Window for chained calls.
-    auto setCursorCaptureMode(Bool value) noexcept -> Window &;
+    auto setCursorMode(CursorMode mode) noexcept -> Window &;
 
-    /// Get whether window is in cursor capture mode.
-    /// See `setCursorCaptureMode` for more info on this mode.
-    [[nodiscard]]
-    auto getCursorCaptureMode() const noexcept -> Bool;
-
-    /// Set whether cursor should be visible in the window
-    /// \param[in] value `true` cursor is visible when inside the window,
-    ///                  `false` cursor is invisible when inside the window
-    /// \returns reference to this Window for chained calls.
-    auto setCursorVisibleMode(Bool value) noexcept -> Window &;
-
-    /// Get whether cursor is set to be visible when inside the window
-    [[nodiscard]]
-    auto getCursorVisibleMode() const noexcept -> Bool;
-
+    /// \returns cursor mode for window
+    auto getCursorMode() const noexcept -> CursorMode;
 
     // ----- internal pointer -------------------------------------------------
 

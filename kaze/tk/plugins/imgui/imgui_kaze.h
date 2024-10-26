@@ -1,6 +1,8 @@
 #pragma once
-#include <kaze/tk/lib.h>
+#include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/video/WindowConstants.h>
+#include <kaze/tk/lib.h>
+
 #include "imgui/imgui.h"
 
 KAZE_TK_NAMESPACE_BEGIN
@@ -11,6 +13,7 @@ struct ImGuiKazeContext {
     Float fontSize;
     Double lastTime = 0;
     bool keyboardRequested = false; ///< last state keyboard requested
+    CursorType lastCursor = CursorType::Default;
 };
 
 #define CONTEXT_CAST(userptr) static_cast<ImGuiKazeContext *>(userptr)

@@ -46,49 +46,59 @@ int main(int argc, const char *argv[])
         },
         .keyCallback = [](const KeyboardEvent &e, Double timestamp, void *userptr) {
             const auto app = static_cast<AppData *>(userptr);
-            if (e.type == KeyboardEvent::Down && !e.isRepeat)
+            if (e.isDown && !e.isRepeat)
             {
                 KAZE_LOG("Key pressed: {}, at time: {}", static_cast<Uint>(e.key), timestamp);
 
                 switch(e.key)
                 {
-                    case Key::B:
-                        app->window.setBordered(!app->window.isBordered());
-                        break;
+                case Key::B:
+                    app->window.setBordered(!app->window.isBordered());
+                    break;
                 case Key::F:
-                        app->window.setFullscreenMode(FullscreenMode::Native);
-                        app->window.setFullscreen(!app->window.isFullscreen());
-                        break;
+                    app->window.setFullscreenMode(FullscreenMode::Native);
+                    app->window.setFullscreen(!app->window.isFullscreen());
+                    break;
                 case Key::D:
-                        app->window.setFullscreenMode(FullscreenMode::Desktop);
-                        app->window.setFullscreen(!app->window.isFullscreen());
-                        break;
-                    case Key::M:
-                        if (app->window.isMinimized())
-                            app->window.restore();
-                        else
-                            app->window.minimize();
-                        break;
-                    case Key::N:
-                        if (app->window.isMaximized())
-                            app->window.restore();
-                        else
-                            app->window.maximize();
-                        break;
-                    case Key::P:
-                        app->logMousePos = !app->logMousePos;
-                        if (app->logMousePos)
-                            KAZE_LOG("Activated mouse position logging.");
-                        else
-                            KAZE_LOG("Deactivated mouse position logging.");
-                        break;
+                    app->window.setFullscreenMode(FullscreenMode::Desktop);
+                    app->window.setFullscreen(!app->window.isFullscreen());
+                    break;
+                case Key::C:
+                    if (app->window.getCursorMode() == CursorMode::Capture)
+                    {
+                        app->window.setCursorMode(CursorMode::Visible);
+                    }
+                    else
+                    {
+                        app->window.setCursorMode(CursorMode::Capture);
+                    }
+                    break;
+                case Key::M:
+                    if (app->window.isMinimized())
+                        app->window.restore();
+                    else
+                        app->window.minimize();
+                    break;
+                case Key::N:
+                    if (app->window.isMaximized())
+                        app->window.restore();
+                    else
+                        app->window.maximize();
+                    break;
+                case Key::P:
+                    app->logMousePos = !app->logMousePos;
+                    if (app->logMousePos)
+                        KAZE_LOG("Activated mouse position logging.");
+                    else
+                        KAZE_LOG("Deactivated mouse position logging.");
+                    break;
                     default: break;
                 }
             }
         },
         .mouseButtonCallback = [](const MouseButtonEvent &e, Double timestamp, void *userptr) {
             const auto app = static_cast<AppData *>(userptr);
-            if (e.type == MouseButtonEvent::Down)
+            if (e.isDown)
                 KAZE_LOG("Mouse button pressed: {}", static_cast<Uint>(e.button));
         },
         .mouseMotionCallback = [](const MouseMotionEvent &e, Double timestamp, void *userptr) {
@@ -195,6 +205,8 @@ int main(int argc, const char *argv[])
                 KAZE_LOG("Left Stick moved to: {}, {}", axes.x, axes.y);
             }
         }
+
+
 
         backend::pollEvents();
     }

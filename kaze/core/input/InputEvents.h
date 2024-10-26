@@ -44,39 +44,30 @@ struct FileDropEvent
 
 struct KeyboardEvent
 {
-    enum Type
-    {
-        Down,  ///< Key pressed down
-        Up     ///< Key released
-    } type;         ///< type of keyboard event
-
-    Key key;        ///< key code
-    Bool isRepeat;  ///< key repeated
+    Key key;               ///< key code
+    Bool isDown;           ///< `True` key is pressed down, `False` key is released
+    Bool isRepeat;         ///< key repeated
     WindowHandle window;   ///< window associated with the event
 };
 
 struct MouseButtonEvent
 {
-    enum Type
-    {
-        Down, ///< Mouse button pressed down
-        Up,   ///< Mouse button released
-    } type;           ///< type of mouse button event
-
-    MouseBtn button;  ///< mouse button
+    MouseBtn button;         ///< mouse button
+    Bool isDown;             ///< `True` button is pressed down, `False` button is released
     WindowHandle window;     ///< window associated with the event
 };
 
 /// Describes scroll
 struct MouseScrollEvent
 {
-    Vec2f offset;   ///< relative mouse scroll x and y axes
+    Vec2f offset;          ///< relative mouse scroll x and y axes
     WindowHandle window;   ///< window scroll occurred in
 };
 
+/// Occurs when the mouse moves when hovering a Window
 struct MouseMotionEvent
 {
-    Vec2f position;  ///< position of mouse in window, or relative motion if relative mode is on
+    Vec2f position;         ///< position of mouse in window, or relative motion if relative mode is on
     WindowHandle window;    ///< window the mouse motion event occurred
 };
 

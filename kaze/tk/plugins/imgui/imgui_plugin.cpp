@@ -23,7 +23,7 @@ namespace imgui {
         ImGuiKey_Tab,
         ImGuiKey_Space,
         ImGuiKey_Backspace,
-        ImGuiKey_LeftArrow,
+        ImGuiKey_UpArrow,
         ImGuiKey_DownArrow,
         ImGuiKey_LeftArrow,
         ImGuiKey_RightArrow,
@@ -60,6 +60,18 @@ namespace imgui {
         ImGuiKey_F10,
         ImGuiKey_F11,
         ImGuiKey_F12,
+        ImGuiKey_F13,
+        ImGuiKey_F14,
+        ImGuiKey_F15,
+        ImGuiKey_F16,
+        ImGuiKey_F17,
+        ImGuiKey_F18,
+        ImGuiKey_F19,
+        ImGuiKey_F20,
+        ImGuiKey_F21,
+        ImGuiKey_F22,
+        ImGuiKey_F23,
+        ImGuiKey_F24,
 
         ImGuiMod_Shift,
         ImGuiMod_Shift,
@@ -140,7 +152,7 @@ namespace imgui {
             .init = [](App *app, void *userdata)
             {
                 ImGui_ImplKaze_Init(CONTEXT_CAST(userdata));
-                ImGui_Implbgfx_Init(0);
+                ImGui_Implbgfx_Init(1);
 
                 auto &platformIo = ImGui::GetPlatformIO();
             },
@@ -169,9 +181,7 @@ namespace imgui {
                 auto &io = ImGui::GetIO();
                 if (!e.isRepeat)
                 {
-                    KAZE_CORE_LOG("KEY: {}", (Int)e.key);
-                    io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)],
-                        e.type == KeyboardEvent::Down);
+                    io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)], e.isDown);
                 }
             },
             .mouseButtonEvent = [](const MouseButtonEvent &e, App *app, void *userdata)
@@ -195,7 +205,7 @@ namespace imgui {
                 }
 
                 io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
-                io.AddMouseButtonEvent(mouseButton, e.type == MouseButtonEvent::Down);
+                io.AddMouseButtonEvent(mouseButton, e.isDown);
             },
             .mouseMotionEvent = [](const MouseMotionEvent &e, App *app, void *userdata)
             {
@@ -213,7 +223,6 @@ namespace imgui {
             },
             .textInputEvent = [](const TextInputEvent &e, App *app, void *userdata)
             {
-                KAZE_CORE_LOG("Text: {}", e.codepoint);
                 auto ctx = CONTEXT_CAST(userdata);
                 if (ctx->window != e.window)
                     return;

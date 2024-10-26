@@ -221,8 +221,8 @@ namespace backend {
                 {
                     const auto window = SDL_GetWindowFromID(e.wheel.windowID);
                     events.emit(KeyboardEvent {
-                        .type     = e.key.down ? KeyboardEvent::Down : KeyboardEvent::Up,
                         .key      = backend::toKey(e.key.scancode),
+                        .down     = e.key.down,
                         .isRepeat = e.key.repeat,
                         .window = window,
                     });
@@ -248,8 +248,8 @@ namespace backend {
                 {
                     const auto window = SDL_GetWindowFromID(e.button.windowID);
                     events.emit(MouseButtonEvent {
-                        .type = e.button.down ? MouseButtonEvent::Down : MouseButtonEvent::Up,
                         .button = static_cast<MouseBtn>(e.button.button - 1),
+                        .isDown = e.button.down,
                         .window = window
                     });
                 } break;

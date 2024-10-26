@@ -52,11 +52,9 @@ auto Mouse::processEvent(const MouseMotionEvent &e) -> void
 {
     if (e.window == m_window)
     {
-        bool isCapture;
-        if (backend::window::getCaptureCursorMode(e.window, &isCapture))
+        if (getMode() == CursorMode::Capture)
         {
-            if (isCapture)
-                m_motion += e.position;
+            m_motion += e.position;
         }
     }
 }
@@ -101,17 +99,17 @@ auto Mouse::getGlobalPosition() const noexcept -> Vec2f
     return position;
 }
 
-auto Mouse::setCaptureMode(bool captureMode) noexcept -> Mouse &
+auto Mouse::setMode(const CursorMode mode) noexcept -> Mouse &
 {
-    backend::window::setCaptureCursorMode(m_window, captureMode);
+    backend::window::setCursorMode(m_window, mode);
     return *this;
 }
 
-auto Mouse::getCaptureMode() const noexcept -> Bool
+auto Mouse::getMode() const noexcept -> CursorMode
 {
-    bool captureMode;
-    if ( !backend::window::getCaptureCursorMode(m_window, &captureMode) )
-        return false;
+    auto captureMode = CursorMode::Count;
+    backend::window::getCursorMode(m_window, &captureMode);
+
     return captureMode;
 }
 
