@@ -222,7 +222,7 @@ namespace backend {
                     const auto window = SDL_GetWindowFromID(e.wheel.windowID);
                     events.emit(KeyboardEvent {
                         .key      = backend::toKey(e.key.scancode),
-                        .down     = e.key.down,
+                        .isDown     = e.key.down,
                         .isRepeat = e.key.repeat,
                         .window = window,
                     });
@@ -439,6 +439,10 @@ namespace backend {
                         .position = {
                             e.motion.x,
                             e.motion.y,
+                        },
+                        .relative = {
+                            e.motion.xrel,
+                            e.motion.yrel,
                         },
                         .window = SDL_GetWindowFromID(e.motion.windowID)
                     });

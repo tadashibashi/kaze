@@ -306,6 +306,11 @@ namespace backend {
 
     auto pollEvents() noexcept -> bool
     {
+        for (auto &[handle, data] : windows.data())
+        {
+            data.relCursorPos = {};
+        }
+
         glfwPollEvents();
 
         for (int i = 0; i <= GLFW_JOYSTICK_LAST; ++i)

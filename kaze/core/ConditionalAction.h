@@ -2,32 +2,20 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/traits.h>
 
-#include <algorithm>
 #include <ranges>
 
 KAZE_NAMESPACE_BEGIN
 
-/// @description
-/// Container of callbacks with no return value.
-/// (Inspired by and similar to multi-cast Action delegates in C#)
-///
-/// \note
-/// Each callback contains a user pointer useful for providing context to the callback. This means that you
-/// must add a `void *` parameter at the end of each callback function subscribing to the event.
-/// For example an `Action<int>` must have callbacks with this signature `void(int, void *)`.
-///
-/// @tparam  Args... types of parameters for the callbacks
 template <typename... Args>
-class Action {
-    /// Individual callback container
+class ConditionalAction {
     class Callback {
     public:
-        Callback(funcptr_t<void(Args..., void *)> callback, void *userptr = nullptr, Int priority = 0) :
+        Callback(funcptr_t<Bool(Args..., void *)> callback, void *userptr = nullptr, Int priority = 0) :
             m_callback(callback), m_userptr(userptr), m_priority(priority) { }
 
         [[nodiscard]]
         auto operator ==(const Callback &other) const noexcept -> Bool {
-            return m_callback == other.m_callback && m_userptr == other.m_userptr;
+            return other.m_callback == m_callback && other.m_userptr == m_userptr;
         }
 
         [[nodiscard]]
@@ -35,19 +23,18 @@ class Action {
             return !operator==(other);
         }
 
-        auto operator ()(Args... args) const -> void
+        auto operator ()(Args... args) const -> Bool
         {
             KAZE_ASSERT(m_callback != nullptr);
             return m_callback(args..., m_userptr);
         }
 
-        [[nodiscard]]
         auto priority() const noexcept -> Int { return m_priority; }
 
     private:
-        funcptr_t<void(Args..., void *)> m_callback{}; ///< function pointer callback
-        void *m_userptr;                           ///< user pointer for context and signature
-        Int m_priority;                            ///< lower numbers come first, higher numbers later
+        funcptr_t<Bool(Args..., void *)> m_callback;
+        void *m_userptr;
+        Int m_priority;
     };
 
     struct Command {
@@ -59,13 +46,13 @@ class Action {
     };
 
 public:
-    Action() : m_callbacks(), m_commands(), m_isCalling() {}
+    ConditionalAction() : m_callbacks(), m_commands(), m_isCalling(), m_wasAdded() { }
 
-    KAZE_NO_COPY(Action);
+    KAZE_NO_COPY(ConditionalAction);
 
-    auto operator()(Args... args) -> void
+    auto operator()(Args... args) -> Bool
     {
-        if (m_isCalling) return;
+        if (m_isCalling) return False;
 
         sortByPriority();
 
@@ -73,17 +60,21 @@ public:
         {
             m_isCalling = true;
             for (const auto &callback : m_callbacks)
-                callback(args...);
+            {
+                if ( !callback(args...) )
+                    return False;
+            }
             m_isCalling = false;
         }
 
         processCommands();
+        return True;
     }
 
     /// Call the callbacks in reverse order
-    auto reverseInvoke(Args... args) -> void
+    auto reverseInvoke(Args... args) -> Bool
     {
-        if (m_isCalling) return;
+        if (m_isCalling) return False;
 
         sortByPriority();
 
@@ -91,15 +82,20 @@ public:
         {
             m_isCalling = true;
             for (auto &callback : std::views::reverse(m_callbacks))
-                callback(args...);
+            {
+                if ( !callback(args...) )
+                    return False;
+            }
             m_isCalling = false;
         }
 
         processCommands();
+        return True;
     }
 
-    auto add(funcptr_t<void(Args..., void *)> func, void *userptr = nullptr, Int priority = 0)
+    auto add(funcptr_t<Bool(Args..., void *)> func, void *userptr = nullptr, Int priority = 0)
     {
+        KAZE_ASSERT(func != nullptr, "added callback must not be null");
         if (m_isCalling)
         {
             // Defer the addition of the callback
@@ -113,12 +109,12 @@ public:
         }
     }
 
-    auto add(funcptr_t<void(Args..., void *)> func, Int priority)
+    auto add(funcptr_t<Bool(Args..., void *)> func, Int priority)
     {
         add(func, nullptr, priority);
     }
 
-    auto remove(funcptr_t<void(Args..., void *)> func, void *userptr = nullptr)
+    auto remove(funcptr_t<Bool(Args..., void *)> func, void *userptr = nullptr)
     {
         const auto callback = Callback(func, userptr);
         if (m_isCalling)
@@ -162,7 +158,7 @@ public:
     /// \param[in] func function pointer
     /// \param[in] userptr associated user data context pointer
     /// @return whether callback exists in container or not
-    auto contains(funcptr_t<void(Args..., void *)> func, void *userptr = nullptr) noexcept -> Bool
+    auto contains(funcptr_t<Bool(Args..., void *)> func, void *userptr = nullptr) noexcept -> Bool
     {
         const auto target = Callback(func, userptr);
         for (const auto &callback : m_callbacks)

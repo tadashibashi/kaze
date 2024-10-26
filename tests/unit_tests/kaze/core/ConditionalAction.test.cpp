@@ -1,20 +1,21 @@
 #include <doctest/doctest.h>
-#include <kaze/core/Action.h>
+#include <kaze/core/ConditionalAction.h>
 
 USING_KAZE_NAMESPACE;
 
-TEST_SUITE("Action")
+TEST_SUITE("ConditionalAction")
 {
     TEST_CASE("General Test")
     {
-        Action<int> action;
+        ConditionalAction<int> action;
         CHECK(action.empty());
         CHECK(action.size() == 0);
 
         int testData = 0;
-        auto callback = [](int n, void *userdata) {
+        auto callback = [](int n, void *userdata) -> Bool {
             auto testData = static_cast<int *>(userdata);
             *testData = n;
+            return True;
         };
 
         action.add(callback, &testData);
@@ -35,10 +36,10 @@ TEST_SUITE("Action")
 
     TEST_CASE("contains")
     {
-        Action<int> action;
-        auto func1 = [](int i, void *userptr) { };
-        auto func2 = [](int i, void *userptr) { };
-        auto func3 = [](int i, void *userptr) { };
+        ConditionalAction<int> action;
+        auto func1 = [](int i, void *userptr) { return True; };
+        auto func2 = [](int i, void *userptr) { return True; };
+        auto func3 = [](int i, void *userptr) { return True; };
 
         CHECK( !action.contains(func1) );
         CHECK( !action.contains(func2) );
@@ -80,7 +81,7 @@ TEST_SUITE("Action")
 
     TEST_CASE("Mismatched context or pointer will not remove callback")
     {
-        Action<int> action;
+        ConditionalAction<int> action;
 
         struct UserData {
             int value{};
@@ -89,11 +90,13 @@ TEST_SUITE("Action")
         auto timesTwo = [](int n, void *userptr) {
             auto data = static_cast<UserData *>(userptr);
             data->value = n * 2;
+            return True;
         };
 
         auto plusTwo = [](int n, void *userptr) {
             auto data = static_cast<UserData *>(userptr);
             data->value = n + 2;
+            return True;
         };
 
         action.add(timesTwo, &dataA);
@@ -129,10 +132,10 @@ TEST_SUITE("Action")
 
     TEST_CASE("Removal during invoke")
     {
-        Action<Int, const String &> action;
+        ConditionalAction<Int, const String &> action;
         struct UserData {
-            Action<Int, const String &> *action;
-            funcptr_t< void(Int, const String &, void *)> func;
+            ConditionalAction<Int, const String &> *action;
+            funcptr_t< Bool(Int, const String &, void *)> func;
             Int intValue;
             String stringValue;
         };
@@ -143,6 +146,8 @@ TEST_SUITE("Action")
             data->intValue = i;
             data->stringValue = s;
             data->action->remove(data->func, userptr);
+
+            return True;
         };
         auto data1 = UserData {
             .action = &action,
@@ -157,6 +162,7 @@ TEST_SUITE("Action")
             data->intValue = i * 2;
             data->stringValue = s + s;
             data->action->remove(data->func, userptr);
+            return True;
         };
         auto data2 = UserData {
             .action = &action,
@@ -171,6 +177,7 @@ TEST_SUITE("Action")
             data->intValue = i * 3;
             data->stringValue = s + s + s;
             data->action->remove(data->func, userptr);
+            return True;
         };
         auto data3 = UserData {
             .action = &action,
@@ -183,6 +190,7 @@ TEST_SUITE("Action")
             auto data = static_cast<UserData *>(userptr);
             data->intValue = i * 4;
             data->stringValue = s + s + s + s;
+            return True;
         };
         auto data4 = UserData {
             .action = &action,
@@ -209,7 +217,7 @@ TEST_SUITE("Action")
         CHECK(action.size() == 1); // each call back except callback4 has unsubscribed itself
         CHECK(action.contains(callback4, &data4));
 
-        // Calling the Action will not affect the unsubscribed callbacks
+        // Calling the ConditionalAction will not affect the unsubscribed callbacks
         action(20, "goodbye");
         CHECK(data1.intValue == 10); // maintains value
         CHECK(data2.intValue == 20);
@@ -227,11 +235,11 @@ TEST_SUITE("Action")
             int value;
         };
 
-        Action<const UserData &> action;
-        action.add([](const UserData &ud, void *data) {});
-        action.add([](const UserData &ud, void *data) {});
-        action.add([](const UserData &ud, void *data) {});
-        action.add([](const UserData &ud, void *data) {});
+        ConditionalAction<const UserData &> action;
+        action.add([](const UserData &ud, void *data) { return True; });
+        action.add([](const UserData &ud, void *data) { return True; });
+        action.add([](const UserData &ud, void *data) { return True; });
+        action.add([](const UserData &ud, void *data) { return True; });
         CHECK(action.size() == 4);
 
         action.clear();
@@ -242,23 +250,26 @@ TEST_SUITE("Action")
     TEST_CASE("priority order")
     {
         List<Int> priorityTester{};
-        Action<Int> action;
+        ConditionalAction<Int> action;
 
         SUBCASE("Regular order")
         {
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(n);
+                return True;
             }, &priorityTester, 10);
 
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(2 * n);
+                return True;
             }, &priorityTester, 15);
 
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(3 * n);
+                return True;
             }, &priorityTester, 25);
 
             action(5);
@@ -273,16 +284,19 @@ TEST_SUITE("Action")
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(n);
+                return True;
             }, &priorityTester, 25);
 
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(2 * n);
+                return True;
             }, &priorityTester, 15);
 
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(3 * n);
+                return True;
             }, &priorityTester, -15);
 
             action(5);
@@ -297,16 +311,19 @@ TEST_SUITE("Action")
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(n);
+                return True;
             }, &priorityTester, 15);
 
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(2 * n);
+                return True;
             }, &priorityTester, 25);
 
             action.add([](Int n, void *data) {
                 auto list = static_cast<List<Int> *>(data);
                 list->emplace_back(3 * n);
+                return True;
             }, &priorityTester, -15);
 
             action(5);
@@ -315,5 +332,39 @@ TEST_SUITE("Action")
             CHECK(priorityTester.at(1) == 5);
             CHECK(priorityTester.at(2) == 10);
         }
+    }
+
+    TEST_CASE("Break mid callback")
+    {
+        List<int> list{};
+        ConditionalAction<int> action;
+
+        action.add([](int n, void *userptr) {
+            static_cast<List<int> *>(userptr)->emplace_back(n);
+            return True;
+        }, &list);
+
+        action.add([](int n, void *userptr) {
+            if (n < 10)
+            {
+                static_cast<List<int> *>(userptr)->emplace_back(n * 2);
+                return True;
+            }
+            else
+            {
+                return False;
+            }
+
+        }, &list);
+
+        action.add([](int n, void *userptr) {
+            static_cast<List<int> *>(userptr)->emplace_back(n * 3);
+            return True;
+        }, &list);
+
+        CHECK( !action(20) );
+
+        CHECK(list.size() == 1);
+        CHECK(list.at(0) == 20);
     }
 }

@@ -33,16 +33,17 @@ auto CursorMgr::set(const String &key) -> Bool
         return False;
     }
 
-    auto it = m_customCursors.find(String(key));
-
-    if (it == m_customCursors.end())
+    if (const auto it = m_customCursors.find(String(key));
+        it == m_customCursors.end())
     {
         KAZE_CORE_ERRCODE(Error::MissingKeyErr,
             "Attempted to set cursor with key \"{}\", but it does not exist.", key);
         return False;
     }
-
-    return backend::cursor::setCursor(m_window, it->second);
+    else
+    {
+        return backend::cursor::setCursor(m_window, it->second);
+    }
 }
 
 auto CursorMgr::set(CursorType type) -> Bool
@@ -53,9 +54,8 @@ auto CursorMgr::set(CursorType type) -> Bool
         return False;
     }
 
-    CursorHandle cursor;
-
     // Get cursor if it exists
+    CursorHandle cursor;
     if (auto it = m_systemCursors.find(type); it != m_systemCursors.end())
     {
         cursor = it->second;

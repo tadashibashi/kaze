@@ -104,7 +104,10 @@ int main(int argc, const char *argv[])
         .mouseMotionCallback = [](const MouseMotionEvent &e, Double timestamp, void *userptr) {
             const auto app = static_cast<AppData *>(userptr);
             if (app->logMousePos)
-                KAZE_LOG("Mouse moved: {{{}, {}}}", e.position.x, e.position.y);
+            {
+                KAZE_LOG("Mouse moved: {{{}, {}}}, relative: {{{}, {}}}",
+                    e.position.x, e.position.y, e.relative.x, e.relative.y);
+            }
         },
         .mouseScrollCallback = [](const MouseScrollEvent &e, Double timestamp, void *userptr) {
             KAZE_LOG("Scrolled: {}, {}", e.offset.x, e.offset.y);

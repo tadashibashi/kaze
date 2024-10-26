@@ -15,7 +15,8 @@ namespace backend
     template <typename T>
     class WindowHandleContainer {
         std::mutex m_windowMutex{};
-        Dictionary<WindowHandle, T> m_windows{};
+        Dictionary<WindowHandle, T> m_data{};
+        List<WindowHandle> m_windows;
         WindowHandle m_mainWindow{};
     public:
         /// Add a window to the container
@@ -44,6 +45,19 @@ namespace backend
         bool getData(WindowHandle window, T **outData) noexcept;
 
         [[nodiscard]]
+        auto begin() noexcept { return m_windows.begin(); }
+        [[nodiscard]]
+        auto end() noexcept { return m_windows.end(); }
+
+        auto data() const noexcept -> const Dictionary<WindowHandle, T> & { return m_data; }
+        auto data() noexcept -> Dictionary<WindowHandle, T> & { return m_data; }
+
+        [[nodiscard]]
+        auto begin() const noexcept { return m_windows.cbegin(); }
+        [[nodiscard]]
+        auto end() const noexcept { return m_windows.cend(); }
+
+        [[nodiscard]]
         auto size() const noexcept -> Size;
         [[nodiscard]]
         auto empty() const noexcept -> bool;
@@ -57,12 +71,13 @@ namespace backend
         std::lock_guard lockGuard(m_windowMutex);
         try
         {
-            auto it = m_windows.find(window);
-            if (it == m_windows.end())
+            auto it = m_data.find(window);
+            if (it == m_data.end())
             {
-                if (m_windows.empty())
+                if (m_data.empty())
                     m_mainWindow = window;
-                m_windows[window] = std::move(data);
+                m_data[window] = std::move(data);
+                m_windows.emplace_back(window);
             }
             else
             {
@@ -90,7 +105,7 @@ namespace backend
         try
         {
             if (outContains)
-                *outContains = m_windows.contains(window);
+                *outContains = m_data.contains(window);
             return true;
         }
         catch(const std::exception &e)
@@ -111,12 +126,19 @@ namespace backend
         std::lock_guard lockGuard(m_windowMutex);
         try
         {
-            const auto wasErased = m_windows.erase(window) > 0;
+            const auto wasErased = m_data.erase(window) > 0;
             if (outWasErased) // report whether a window was actually removed form the container
                 *outWasErased = wasErased;
 
-            if (window == m_mainWindow && !m_windows.empty()) // replace main window if it just got closed
-                m_mainWindow = m_windows.begin()->first;
+            if (window == m_mainWindow && !m_data.empty()) // replace main window if it just got closed
+                m_mainWindow = m_data.begin()->first;
+
+            if (const auto it = std::find(m_windows.begin(), m_windows.end(), window);
+                it != m_windows.end())
+            {
+                m_windows.erase(it);
+            }
+
             return true;
         }
         catch(const std::exception &e)
@@ -140,8 +162,8 @@ namespace backend
     {
         try
         {
-            auto it = m_windows.find(window);
-            if (it == m_windows.end())
+            auto it = m_data.find(window);
+            if (it == m_data.end())
             {
                 if (outData)
                     *outData = nullptr;
@@ -168,13 +190,13 @@ namespace backend
     template <typename T>
     auto WindowHandleContainer<T>::size() const noexcept -> Size
     {
-        return m_windows.size();
+        return m_data.size();
     }
 
     template <typename T>
     auto WindowHandleContainer<T>::empty() const noexcept -> bool
     {
-        return m_windows.empty();;
+        return m_data.empty();;
     }
 
     template <typename T>

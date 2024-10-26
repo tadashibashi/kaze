@@ -34,6 +34,9 @@ namespace backend {
 
         bool isDesktopFullscreen{};  ///< whether the window is in fullscreen with desktop mode on
         CursorHandle cursor{};
+        Vec2d lastCursorPos{};
+        Vec2d relCursorPos{};
+        bool isCapture{};
     };
 
     /// Get data from a glfw window

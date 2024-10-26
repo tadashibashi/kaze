@@ -109,18 +109,48 @@ namespace backend {
 
     static auto glfwCursorPosCallback(GLFWwindow *window, const double x, const double y) -> void
     {
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return;
+
         int w, h;
         glfwGetWindowSize(window, &w, &h);
 
-        if (x >= 0 && x < w && y >= 0 && y < h)
+        if (!data->isCapture)
+        {
+            if (x >= 0 && x < w && y >= 0 && y < h) // this matches sdl3's behavior
+            {
+                events.emit(MouseMotionEvent {
+                   .position = {
+                       static_cast<Float>(x),
+                       static_cast<Float>(y),
+                   },
+                   .relative = {
+                        static_cast<Float>(x - data->lastCursorPos.x),
+                        static_cast<Float>(y - data->lastCursorPos.y),
+                   },
+                   .window = window,
+                });
+            }
+
+            data->lastCursorPos = {x, y};
+        }
+        else
         {
             events.emit(MouseMotionEvent {
-               .position = {
-                   static_cast<Float>(x),
-                   static_cast<Float>(y),
-               },
-               .window = window,
+                .position = {
+                    static_cast<Float>(x),
+                    static_cast<Float>(y),
+                },
+                .relative = {
+                    static_cast<Float>(x - w/2.0),
+                    static_cast<Float>(y - h/2.0),
+                },
+                .window = window,
             });
+
+            glfwSetCursorPos(window, w/2.0, h/2.0);
+            data->relCursorPos += Vec2d{x, y};
         }
     }
 
@@ -259,7 +289,11 @@ namespace backend {
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);  WARN_CHECK("set window client api to none");
 
         const auto window = glfwCreateWindow(width, height, title, nullptr, nullptr); ERR_CHECK(Error::BE_RuntimeErr, "create GLFWwindow");
-        KAZE_ASSERT(window);
+        if ( !window )
+        {
+            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create window: {}", getGlfwErrorStr());
+            return false;
+        }
 
         // Set up window callbacks
         glfwSetWindowCloseCallback    ( window, glfwWindowCloseCallback ); WARN_CHECK("set window close callback");
@@ -277,7 +311,6 @@ namespace backend {
         glfwSetDropCallback           ( window, glfwDropCallback );        WARN_CHECK("set window drop callback");
         glfwSetCharCallback           ( window, glfwTextInputCallback );   WARN_CHECK("set window char callback");
 
-
         if (flags & WindowInit::Fullscreen)
         {
             if (!setFullscreen(window, true))
@@ -291,7 +324,12 @@ namespace backend {
             glfwShowWindow(window); WARN_CHECK("show window");
         }
 
-        if ( !windows.emplace(window, {}) )
+        double mouseX, mouseY;
+        glfwGetCursorPos(window, &mouseX, &mouseY);
+
+        if ( !windows.emplace(window, {
+            .lastCursorPos = {mouseX, mouseY}
+        }) )
         {
             glfwDestroyWindow(window); ERR_CHECK(Error::BE_RuntimeErr, "clean up window after failed data emplacement");
             return false;
@@ -932,16 +970,21 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
+        WindowData *data;
+        if ( !getWindowData(window, &data) ) return false;
+
         int glfwCursorMode = GLFW_CURSOR_NORMAL;
         switch(mode)
         {
         case CursorMode::Visible: glfwCursorMode = GLFW_CURSOR_NORMAL; break;
-        case CursorMode::Hidden:  glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
-        case CursorMode::Capture: glfwCursorMode = GLFW_CURSOR_CAPTURED; break;
+        case CursorMode::Hidden: glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
+        case CursorMode::Capture: glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
         default:
             KAZE_CORE_ERRCODE(Error::InvalidEnum, "Unknown `CursorMode` passed to `window::setCurosrMode`");
             return false;
         }
+
+        data->isCapture = (mode == CursorMode::Capture);
 
         glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR, glfwCursorMode);
         ERR_CHECK(Error::BE_RuntimeErr, "set cursor mode");
@@ -954,12 +997,20 @@ namespace backend {
         RETURN_IF_NULL(window);
         RETURN_IF_NULL(outMode);
 
+        WindowData *data;
+        if ( !getWindowData(window, &data) ) return false;
+
+        if (data->isCapture)
+        {
+            *outMode = CursorMode::Capture;
+            return true;
+        }
+
         const auto glfwCursorMode = glfwGetInputMode(WIN_CAST(window), GLFW_CURSOR);
         switch(glfwCursorMode)
         {
-        case GLFW_CURSOR_NORMAL: *outMode = CursorMode::Visible; break;
-        case GLFW_CURSOR_HIDDEN: *outMode = CursorMode::Hidden; break;
-        case GLFW_CURSOR_CAPTURED: *outMode = CursorMode::Capture; break;
+        case GLFW_CURSOR_NORMAL:   *outMode = CursorMode::Visible; break;
+        case GLFW_CURSOR_HIDDEN:   *outMode = CursorMode::Hidden; break;
         default:
             KAZE_CORE_ERRCODE(Error::BE_RuntimeErr,
                 "Internal error: unsupported or unknown cursor mode retrieved from window: {}",

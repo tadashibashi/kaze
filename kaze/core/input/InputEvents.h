@@ -68,6 +68,7 @@ struct MouseScrollEvent
 struct MouseMotionEvent
 {
     Vec2f position;         ///< position of mouse in window, or relative motion if relative mode is on
+    Vec2f relative;         ///< relative motion from last event
     WindowHandle window;    ///< window the mouse motion event occurred
 };
 
