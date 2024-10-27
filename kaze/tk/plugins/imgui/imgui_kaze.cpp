@@ -43,7 +43,7 @@ static auto toCursorType(const ImGuiMouseCursor cursor) -> CursorType
 {
     switch(cursor)
     {
-    case ImGuiMouseCursor_Arrow: return CursorType::Default;
+    case ImGuiMouseCursor_Arrow: return CursorType::Arrow;
     case ImGuiMouseCursor_TextInput: return CursorType::TextInput;
     case ImGuiMouseCursor_ResizeAll: return CursorType::Move;
     case ImGuiMouseCursor_ResizeNS: return CursorType::ResizeV;
@@ -54,7 +54,7 @@ static auto toCursorType(const ImGuiMouseCursor cursor) -> CursorType
     case ImGuiMouseCursor_NotAllowed: return CursorType::NotAllowed;
     default:
         KAZE_CORE_ERRCODE(Error::InvalidEnum, "Invalid ImGuiMouseCursor value passed: {}", cursor);
-        return CursorType::Default;
+        return CursorType::Arrow;
     }
 }
 

@@ -13,7 +13,7 @@ struct ImGuiKazeContext {
     Float fontSize;
     Double lastTime = 0;
     bool keyboardRequested = false; ///< last state keyboard requested
-    CursorType lastCursor = CursorType::Default;
+    CursorType lastCursor = CursorType::Arrow;
 };
 
 #define CONTEXT_CAST(userptr) static_cast<ImGuiKazeContext *>(userptr)

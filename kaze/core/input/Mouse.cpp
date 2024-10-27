@@ -52,7 +52,7 @@ auto Mouse::processEvent(const MouseMotionEvent &e) -> void
 {
     if (e.window == m_window)
     {
-        if (getMode() == CursorMode::Capture)
+        if (getMode() == CursorMode::Relative)
         {
             m_motion += e.position;
         }

@@ -64,13 +64,13 @@ int main(int argc, const char *argv[])
                     app->window.setFullscreen(!app->window.isFullscreen());
                     break;
                 case Key::C:
-                    if (app->window.getCursorMode() == CursorMode::Capture)
+                    if (app->window.getCursorMode() == CursorMode::Relative)
                     {
                         app->window.setCursorMode(CursorMode::Visible);
                     }
                     else
                     {
-                        app->window.setCursorMode(CursorMode::Capture);
+                        app->window.setCursorMode(CursorMode::Relative);
                     }
                     break;
                 case Key::M:

@@ -60,6 +60,16 @@ namespace backend {
     /// \returns the equivalen SDL_Scancode, granted the `key` is valid, otherwise the result is undefined.
     [[nodiscard]] auto toSDLKey(Key key) noexcept -> SDL_Scancode;
 
+    /// Convert SDL_BUTTON_* constant to MouseBtn
+    /// \param[in]  button   SDL mouse button
+    /// \returns related MouseBtn value
+    [[nodiscard]] auto toMouseBtn(Uint8 button) noexcept -> MouseBtn;
+
+    /// Convert MouseBtn to SDL_BUTTON_* constant
+    /// \param[in]  button  mouse button
+    /// \returns related SDL_BUTTON_* value
+    [[nodiscard]] auto toSDLMouseBtn(MouseBtn button) noexcept -> Uint8;
+
     /// Initialize the backend global variable internals. Must be called before calling any constant conversion func.
     auto initGlobals() noexcept -> void;
 

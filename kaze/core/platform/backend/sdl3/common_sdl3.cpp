@@ -4,6 +4,7 @@
 #include "window_sdl3.h"
 #include "private/GamepadConstants.inl"
 #include "private/KeyboardConstants.inl"
+#include "private/MouseConstants.inl"
 
 #include <kaze/core/memory.h>
 #include <kaze/core/platform/backend/backend.h>
@@ -47,6 +48,16 @@ namespace backend {
         return static_cast<SDL_Scancode>(s_keyToSdlKey[ static_cast<int>(key) ]);
     }
 
+    auto toMouseBtn(Uint8 button) noexcept -> MouseBtn
+    {
+        return s_toMouseButton[ button ];
+    }
+
+    auto toSDLMouseBtn(MouseBtn button) noexcept -> Uint8
+    {
+        return s_toSDLMouseButton[ static_cast<int>(button) ];
+    }
+
     auto initGlobals() noexcept -> void
     {
         // Initialize SDL key to kaze::Key array
@@ -73,6 +84,15 @@ namespace backend {
             for (Uint8 i = 0; const auto axis : s_gamepadAxisToSDL)
             {
                 s_sdlToGamepadAxis[axis] = i++;
+            }
+        }
+
+        // Initialize SDL mouse buttons
+        if (s_toMouseButton[SDL_BUTTON_X2] == (MouseBtn)0)
+        {
+            for (Uint8 i = 0; const auto button : s_toSDLMouseButton)
+            {
+                s_toMouseButton[button] = (MouseBtn)i++;
             }
         }
     }
@@ -248,7 +268,7 @@ namespace backend {
                 {
                     const auto window = SDL_GetWindowFromID(e.button.windowID);
                     events.emit(MouseButtonEvent {
-                        .button = static_cast<MouseBtn>(e.button.button - 1),
+                        .button = toMouseBtn(e.button.button),
                         .isDown = e.button.down,
                         .window = window
                     });
@@ -487,7 +507,7 @@ namespace backend {
             return false;
         }
 
-        if (type >= CursorType::Count || type < CursorType::Default)
+        if (type >= CursorType::Count || type < CursorType::Arrow)
         {
             KAZE_CORE_ERRCODE(Error::InvalidEnum, "CursorType was out of range");
             return false;

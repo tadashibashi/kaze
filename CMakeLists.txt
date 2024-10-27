@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.28)
 project(kaze_engine LANGUAGES CXX)
 
-# ===== C++ 20 Standard =======================================================
+# ===== C++ Standard =======================================================
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF) # No C++20 Modules in this project
 
@@ -19,6 +19,7 @@ else()
     set(KAZE_IS_ROOT OFF CACHE BOOL "" FORCE)
 endif()
 
+include(kaze/compiler_detection)
 include(kaze/utils)
 
 # ===== Options =================================================================
@@ -29,7 +30,7 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.user.txt)
     include(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.user.txt)
 endif()
 
-# Kaze Core Options
+# ----- Kaze Core Options -----
 set(KAZE_BACKEND        ${KAZE_BACKEND_DEFAULT}         CACHE STRING "Backend to compile Kaze with: glfw3, sdl3")
 set(KAZE_BACKEND_SHARED ${KAZE_BACKEND_SHARED_DEFAULT}  CACHE BOOL   "Whether to link dynamically to backend library; static linkage if false")
 set(KAZE_NO_NAMESPACE   OFF                             CACHE BOOL   "Unwrap all kaze engine types and functions into the global namespace")
@@ -40,7 +41,17 @@ set(KAZE_BUILD_TESTS   ${KAZE_IS_ROOT}       CACHE BOOL   "Make kaze unit tests 
 
 set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland support on Linux")
 
-# Kaze Toolkit Options
+# Validate backend. The name must correspond to the name of a folder in:
+# "kaze/platform/backend/", which contains a "plugin.cmake" file.
+# See cmake function `kaze_target_plugin`, located in `cmake/modules/kaze/utils.cmake` for more details.
+if (EXISTS "${KAZE_BACKEND_ROOT}/${KAZE_BACKEND}/plugin.cmake")
+    message("Kaze Backend: ${KAZE_BACKEND}")
+else()
+    message(FATAL_ERROR "Backend ${KAZE_BACKEND} is not supported by Kaze")
+endif()
+
+
+# ----- Kaze Toolkit Options -----
 set(KAZE_TK_IMGUI_PLUGIN  ON CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")
 
 # ===== Projects ==============================================================

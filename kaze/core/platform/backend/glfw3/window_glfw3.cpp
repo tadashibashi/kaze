@@ -978,13 +978,13 @@ namespace backend {
         {
         case CursorMode::Visible: glfwCursorMode = GLFW_CURSOR_NORMAL; break;
         case CursorMode::Hidden: glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
-        case CursorMode::Capture: glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
+        case CursorMode::Relative: glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
         default:
             KAZE_CORE_ERRCODE(Error::InvalidEnum, "Unknown `CursorMode` passed to `window::setCurosrMode`");
             return false;
         }
 
-        data->isCapture = (mode == CursorMode::Capture);
+        data->isCapture = (mode == CursorMode::Relative);
 
         glfwSetInputMode(WIN_CAST(window), GLFW_CURSOR, glfwCursorMode);
         ERR_CHECK(Error::BE_RuntimeErr, "set cursor mode");
@@ -1002,7 +1002,7 @@ namespace backend {
 
         if (data->isCapture)
         {
-            *outMode = CursorMode::Capture;
+            *outMode = CursorMode::Relative;
             return true;
         }
 

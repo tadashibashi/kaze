@@ -785,7 +785,7 @@ namespace backend {
         case CursorMode::Hidden:
             data->cursorVisibleMode = false;
             return SDL_SetWindowRelativeMouseMode(WIN_CAST(window), false);
-        case CursorMode::Capture:
+        case CursorMode::Relative:
             data->cursorVisibleMode = false;
             return SDL_SetWindowRelativeMouseMode(WIN_CAST(window), true);
         default:
@@ -809,7 +809,7 @@ namespace backend {
         }
         else if (SDL_GetWindowRelativeMouseMode(WIN_CAST(window)))
         {
-            *outMode = CursorMode::Capture;
+            *outMode = CursorMode::Relative;
         }
         else
         {
