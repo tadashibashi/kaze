@@ -254,7 +254,7 @@ namespace backend {
                     const auto offset = (e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) ?
                         Vec2f{ -e.wheel.x, -e.wheel.y } :
                         Vec2f{ e.wheel.x, e.wheel.y };
-#if KAZE_TARGET_EMSCRIPTEN
+#if KAZE_PLATFORM_EMSCRIPTEN
                     offset.x *= 0.01f;
 #endif
                     events.emit(MouseScrollEvent {

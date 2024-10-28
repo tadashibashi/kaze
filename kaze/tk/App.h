@@ -93,10 +93,13 @@ private:
 
     // ----- Private implementation -----
     auto preInit() -> Bool;
-    auto pollEvents() -> void;
-    auto runOneFrame() -> void;
+    auto oneTick() -> void; // indented to show what calls what
+        auto pollEvents() -> void;
+        auto frame() -> void;
+            auto doUpdate() -> void;
+            auto doRender() -> void;
     auto postClose() -> void;
-    auto renderAll() -> void;
+
 
     struct Impl;
     Impl *m;

@@ -62,7 +62,10 @@ public:
             for (const auto &callback : m_callbacks)
             {
                 if ( !callback(args...) )
+                {
+                    m_isCalling = false;
                     return False;
+                }
             }
             m_isCalling = false;
         }

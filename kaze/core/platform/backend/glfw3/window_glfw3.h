@@ -15,7 +15,7 @@ KAZE_NAMESPACE_BEGIN
 
 namespace backend {
 
-#if KAZE_TARGET_MACOS // Platform-specific fullscreen workaround for Mac (bugged out in glfw3)
+#if KAZE_PLATFORM_MACOS // Platform-specific fullscreen workaround for Mac (bugged out in glfw3)
     auto setWindowCocoaFullscreen(GLFWwindow *window, bool fullscreen) noexcept -> bool;
     auto getWindowCocoaFullscreen(GLFWwindow *window, bool *outFullscreen) noexcept -> bool;
 #endif

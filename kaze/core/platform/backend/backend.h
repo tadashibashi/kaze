@@ -25,16 +25,16 @@ namespace backend {
     struct PlatformCallbacks
     {
         void *userptr{};
-        funcptr_t<void(const FileDropEvent &e, double timestamp, void *userptr)>      fileDropCallback{[](auto...){}};
-        funcptr_t<void(const GamepadAxisEvent &e, double timestamp, void *userptr)>   gamepadAxisCallback{[](auto...){}};
-        funcptr_t<void(const GamepadButtonEvent &e, double timestamp, void *userptr)> gamepadButtonCallback{[](auto...){}};
-        funcptr_t<void(const GamepadConnectEvent &e, double timestamp, void *userptr)>gamepadConnectCallback{[](auto...){}};
-        funcptr_t<void(const KeyboardEvent &e, double timestamp, void *userptr)>      keyCallback{[](auto...){}};
-        funcptr_t<void(const MouseButtonEvent &e, double timestamp, void *userptr)>   mouseButtonCallback{[](auto...){}};
-        funcptr_t<void(const MouseMotionEvent &e, double timestamp, void *userptr)>   mouseMotionCallback{[](auto...){}};
-        funcptr_t<void(const MouseScrollEvent &e, double timestamp, void *userptr)>   mouseScrollCallback{[](auto...){}};
-        funcptr_t<void(const TextInputEvent &e, double timestamp, void *userptr)>     textInputCallback{[](auto...){}};
-        funcptr_t<void(const WindowEvent &e, double timestamp, void *userptr)>        windowCallback{[](auto...){}};
+        funcptr_t<void(const FileDropEvent &e, double timestamp, void *userptr)>       fileDropCallback{[](auto...){}};
+        funcptr_t<void(const GamepadAxisEvent &e, double timestamp, void *userptr)>    gamepadAxisCallback{[](auto...){}};
+        funcptr_t<void(const GamepadButtonEvent &e, double timestamp, void *userptr)>  gamepadButtonCallback{[](auto...){}};
+        funcptr_t<void(const GamepadConnectEvent &e, double timestamp, void *userptr)> gamepadConnectCallback{[](auto...){}};
+        funcptr_t<void(const KeyboardEvent &e, double timestamp, void *userptr)>       keyCallback{[](auto...){}};
+        funcptr_t<void(const MouseButtonEvent &e, double timestamp, void *userptr)>    mouseButtonCallback{[](auto...){}};
+        funcptr_t<void(const MouseMotionEvent &e, double timestamp, void *userptr)>    mouseMotionCallback{[](auto...){}};
+        funcptr_t<void(const MouseScrollEvent &e, double timestamp, void *userptr)>    mouseScrollCallback{[](auto...){}};
+        funcptr_t<void(const TextInputEvent &e, double timestamp, void *userptr)>      textInputCallback{[](auto...){}};
+        funcptr_t<void(const WindowEvent &e, double timestamp, void *userptr)>         windowCallback{[](auto...){}};
 
         auto emit(const KeyboardEvent &e, double timestamp = 0) const -> void;
         auto emit(const MouseButtonEvent &e, double timestamp = 0) const -> void;

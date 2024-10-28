@@ -1,5 +1,4 @@
 #include "SpriteBatch.h"
-#include "bgfx/bgfx.h"
 
 #include <kaze/core/debug.h>
 #include <kaze/core/math/Vec/Vec3.h>
@@ -37,7 +36,7 @@ struct SpriteBatch::Impl
         TextureHandle texture; ///< gpu id of texture
     };
 
-    explicit Impl() : m_window(), m_uniforms()
+    explicit Impl() : m_graphics()
     {
 
     }
@@ -72,15 +71,14 @@ struct SpriteBatch::Impl
                     .add(Attrib::TexCoord0, 2, AttribType::Float)
                     .add(Attrib::Color0, 4, AttribType::Uint8, KAZE_TRUE)
                 .end(),
-            .initialVertexCount = 40000,
-            .initialIndexCount = 60000,
+            // .initialVertexCount = 40000,
+            // .initialIndexCount = 60000,
         });
 
         if ( !result )
             return KAZE_FALSE;
 
-        m_window = &graphics.window();
-        m_uniforms = &graphics.uniforms();
+        m_graphics = &graphics;
         return KAZE_TRUE;
     }
 
@@ -120,7 +118,7 @@ struct SpriteBatch::Impl
         else
         {
             // create transformation matrix based on window size
-            const auto size = m_window->getSize();
+            const auto size = m_graphics->window().getSize();
             m_defaultProjMtx = Mat4f::fromOrtho(0, size.x, 0, size.y);
             m_projMtx = m_defaultProjMtx.data();
         }
@@ -212,8 +210,8 @@ private:
         if (m_quads.empty()) return;
 
         auto targetQuads = m_quads.size();
-        const auto maxQuadsI = bgfx::getAvailTransientIndexBuffer(targetQuads * 6) / 6;
-        const auto maxQuadsV = bgfx::getAvailTransientVertexBuffer(targetQuads * 4, m_renderable.getLayout().getLayout()) / 4;
+        const auto maxQuadsI = m_graphics->getAvailTransientIBuffer(targetQuads * 6) / 6;
+        const auto maxQuadsV = m_graphics->getAvailTransientVBuffer(targetQuads * 4, m_renderable.getLayout()) / 4;
         targetQuads = mathf::min(maxQuadsI, maxQuadsV);
 
         // add any necessary indices
@@ -270,10 +268,10 @@ private:
     {
         if (m_batches.empty())
             return;
-        const auto size = m_window->getDisplaySize();
+        const auto size = m_graphics->window().getDisplaySize();
         m_renderable.setViewRect({0, 0, size.x, size.y});
         m_renderable.setViewTransform(m_viewMtx, m_projMtx);
-        m_renderable.setVertices(m_vertices);
+        m_renderable.setVertices(makeRef(m_vertices.data(), m_vertices.size()));
 
         if (m_indexUpdatedLastSize >= 0)
         {
@@ -283,10 +281,10 @@ private:
 
         for (const auto &[offset, count, texture] : m_batches)
         {
-            m_uniforms->setTexture(0, texture); // TODO: move setTexture to renderable? (needs to contain ref to UniformMgr)
-            m_renderable.activateIndices(offset * 6, count * 6);
-            m_renderable.activateVertices(offset * 4, count * 4);
-            m_renderable.submit();
+            m_graphics->uniforms().setTexture(0, texture); // TODO: move setTexture to renderable? (needs to contain ref to UniformMgr)
+            // m_renderable.activateIndices(offset * 6, count * 6);
+            // m_renderable.activateVertices(offset * 4, count * 4);
+            m_renderable.submit(offset * 4, count * 4, offset * 6, count * 6);
         }
     }
 
@@ -301,8 +299,7 @@ private:
 
     Bool m_batchStarted{};
     Renderable m_renderable{};
-    const Window *m_window{};
-    const UniformMgr *m_uniforms{};
+    const GraphicsMgr *m_graphics{};
 
     Int64 m_indexUpdatedLastSize{-1};
     Texture2D m_pixelTexture{};

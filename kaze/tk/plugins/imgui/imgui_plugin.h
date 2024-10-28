@@ -6,14 +6,14 @@
 
 KAZE_TK_NAMESPACE_BEGIN
 
-namespace imgui {
+namespace plugins::imgui {
     struct InitConfig {
         WindowHandle window;
+        Int viewId = 1;
         Float fontSize = 18.f;
     };
 
-    auto createPlugin(const InitConfig &config) -> AppPlugin;
+    auto create(const InitConfig &config) -> AppPlugin;
 }
-
 
 KAZE_TK_NAMESPACE_END

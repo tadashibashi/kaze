@@ -41,7 +41,7 @@ void App::run()
 
     m->isRunning = true;
     do {
-        runOneFrame();
+        oneTick();
     } while (m->isRunning);
 
     close();
@@ -114,7 +114,8 @@ auto App::removePlugin(const StringView name) -> Bool
 {
     return m->plugins.removePlugin(name);
 }
-auto kaze::tk::App::removePlugin(const AppPlugin &plugin) -> Bool
+
+auto App::removePlugin(const AppPlugin &plugin) -> Bool
 {
     return removePlugin(plugin.name());
 }
@@ -145,49 +146,75 @@ auto App::preInit() -> Bool
         .userptr = m,
         .gamepadAxisCallback = [] (const GamepadAxisEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.gamepadAxisEvent(e, impl->app);
+            if (impl->plugins.gpadAxisFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.gpadAxisEvent(e, timestamp, impl->app);
+            }
         },
         .gamepadButtonCallback = [] (const GamepadButtonEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.gamepadButtonEvent(e, impl->app);
+            if (impl->plugins.gpadButtonFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.gpadButtonEvent(e, timestamp, impl->app);
+            }
         },
         .gamepadConnectCallback = [] (const GamepadConnectEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.gamepadConnectEvent(e, impl->app);
+            if (impl->plugins.gpadConnectFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.gpadConnectEvent(e, timestamp, impl->app);
+            }
         },
         .keyCallback = [] (const KeyboardEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.keyboardEvent(e, impl->app);
+            if (impl->plugins.keyFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.keyEvent(e, timestamp, impl->app);
+            }
         },
         .mouseButtonCallback = [] (const MouseButtonEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.mouseButtonEvent(e, impl->app);
+            if (impl->plugins.mbuttonFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.mbuttonEvent(e, timestamp, impl->app);
+            }
         },
         .mouseMotionCallback = [] (const MouseMotionEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.mouseMotionEvent(e, impl->app);
+            if (impl->plugins.mmotionFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.mmotionEvent(e, timestamp, impl->app);
+            }
         },
         .mouseScrollCallback = [] (const MouseScrollEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.mouseScrollEvent(e, impl->app);
+            if (impl->plugins.mscrollFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.mscrollEvent(e, timestamp, impl->app);
+            }
         },
         .textInputCallback = [] (const TextInputEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-            impl->input.processEvent(e, timestamp);
-            impl->plugins.textInputEvent(e, impl->app);
+            if (impl->plugins.textInputFilter(e, timestamp, impl->app))
+            {
+                impl->input.processEvent(e, timestamp);
+                impl->plugins.textInputEvent(e, timestamp, impl->app);
+            }
         },
         .windowCallback = [] (const WindowEvent &e, const Double timestamp, void *userdata) {
             const auto impl = static_cast<Impl *>(userdata);
-
-            impl->plugins.windowEvent(e, impl->app);
-            impl->app->processWindowEvent(e, timestamp);
+            if (impl->plugins.windowFilter(e, timestamp, impl->app))
+            {
+                impl->app->processWindowEvent(e, timestamp);
+                impl->plugins.windowEvent(e, timestamp, impl->app);
+            }
         }
     });
 
@@ -210,7 +237,8 @@ auto App::processWindowEvent(const WindowEvent &e, const Double timestamp) -> vo
         if (m->window.getHandle() == e.window)
         {
             m->graphics.reset(e.data0, e.data1);
-            renderAll();
+
+            doRender();
             m->graphics.frame();
             m->graphics.renderFrame();
         }
@@ -227,7 +255,7 @@ void App::pollEvents()
     m->input.postProcessEvents();
 }
 
-auto App::renderAll() -> void
+auto App::doRender() -> void
 {
     m->plugins.preRender(this);
     render();
@@ -238,7 +266,7 @@ auto App::renderAll() -> void
     m->plugins.postRenderUI.reverseInvoke(this);
 }
 
-void App::runOneFrame()
+auto App::oneTick() -> void
 {
     double currentTime = 0;
     backend::getTime(&currentTime);
@@ -246,17 +274,25 @@ void App::runOneFrame()
 
     pollEvents();
 
-    m->plugins.preFrame(this);
+    frame();
+
+    m->lastTime = currentTime;
+}
+
+auto App::doUpdate() -> void
+{
     m->plugins.preUpdate(this);
     update();
     m->plugins.postUpdate.reverseInvoke(this);
+}
 
-    renderAll();
-
+auto App::frame() -> void
+{
+    m->plugins.preFrame(this);
+    doUpdate();
+    doRender();
     m->graphics.frame();
     m->plugins.postFrame.reverseInvoke(this);
-
-    m->lastTime = currentTime;
 }
 
 KAZE_TK_NAMESPACE_END

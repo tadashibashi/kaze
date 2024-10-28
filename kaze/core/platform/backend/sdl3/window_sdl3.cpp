@@ -110,7 +110,7 @@ namespace backend {
         WindowHandle *outWindow) noexcept -> bool
     {
         auto sdl3Flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
-    #ifdef KAZE_TARGET_APPLE
+    #ifdef KAZE_PLATFORM_APPLE
         sdl3Flags |= SDL_WINDOW_METAL;
     #endif
         if (flags & WindowInit::Resizable)

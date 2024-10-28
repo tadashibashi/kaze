@@ -9,23 +9,23 @@
 
 #include <GLFW/glfw3.h>
 
-#if   KAZE_TARGET_WINDOWS
+#if   KAZE_PLATFORM_WINDOWS
 #   define GLFW_EXPOSE_NATIVE_WIN32
-#elif KAZE_TARGET_MACOS
+#elif KAZE_PLATFORM_MACOS
 #   define GLFW_EXPOSE_NATIVE_COCOA
-#elif KAZE_TARGET_LINUX
+#elif KAZE_PLATFORM_LINUX
 #   if KAZE_USE_WAYLAND
 #       define GLFW_EXPOSE_NATIVE_WAYLAND
 #   else
 #       define GLFW_EXPOSE_NATIVE_X11
 #   endif
-# elif KAZE_TARGET_EMSCRIPTEN
+# elif KAZE_PLATFORM_EMSCRIPTEN
 // webgl
 #else
 #   error GLFW does not support the current platform...
 #endif
 
-#if !KAZE_TARGET_EMSCRIPTEN
+#if !KAZE_PLATFORM_EMSCRIPTEN
 #include <GLFW/glfw3native.h>
 #endif
 
@@ -34,17 +34,17 @@ KAZE_NAMESPACE_BEGIN
 namespace backend {
     window::NativePlatformData window::getNativeInfo(const WindowHandle window) noexcept
     {
-    #if   KAZE_TARGET_WINDOWS
+    #if   KAZE_PLATFORM_WINDOWS
         return {
             .windowHandle = glfwGetWin32Window(WIN_CAST(window)),
             .displayType = nullptr,
         };
-    #elif KAZE_TARGET_MACOS
+    #elif KAZE_PLATFORM_MACOS
         return {
             .windowHandle = glfwGetCocoaWindow(WIN_CAST(window)),
             .displayType = nullptr,
         };
-    #elif KAZE_TARGET_LINUX
+    #elif KAZE_PLATFORM_LINUX
     #   if KAZE_USE_WAYLAND
         return {
             .windowHandle = glfwGetWaylandWindow(WIN_CAST(window)),
@@ -452,7 +452,7 @@ namespace backend {
         RETURN_IF_NULL(window);
         RETURN_IF_NULL(outFullscreen);
 
-#if KAZE_TARGET_MACOS
+#if KAZE_PLATFORM_MACOS
         if ( !getWindowCocoaFullscreen(WIN_CAST(window), outFullscreen) )
             return false;
 #else
@@ -498,7 +498,7 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
-#if KAZE_TARGET_MACOS
+#if KAZE_PLATFORM_MACOS
         return setWindowCocoaFullscreen(WIN_CAST(window), fullscreen);
 #else
         WindowData *data;

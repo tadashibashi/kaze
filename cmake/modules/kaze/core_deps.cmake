@@ -46,31 +46,24 @@ set(GLM_BUILD_INSTALL         OFF CACHE BOOL "Generate the GLM install target")
 if (KAZE_COMPILER_SUPPORTS_SSE2)
     set(GLM_ENABLE_SIMD_SSE2      ON "Enable SSE2 optimizations")
 endif()
-
 if (KAZE_COMPILER_SUPPORTS_SSE3)
     set(GLM_ENABLE_SIMD_SSE3      ON "Enable SSE3 optimizations")
 endif()
-
 if (KAZE_COMPILER_SUPPORTS_SSSE3)
     set(GLM_ENABLE_SIMD_SSSE3     ON "Enable SSSE3 optimizations")
 endif()
-
 if (KAZE_COMPILER_SUPPORTS_SSE4_1)
     set(GLM_ENABLE_SIMD_SSE4_1    ON "Enable SSE 4.1 optimizations")
 endif()
-
 if (KAZE_COMPILER_SUPPORTS_SSE4_2)
     set(GLM_ENABLE_SIMD_SSE4_2    ON "Enable SSE 4.2 optimizations")
 endif()
-
 if (KAZE_COMPILER_SUPPORTS_AVX)
     set(GLM_ENABLE_SIMD_AVX       ON "Enable AVX optimizations")
 endif()
-
 if (KAZE_COMPILER_SUPPORTS_AVX2)
     set(GLM_ENABLE_SIMD_AVX2      ON "Enable AVX2 optimizations")
 endif()
-
 if (KAZE_COMPILER_SUPPORTS_ARM_NEON)
     set(GLM_TEST_ENABLE_SIMD_NEON ON "Enable ARM NEON optimizations")
 endif()

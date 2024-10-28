@@ -7,6 +7,8 @@
 
 KAZE_TK_NAMESPACE_BEGIN
 
+namespace plugins::imgui {
+
 static CursorMgr s_cursors{};
 
 auto ImGui_ImplKaze_SetViewportSize(const WindowHandle window) -> void
@@ -99,6 +101,8 @@ auto ImGui_ImplKaze_Init(ImGuiKazeContext *context) -> Bool
     io.GetClipboardTextFn = ImGui_ImplKaze_GetClipboardText;
     io.ClipboardUserData = nullptr;
 
+    io.UserData = context;
+
     // Set platform dependent data
     const auto viewport = ImGui::GetMainViewport();
     const auto [windowHandle, displayType] = backend::window::getNativeInfo(context->window);
@@ -137,6 +141,8 @@ auto ImGui_ImplKaze_NewFrame(ImGuiKazeContext *context) -> void
         ImGui::DestroyContext(context->context);
 
     s_cursors.clear();
+}
+
 }
 
 KAZE_TK_NAMESPACE_END

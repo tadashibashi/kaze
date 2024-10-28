@@ -44,6 +44,7 @@ struct Error
         MissingKeyErr,        ///< Dictionary/Map is missing an expected key
         DuplicateKey,         ///< Attempted to add a duplicate key into a Dictionary/Map when not permitted
         InvalidArgErr,        ///< Argument is not valid
+        PlatformErr,          ///< Platform-specific error
         Unsupported,          ///< Feature not supported
 
         Count                 ///< Number of error codes

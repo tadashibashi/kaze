@@ -20,6 +20,7 @@ else()
 endif()
 
 include(kaze/compiler_detection)
+include(kaze/platform_detection)
 include(kaze/utils)
 
 # ===== Options =================================================================
@@ -40,15 +41,6 @@ set(KAZE_DEBUG         ${KAZE_DEBUG_DEFAULT} CACHE BOOL   "Build with debug mode
 set(KAZE_BUILD_TESTS   ${KAZE_IS_ROOT}       CACHE BOOL   "Make kaze unit tests available for compilation")
 
 set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland support on Linux")
-
-# Validate backend. The name must correspond to the name of a folder in:
-# "kaze/platform/backend/", which contains a "plugin.cmake" file.
-# See cmake function `kaze_target_plugin`, located in `cmake/modules/kaze/utils.cmake` for more details.
-if (EXISTS "${KAZE_BACKEND_ROOT}/${KAZE_BACKEND}/plugin.cmake")
-    message("Kaze Backend: ${KAZE_BACKEND}")
-else()
-    message(FATAL_ERROR "Backend ${KAZE_BACKEND} is not supported by Kaze")
-endif()
 
 
 # ----- Kaze Toolkit Options -----

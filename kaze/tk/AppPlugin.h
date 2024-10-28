@@ -15,6 +15,7 @@ public:
     {
         void *userptr{};                                            ///< associated user data context passed into each callback
 
+
         // ----- App events -----
         funcptr_t<void (App *app, void *userptr)> init{};           ///< occurs after the app has successfully initialized; called immediately if already initialized: initialize resources here
         funcptr_t<void (App *app, void *userptr)> preFrame{};       ///< occurs at the start of the app frame
@@ -28,15 +29,30 @@ public:
         funcptr_t<void (App *app, void *userptr)> close{};          ///< occurs right before the app closes or disposes of this plugin: clean up resources here, e.g. userptr.
 
         // ----- Input and System events -----
-        funcptr_t<void (const GamepadAxisEvent &e, App *app, void *userptr)>    gamepadAxisEvent{};
-        funcptr_t<void (const GamepadButtonEvent &e, App *app, void *userptr)>  gamepadButtonEvent{};
-        funcptr_t<void (const GamepadConnectEvent &e, App *app, void *userptr)> gamepadConnectEvent{};
-        funcptr_t<void (const KeyboardEvent &e, App *app, void *userptr)>       keyboardEvent{};
-        funcptr_t<void (const MouseButtonEvent &e, App *app, void *userptr)>    mouseButtonEvent{};
-        funcptr_t<void (const MouseMotionEvent &e, App *app, void *userptr)>    mouseMotionEvent{};
-        funcptr_t<void (const MouseScrollEvent &e, App *app, void *userptr)>    mouseScrollEvent{};
-        funcptr_t<void (const TextInputEvent &e, App *app, void *userptr)>      textInputEvent{};
-        funcptr_t<void (const WindowEvent &e, App *app, void *userptr)>         windowEvent{};
+        // Filtered input events (ending in "Filter") enable the ability to prevent the rest of the app from
+        // forwarding the event if `False` is returned. Input state has not yet been processed by the App, so checking
+        // App->input() will not yet be updated to reflect the events received in these callbacks.
+        funcptr_t<Bool (const GamepadAxisEvent &e, Double, App *app, void *userptr)>    gpadAxisFilter{};
+        funcptr_t<Bool (const GamepadButtonEvent &e, Double, App *app, void *userptr)>  gpadButtonFilter{};
+        funcptr_t<Bool (const GamepadConnectEvent &e, Double, App *app, void *userptr)> gpadConnectFilter{};
+        funcptr_t<Bool (const KeyboardEvent &e, Double, App *app, void *userptr)>       keyFilter{};
+        funcptr_t<Bool (const MouseButtonEvent &e, Double, App *app, void *userptr)>    mbuttonFilter{};
+        funcptr_t<Bool (const MouseMotionEvent &e, Double, App *app, void *userptr)>    mmotionFilter{};
+        funcptr_t<Bool (const MouseScrollEvent &e, Double, App *app, void *userptr)>    mscrollFilter{};
+        funcptr_t<Bool (const TextInputEvent &e, Double, App *app, void *userptr)>      textInputFilter{};
+        funcptr_t<Bool (const WindowEvent &e, Double, App *app, void *userptr)>         windowFilter{};
+
+        // Regular input events (ending in "Event") occur after the filter stage, and after the application has
+        // processed these events.
+        funcptr_t<void (const GamepadAxisEvent &e, Double, App *app, void *userptr)>    gpadAxisEvent{};
+        funcptr_t<void (const GamepadButtonEvent &e, Double, App *app, void *userptr)>  gpadButtonEvent{};
+        funcptr_t<void (const GamepadConnectEvent &e, Double, App *app, void *userptr)> gpadConnectEvent{};
+        funcptr_t<void (const KeyboardEvent &e, Double, App *app, void *userptr)>       keyEvent{};
+        funcptr_t<void (const MouseButtonEvent &e, Double, App *app, void *userptr)>    mbuttonEvent{};
+        funcptr_t<void (const MouseMotionEvent &e, Double, App *app, void *userptr)>    mmotionEvent{};
+        funcptr_t<void (const MouseScrollEvent &e, Double, App *app, void *userptr)>    mscrollEvent{};
+        funcptr_t<void (const TextInputEvent &e, Double, App *app, void *userptr)>      textInputEvent{};
+        funcptr_t<void (const WindowEvent &e, Double, App *app, void *userptr)>         windowEvent{};
     };
 
     AppPlugin(StringView name, const Callbacks &callbacks) noexcept :

@@ -93,20 +93,39 @@ auto AppPluginMgr::removePluginCallbacks(const AppPlugin &plugin) -> void
     if (cb.close)
         close.remove(cb.close, cb.userptr);
 
-    if (cb.gamepadAxisEvent)
-        gamepadAxisEvent.remove(cb.gamepadAxisEvent, cb.userptr);
-    if (cb.gamepadButtonEvent)
-        gamepadButtonEvent.remove(cb.gamepadButtonEvent, cb.userptr);
-    if (cb.gamepadConnectEvent)
-        gamepadConnectEvent.remove(cb.gamepadConnectEvent, cb.userptr);
-    if (cb.keyboardEvent)
-        keyboardEvent.remove(cb.keyboardEvent, cb.userptr);
-    if (cb.mouseButtonEvent)
-        mouseButtonEvent.remove(cb.mouseButtonEvent, cb.userptr);
-    if (cb.mouseMotionEvent)
-        mouseMotionEvent.remove(cb.mouseMotionEvent, cb.userptr);
-    if (cb.mouseScrollEvent)
-        mouseScrollEvent.remove(cb.mouseScrollEvent, cb.userptr);
+    if (cb.gpadAxisFilter)
+        gpadAxisFilter.remove(cb.gpadAxisFilter, cb.userptr);
+    if (cb.gpadButtonFilter)
+        gpadButtonFilter.remove(cb.gpadButtonFilter, cb.userptr);
+    if (cb.gpadConnectFilter)
+        gpadConnectFilter.remove(cb.gpadConnectFilter, cb.userptr);
+    if (cb.keyFilter)
+        keyFilter.remove(cb.keyFilter, cb.userptr);
+    if (cb.mbuttonFilter)
+        mbuttonFilter.remove(cb.mbuttonFilter, cb.userptr);
+    if (cb.mmotionFilter)
+        mmotionFilter.remove(cb.mmotionFilter, cb.userptr);
+    if (cb.mscrollFilter)
+        mscrollFilter.remove(cb.mscrollFilter, cb.userptr);
+    if (cb.textInputFilter)
+        textInputFilter.remove(cb.textInputFilter, cb.userptr);
+    if (cb.windowFilter)
+        windowFilter.remove(cb.windowFilter, cb.userptr);
+
+    if (cb.gpadAxisEvent)
+        gpadAxisEvent.remove(cb.gpadAxisEvent, cb.userptr);
+    if (cb.gpadButtonEvent)
+        gpadButtonEvent.remove(cb.gpadButtonEvent, cb.userptr);
+    if (cb.gpadConnectEvent)
+        gpadConnectEvent.remove(cb.gpadConnectEvent, cb.userptr);
+    if (cb.keyEvent)
+        keyEvent.remove(cb.keyEvent, cb.userptr);
+    if (cb.mbuttonEvent)
+        mbuttonEvent.remove(cb.mbuttonEvent, cb.userptr);
+    if (cb.mmotionEvent)
+        mmotionEvent.remove(cb.mmotionEvent, cb.userptr);
+    if (cb.mscrollEvent)
+        mscrollEvent.remove(cb.mscrollEvent, cb.userptr);
     if (cb.textInputEvent)
         textInputEvent.remove(cb.textInputEvent, cb.userptr);
     if (cb.windowEvent)
@@ -135,20 +154,39 @@ auto AppPluginMgr::addPluginCallbacks(const AppPlugin &plugin) -> void
     if (cb.close)
         close.add(cb.close, cb.userptr);
 
-    if (cb.gamepadAxisEvent)
-        gamepadAxisEvent.add(cb.gamepadAxisEvent, cb.userptr);
-    if (cb.gamepadButtonEvent)
-        gamepadButtonEvent.add(cb.gamepadButtonEvent, cb.userptr);
-    if (cb.gamepadConnectEvent)
-        gamepadConnectEvent.add(cb.gamepadConnectEvent, cb.userptr);
-    if (cb.keyboardEvent)
-        keyboardEvent.add(cb.keyboardEvent, cb.userptr);
-    if (cb.mouseButtonEvent)
-        mouseButtonEvent.add(cb.mouseButtonEvent, cb.userptr);
-    if (cb.mouseMotionEvent)
-        mouseMotionEvent.add(cb.mouseMotionEvent, cb.userptr);
-    if (cb.mouseScrollEvent)
-        mouseScrollEvent.add(cb.mouseScrollEvent, cb.userptr);
+    if (cb.gpadAxisFilter)
+        gpadAxisFilter.add(cb.gpadAxisFilter, cb.userptr);
+    if (cb.gpadButtonFilter)
+        gpadButtonFilter.add(cb.gpadButtonFilter, cb.userptr);
+    if (cb.gpadConnectFilter)
+        gpadConnectFilter.add(cb.gpadConnectFilter, cb.userptr);
+    if (cb.keyFilter)
+        keyFilter.add(cb.keyFilter, cb.userptr);
+    if (cb.mbuttonFilter)
+        mbuttonFilter.add(cb.mbuttonFilter, cb.userptr);
+    if (cb.mmotionFilter)
+        mmotionFilter.add(cb.mmotionFilter, cb.userptr);
+    if (cb.mscrollFilter)
+        mscrollFilter.add(cb.mscrollFilter, cb.userptr);
+    if (cb.textInputFilter)
+        textInputFilter.add(cb.textInputFilter, cb.userptr);
+    if (cb.windowFilter)
+        windowFilter.add(cb.windowFilter, cb.userptr);
+
+    if (cb.gpadAxisEvent)
+        gpadAxisEvent.add(cb.gpadAxisEvent, cb.userptr);
+    if (cb.gpadButtonEvent)
+        gpadButtonEvent.add(cb.gpadButtonEvent, cb.userptr);
+    if (cb.gpadConnectEvent)
+        gpadConnectEvent.add(cb.gpadConnectEvent, cb.userptr);
+    if (cb.keyEvent)
+        keyEvent.add(cb.keyEvent, cb.userptr);
+    if (cb.mbuttonEvent)
+        mbuttonEvent.add(cb.mbuttonEvent, cb.userptr);
+    if (cb.mmotionEvent)
+        mmotionEvent.add(cb.mmotionEvent, cb.userptr);
+    if (cb.mscrollEvent)
+        mscrollEvent.add(cb.mscrollEvent, cb.userptr);
     if (cb.textInputEvent)
         textInputEvent.add(cb.textInputEvent, cb.userptr);
     if (cb.windowEvent)

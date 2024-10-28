@@ -7,9 +7,12 @@
 
 KAZE_TK_NAMESPACE_BEGIN
 
+namespace plugins::imgui {
+
 struct ImGuiKazeContext {
     ImGuiContext *context;
     WindowHandle window;
+    Int viewId;
     Float fontSize;
     Double lastTime = 0;
     bool keyboardRequested = false; ///< last state keyboard requested
@@ -23,5 +26,7 @@ auto ImGui_ImplKaze_Shutdown(ImGuiKazeContext *context) -> void;
 auto ImGui_ImplKaze_NewFrame(ImGuiKazeContext *context) -> void;
 
 auto ImGui_ImplKaze_SetViewportSize(WindowHandle window) -> void;
+
+}
 
 KAZE_TK_NAMESPACE_END

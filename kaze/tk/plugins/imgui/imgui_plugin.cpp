@@ -1,5 +1,4 @@
 #include "imgui_plugin.h"
-#include "bgfx/bgfx.h"
 #include "imgui_bgfx.h"
 #include "imgui_kaze.h"
 
@@ -10,12 +9,11 @@
 
 KAZE_TK_NAMESPACE_BEGIN
 
-namespace imgui {
+namespace plugins::imgui {
     static auto toImGuiColor(const Color &c) -> Uint
     {
         return c.toABGR8();
     }
-
 
     static Array<ImGuiKey, static_cast<Int>(Key::Count)> s_keyToImGuiKey = {
         ImGuiKey_Escape,
@@ -139,11 +137,12 @@ namespace imgui {
         ImGuiKey_Z,
     };
 
-    auto createPlugin(const InitConfig &config) -> AppPlugin
+    auto create(const InitConfig &config) -> AppPlugin
     {
         auto context = new ImGuiKazeContext {
             .context = nullptr,
             .window = config.window,
+            .viewId = config.viewId,
             .fontSize = config.fontSize,
         };
 
@@ -152,9 +151,7 @@ namespace imgui {
             .init = [](App *app, void *userdata)
             {
                 ImGui_ImplKaze_Init(CONTEXT_CAST(userdata));
-                ImGui_Implbgfx_Init(1);
-
-                auto &platformIo = ImGui::GetPlatformIO();
+                ImGui_Implbgfx_Init(CONTEXT_CAST(userdata)->viewId);
             },
             .preFrame = [](App *app, void *userdata)
             {
@@ -173,22 +170,24 @@ namespace imgui {
                 ImGui_ImplKaze_Shutdown(CONTEXT_CAST(userdata));
                 delete CONTEXT_CAST(userdata);
             },
-            .keyboardEvent = [](const KeyboardEvent &e, App *app, void *userdata)
+            .keyFilter = [](const KeyboardEvent &e, Double timestamp, App *app, void *userdata) -> Bool
             {
                 auto ctx = CONTEXT_CAST(userdata);
                 if (ctx->window != e.window)
-                    return;
+                    return True;
                 auto &io = ImGui::GetIO();
                 if (!e.isRepeat)
                 {
                     io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)], e.isDown);
                 }
+
+                return !io.WantCaptureKeyboard;
             },
-            .mouseButtonEvent = [](const MouseButtonEvent &e, App *app, void *userdata)
+            .mbuttonFilter = [](const MouseButtonEvent &e, Double timestamp, App *app, void *userdata) -> Bool
             {
                 auto ctx = CONTEXT_CAST(userdata);
                 if (ctx->window != e.window)
-                    return;
+                    return True;
 
                 auto &io = ImGui::GetIO();
 
@@ -201,39 +200,44 @@ namespace imgui {
                 case MouseBtn::Ext1: mouseButton = 3; break;
                 case MouseBtn::Ext2: mouseButton = 4; break;
                 default:
-                    return;
+                    return True;
                 }
 
                 io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
                 io.AddMouseButtonEvent(mouseButton, e.isDown);
+
+                return !io.WantCaptureMouse;
             },
-            .mouseMotionEvent = [](const MouseMotionEvent &e, App *app, void *userdata)
+            .mmotionFilter = [](const MouseMotionEvent &e, Double timestamp, App *app, void *userdata) -> Bool
             {
                 auto ctx = CONTEXT_CAST(userdata);
                 if (ctx->window != e.window)
-                    return;
+                    return True;
                 ImGui::GetIO().AddMousePosEvent(e.position.x, e.position.y);
+                return !ImGui::GetIO().WantCaptureMouse;
             },
-            .mouseScrollEvent = [](const MouseScrollEvent &e, App *app, void *userdata)
+            .mscrollFilter = [](const MouseScrollEvent &e, Double timestamp, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
                 if (ctx->window != e.window)
-                    return;
+                    return True;
                 ImGui::GetIO().AddMouseWheelEvent(-e.offset.x, -e.offset.y);
+                return !ImGui::GetIO().WantCaptureMouse;
             },
-            .textInputEvent = [](const TextInputEvent &e, App *app, void *userdata)
+            .textInputFilter = [](const TextInputEvent &e, Double timestamp, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
                 if (ctx->window != e.window)
-                    return;
+                    return True;
                 ImGui::GetIO().AddInputCharacter(e.codepoint);
+                return !ImGui::GetIO().WantTextInput;
             },
-            .windowEvent = [](const WindowEvent &e, App *app, void *userdata)
+            .windowFilter = [](const WindowEvent &e, Double timestamp, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
                 auto &io = ImGui::GetIO();
                 if (ctx->window != e.window)
-                    return;
+                    return True;
                 switch(e.type)
                 {
                 case WindowEvent::ResizedFramebuffer:
@@ -257,15 +261,12 @@ namespace imgui {
 
                 default: break;
                 }
+
+                return True;
             }
         });
 
         return plugin;
-    }
-
-    auto destroyPlugin(const AppPlugin &plugin) -> void
-    {
-
     }
 
 }  // namespace imgui

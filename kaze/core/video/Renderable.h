@@ -16,8 +16,6 @@ public:
         Shader vertShader;
         Shader fragShader;
         VertexLayout layout;
-        Int initialVertexCount{10000};
-        Int initialIndexCount{10000};
     };
 
     Renderable();
@@ -38,8 +36,8 @@ public:
         return setIndices(indices.data(), indices.size());
     }
 
-    auto activateVertices(Uint startVertex, Uint vertexCount) -> Renderable &;
-    auto activateIndices(Uint startIndex, Uint indexCount) -> Renderable &;
+    // auto activateVertices(Uint startVertex, Uint vertexCount) -> Renderable &;
+    // auto activateIndices(Uint startIndex, Uint indexCount) -> Renderable &;
 
     auto setViewTransform(const Mat4f &view, const Mat4f &projection) -> Renderable &;
     auto setViewTransform(const Float *view, const Float *projection) -> Renderable &;

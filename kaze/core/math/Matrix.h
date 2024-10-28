@@ -4,12 +4,11 @@
 #include <kaze/core/concepts.h>
 #include <kaze/core/math/Vec.hpp>
 
-#include <bgfx/bgfx.h>
-#include <bx/math.h>
-
 #include <glm/matrix.hpp>
 #include <glm/ext/matrix_clip_space.hpp>
 #include <glm/ext/matrix_transform.hpp>
+
+#include "private/mat4f.h"
 
 KAZE_NAMESPACE_BEGIN
 template <FloatingPoint T, Size Cols, Size Rows>
@@ -62,17 +61,25 @@ struct alignas(16) Matrix {
     [[nodiscard]] static constexpr auto fromOrtho(T left, T right, T top, T bottom) -> Matrix<T, Cols, Rows>
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
-        Matrix result;
-        bx::mtxOrtho(result.data(), left, right, bottom, top, 0, 100.f, 0, bgfx::getCaps()->homogeneousDepth);
-        return result;
+        Matrix<Float, 4, 4> result;
+        mathf::mat4f::ortho(result.data(), left, right, bottom, top, 0, 100.f, 0);
+
+        if constexpr (std::is_same_v<Float, T>)
+            return result;
+        else
+            return (Matrix<T, 4, 4>)result;
     }
 
     [[nodiscard]] static constexpr auto fromPerspective(T fovy, T aspect, T near, T far) -> Matrix<T, Cols, Rows>
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
-        Matrix result;
-        result.m_mat = glm::perspective(fovy, aspect, near, far);
-        return result;
+        Matrix<Float, 4, 4> result;
+        mathf::mat4f::proj(result.data(), fovy, aspect, near, far);
+
+        if constexpr (std::is_same_v<Float, T>)
+            return result;
+        else
+            return (Matrix<T, 4, 4>)result;
     }
 
     [[nodiscard]] constexpr auto isNaN() const noexcept -> bool

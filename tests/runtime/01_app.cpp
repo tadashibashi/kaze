@@ -114,7 +114,7 @@ private:
         camera.setViewport({0, 0, windowSize.x, windowSize.y});
         camera.setOrigin({0, 0});
 
-        addPlugin(imgui::createPlugin({
+        addPlugin(plugins::imgui::create({
             .window = window().getHandle()
         }));
 

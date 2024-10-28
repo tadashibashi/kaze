@@ -1,4 +1,5 @@
 #pragma once
+#include <kaze/core/ConditionalAction.h>
 #include <kaze/tk/lib.h>
 #include <kaze/tk/AppPlugin.h>
 #include <kaze/core/Action.h>
@@ -41,15 +42,25 @@ public:
     Action<App *> postFrame{};
     Action<App *> close{};
 
-    Action<const GamepadAxisEvent &, App *> gamepadAxisEvent{};
-    Action<const GamepadButtonEvent &, App *> gamepadButtonEvent{};
-    Action<const GamepadConnectEvent &, App *> gamepadConnectEvent{};
-    Action<const KeyboardEvent &, App *> keyboardEvent{};
-    Action<const MouseButtonEvent &, App *> mouseButtonEvent {};
-    Action<const MouseMotionEvent &, App *> mouseMotionEvent {};
-    Action<const MouseScrollEvent &, App *> mouseScrollEvent {};
-    Action<const TextInputEvent &, App *> textInputEvent{};
-    Action<const WindowEvent &, App *> windowEvent{};
+    ConditionalAction<const GamepadAxisEvent &, Double, App *> gpadAxisFilter{};
+    ConditionalAction<const GamepadButtonEvent &, Double, App *> gpadButtonFilter{};
+    ConditionalAction<const GamepadConnectEvent &, Double, App *> gpadConnectFilter{};
+    ConditionalAction<const KeyboardEvent &, Double, App *> keyFilter{};
+    ConditionalAction<const MouseButtonEvent &, Double, App *> mbuttonFilter{};
+    ConditionalAction<const MouseMotionEvent &, Double, App *> mmotionFilter{};
+    ConditionalAction<const MouseScrollEvent &, Double, App *> mscrollFilter{};
+    ConditionalAction<const TextInputEvent &, Double, App *> textInputFilter{};
+    ConditionalAction<const WindowEvent &, Double, App *> windowFilter{};
+
+    Action<const GamepadAxisEvent &, Double, App *> gpadAxisEvent{};
+    Action<const GamepadButtonEvent &, Double, App *> gpadButtonEvent{};
+    Action<const GamepadConnectEvent &, Double, App *> gpadConnectEvent{};
+    Action<const KeyboardEvent &, Double, App *> keyEvent{};
+    Action<const MouseButtonEvent &, Double, App *> mbuttonEvent{};
+    Action<const MouseMotionEvent &, Double, App *> mmotionEvent{};
+    Action<const MouseScrollEvent &, Double, App *> mscrollEvent{};
+    Action<const TextInputEvent &, Double, App *> textInputEvent{};
+    Action<const WindowEvent &, Double, App *> windowEvent{};
 private:
     auto removePluginCallbacks(const AppPlugin &plugin) -> void;
     auto addPluginCallbacks(const AppPlugin &plugin) -> void;

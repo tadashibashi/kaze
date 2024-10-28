@@ -66,6 +66,8 @@ add_library(${PROJECT_NAME}
         math/Vec/Vec3.h
         math/Vec/Vec4.h
         math/Vec.hpp
+        math/private/mat4f.h
+        math/private/mat4f.cpp
 
         platform/backend/backend.h
         platform/backend/backend.cpp
@@ -133,5 +135,4 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 )
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC lib.pch)
-kaze_target_plugin(${PROJECT_NAME} "${KAZE_BACKEND_ROOT}/${KAZE_BACKEND}")
-
+kaze_target_plugin(${PROJECT_NAME} platform)

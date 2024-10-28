@@ -7,64 +7,64 @@
 /// ===== Target platform definitions =========================================
 /// Update these as more platforms are supported
 #if defined(__EMSCRIPTEN__)              ///< Emscripten (WebAssembly)
-#   define KAZE_TARGET_EMSCRIPTEN 1
+#   define KAZE_PLATFORM_EMSCRIPTEN 1
 #elif defined(__APPLE__)                 ///< Apple (MacOS, iOS)
 #   include <TargetConditionals.h>
-#   define KAZE_TARGET_APPLE 1
+#   define KAZE_PLATFORM_APPLE 1
 #   if TARGET_OS_OSX
-#       define KAZE_TARGET_MACOS 1
+#       define KAZE_PLATFORM_MACOS 1
 #   elif TARGET_OS_IOS
-#       define KAZE_TARGET_IOS 1
+#       define KAZE_PLATFORM_IOS 1
 #   elif TARGET_OS_TV
-#       define KAZE_TARGET_TVOS 1
+#       define KAZE_PLATFORM_TVOS 1
 #   elif TARGET_OS_WATCH
-#       define KAZE_TARGET_WATCHOS 1
+#       define KAZE_PLATFORM_WATCHOS 1
 #   elif TARGET_OS_VISION
-#       define KAZE_TARGET_VISIONOS 1
+#       define KAZE_PLATFORM_VISIONOS 1
 #   elif TARGET_OS_SIMULATOR
-#       define KAZE_TARGET_APPLE_SIMULATOR 1
+#       define KAZE_PLATFORM_APPLE_SIMULATOR 1
 #   endif
 #elif defined(_WIN32)                  ///< Windows
-#   define KAZE_TARGET_WINDOWS 1
+#   define KAZE_PLATFORM_WINDOWS 1
 #elif defined(__ANDROID__)             ///< Android
-#   define KAZE_TARGET_ANDROID 1
+#   define KAZE_PLATFORM_ANDROID 1
 #elif defined(__linux__)               ///< Linux
-#   define KAZE_TARGET_LINUX 1
+#   define KAZE_PLATFORM_LINUX 1
 #endif
 
 // Catch missing defines
-#ifndef KAZE_TARGET_APPLE
-#   define KAZE_TARGET_APPLE 0
+#ifndef KAZE_PLATFORM_APPLE
+#   define KAZE_PLATFORM_APPLE 0
 #endif
-#ifndef KAZE_TARGET_MACOS
-#   define KAZE_TARGET_MACOS 0
+#ifndef KAZE_PLATFORM_MACOS
+#   define KAZE_PLATFORM_MACOS 0
 #endif
-#ifndef KAZE_TARGET_IOS
-#   define KAZE_TARGET_IOS 0
+#ifndef KAZE_PLATFORM_IOS
+#   define KAZE_PLATFORM_IOS 0
 #endif
-#ifndef KAZE_TARGET_TVOS
-#   define KAZE_TARGET_TVOS 0
+#ifndef KAZE_PLATFORM_TVOS
+#   define KAZE_PLATFORM_TVOS 0
 #endif
-#ifndef KAZE_TARGET_WATCHOS
-#   define KAZE_TARGET_WATCHOS 0
+#ifndef KAZE_PLATFORM_WATCHOS
+#   define KAZE_PLATFORM_WATCHOS 0
 #endif
-#ifndef KAZE_TARGET_VISIONOS
-#   define KAZE_TARGET_VISIONOS 0
+#ifndef KAZE_PLATFORM_VISIONOS
+#   define KAZE_PLATFORM_VISIONOS 0
 #endif
-#ifndef KAZE_TARGET_APPLE_SIMULATOR
-#   define KAZE_TARGET_APPLE_SIMULATOR 0
+#ifndef KAZE_PLATFORM_APPLE_SIMULATOR
+#   define KAZE_PLATFORM_APPLE_SIMULATOR 0
 #endif
-#ifndef KAZE_TARGET_WINDOWS
-#   define KAZE_TARGET_WINDOWS 0
+#ifndef KAZE_PLATFORM_WINDOWS
+#   define KAZE_PLATFORM_WINDOWS 0
 #endif
-#ifndef KAZE_TARGET_ANDROID
-#   define KAZE_TARGET_ANDROID 0
+#ifndef KAZE_PLATFORM_ANDROID
+#   define KAZE_PLATFORM_ANDROID 0
 #endif
-#ifndef KAZE_TARGET_LINUX
-#   define KAZE_TARGET_LINUX 0
+#ifndef KAZE_PLATFORM_LINUX
+#   define KAZE_PLATFORM_LINUX 0
 #endif
-#ifndef KAZE_TARGET_EMSCRIPTEN
-#   define KAZE_TARGET_EMSCRIPTEN 0
+#ifndef KAZE_PLATFORM_EMSCRIPTEN
+#   define KAZE_PLATFORM_EMSCRIPTEN 0
 #endif
 
 /// ===== Compiler definitions ================================================
@@ -271,16 +271,16 @@
 #   define KAZE_ARCH_X86_32 0
 #endif
 
-#if KAZE_TARGET_MACOS || KAZE_TARGET_WINDOWS || KAZE_TARGET_LINUX
-#   define KAZE_TARGET_DESKTOP 1
+#if KAZE_PLATFORM_MACOS || KAZE_PLATFORM_WINDOWS || KAZE_PLATFORM_LINUX
+#   define KAZE_PLATFORM_DESKTOP 1
 #else
-#   define KAZE_TARGET_DESKTOP 0
+#   define KAZE_PLATFORM_DESKTOP 0
 #endif
 
-#if KAZE_TARGET_ANDROID || KAZE_TARGET_IOS
-#   define KAZE_TARGET_MOBILE 1
+#if KAZE_PLATFORM_ANDROID || KAZE_PLATFORM_IOS
+#   define KAZE_PLATFORM_MOBILE 1
 #else
-#   define KAZE_TARGET_MOBILE 0
+#   define KAZE_PLATFORM_MOBILE 0
 #endif
 
 #endif // kaze_core_platform_platformdefines_h_

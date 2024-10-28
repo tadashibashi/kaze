@@ -1,11 +1,17 @@
 #include "imgui_bgfx.h"
 #include "imgui/imgui.h"
 
+#include <kaze/core/memory.h>
+
 // BGFX/BX
 #include <bgfx/bgfx.h>
 #include <bgfx/embedded_shader.h>
 #include <bx/math.h>
 #include <bx/timer.h>
+
+KAZE_TK_NAMESPACE_BEGIN
+
+namespace plugins::imgui {
 
 // Data
 static uint8_t g_View = 255;
@@ -69,13 +75,13 @@ void ImGui_Implbgfx_RenderDrawLists(ImDrawData* draw_data)
         bgfx::allocTransientVertexBuffer(&tvb, numVertices, g_VertexLayout);
         bgfx::allocTransientIndexBuffer(&tib, numIndices);
 
-        ImDrawVert* verts = (ImDrawVert*)tvb.data;
-        memcpy(
+        ImDrawVert *verts = (ImDrawVert *)tvb.data;
+        memory::copy(
             verts, cmd_list->VtxBuffer.begin(),
             numVertices * sizeof(ImDrawVert));
 
-        ImDrawIdx* indices = (ImDrawIdx*)tib.data;
-        memcpy(
+        ImDrawIdx *indices = (ImDrawIdx *)tib.data;
+        memory::copy(
             indices, cmd_list->IdxBuffer.begin(),
             numIndices * sizeof(ImDrawIdx));
 
@@ -184,3 +190,7 @@ void ImGui_Implbgfx_NewFrame()
         ImGui_Implbgfx_CreateDeviceObjects();
     }
 }
+
+}
+
+KAZE_TK_NAMESPACE_END

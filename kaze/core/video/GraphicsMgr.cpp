@@ -3,6 +3,7 @@
 
 #include <kaze/core/debug.h>
 #include <kaze/core/platform/backend/backend.h>
+#include <kaze/core/video/VertexLayout.h>
 
 #include <bgfx/bgfx.h>
 #include <bgfx/platform.h>
@@ -133,6 +134,16 @@ auto GraphicsMgr::uniforms() const noexcept -> const UniformMgr &
 auto GraphicsMgr::uniforms() -> UniformMgr &
 {
     return m->uniforms;
+}
+
+auto GraphicsMgr::getAvailTransientVBuffer(Uint requestedCount, const VertexLayout &layout) const noexcept -> Uint
+{
+    return bgfx::getAvailTransientVertexBuffer(requestedCount, layout.getLayout());
+}
+
+auto GraphicsMgr::getAvailTransientIBuffer(Uint requestedCount) const noexcept -> Uint
+{
+    return bgfx::getAvailTransientIndexBuffer(requestedCount);
 }
 
 KAZE_NAMESPACE_END

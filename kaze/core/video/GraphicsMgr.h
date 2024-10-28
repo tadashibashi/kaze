@@ -7,9 +7,10 @@
 #include "UniformMgr.h"
 
 KAZE_NAMESPACE_BEGIN
-    class Window;
+class Window;
+class VertexLayout;
 
-    struct GraphicsInit
+struct GraphicsInit
 {
     WindowHandle window;  ///< A valid window that is already open
     Color clearColor = {100, 154, 206, 235}; /// Default background clear color
@@ -36,6 +37,9 @@ public:
     auto window() const noexcept -> const Window &;
     auto uniforms() const noexcept -> const UniformMgr &;
     auto uniforms() -> UniformMgr &;
+
+    auto getAvailTransientVBuffer(Uint requestedCount, const VertexLayout &layout) const noexcept -> Uint;
+    auto getAvailTransientIBuffer(Uint requestedCount) const noexcept -> Uint;
 private:
     struct Impl;
     Impl *m;
