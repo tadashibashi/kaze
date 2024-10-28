@@ -222,7 +222,7 @@ private:
             m_indices.reserve(targetIndices);
             for (auto curQuad = m_indices.size() / 6; curQuad < targetQuads; ++curQuad)
             {
-                auto vertexIndex = curQuad * 4;
+                auto vertexIndex = static_cast<Uint16>(curQuad * 4);
                 m_indices.emplace_back(vertexIndex);
                 m_indices.emplace_back(vertexIndex + 1);
                 m_indices.emplace_back(vertexIndex + 2);

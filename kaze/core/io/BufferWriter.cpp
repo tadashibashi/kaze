@@ -1,5 +1,7 @@
 #include "BufferWriter.h"
 
+#include <kaze/core/debug.h>
+
 KAZE_NAMESPACE_BEGIN
 
 BufferWriter::BufferWriter(const BufferWriterInit &initConfig) :

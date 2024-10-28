@@ -5,6 +5,8 @@
 #include <kaze/core/memory.h>
 #include <kaze/core/MemView.h>
 
+#include <kaze/core/errors.h>
+
 KAZE_NAMESPACE_BEGIN
 
 struct BufferWriterInit {

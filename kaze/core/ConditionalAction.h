@@ -2,6 +2,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/traits.h>
 
+#include <algorithm>
 #include <ranges>
 
 KAZE_NAMESPACE_BEGIN

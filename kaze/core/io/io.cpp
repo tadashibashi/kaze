@@ -32,8 +32,10 @@ static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
         return KAZE_FALSE;
     }
 
-    Size b = 0;
-    for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerRead); b <= limit; b += BytesPerRead)
+    Int64 b = 0;
+    for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerRead); 
+        b <= limit; 
+        b += BytesPerRead)
     {
         if ( !file.read((char *)data + b, BytesPerRead) )
         {
@@ -65,7 +67,7 @@ auto file::load(StringView path, Ubyte **outData, Size *outSize) -> Bool
         return KAZE_FALSE;
     }
 
-    std::ifstream file(path, std::ios::in | std::ios::binary);
+    std::ifstream file(path.data(), std::ios::in | std::ios::binary);
     if ( !file.is_open() )
     {
         KAZE_CORE_ERRCODE(Error::FileOpenErr, "failed to open file at: \"{}\"", path);
@@ -123,7 +125,7 @@ auto file::write(StringView path, const Mem mem) -> Bool
         }
     }
 
-    std::ofstream file(path, std::ios::out | std::ios::trunc | std::ios::binary);
+    std::ofstream file(path.data(), std::ios::out | std::ios::trunc | std::ios::binary);
     if ( !file.is_open() )
     {
         KAZE_CORE_ERRCODE(Error::FileOpenErr, "Failed to open file for writing at: {}", path);

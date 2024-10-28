@@ -1,5 +1,6 @@
 #include "texture.h"
 
+#include <kaze/core/debug.h>
 #include <kaze/core/memory.h>
 #include <kaze/core/traits.h>
 

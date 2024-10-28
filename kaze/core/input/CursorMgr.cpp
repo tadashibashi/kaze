@@ -2,6 +2,8 @@
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/video/Window.h>
 
+#include <kaze/core/debug.h>
+
 KAZE_NAMESPACE_BEGIN
 
 CursorMgr::~CursorMgr()

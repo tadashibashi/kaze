@@ -107,7 +107,7 @@ endfunction()
 
 function(kaze_target_copy_assets)
     set(options "")
-    set(oneValueArgs TARGET)
+    set(oneValueArgs TARGET ASSET_DIR OUTPUT_DIR)
     set(multiValueArgs ASSETS)
     cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
@@ -123,7 +123,7 @@ function(kaze_target_copy_assets)
         get_filename_component(FILENAME_ABSOLUTE ${FILENAME} ABSOLUTE)
         add_custom_command(TARGET ${ARGS_TARGET}
             DEPENDS ${FILENAME_ABSOLUTE}
-
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FILENAME_ABSOLUTE}
         )
 
         target_sources(${ARGS_TARGET} PRIVATE ${FILENAME_ABSOLUTE})

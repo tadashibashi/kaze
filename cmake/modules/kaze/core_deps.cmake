@@ -89,17 +89,17 @@ FetchContent_MakeAvailable(spdlog)
 # ----- Bgfx ------------------------------------------------------------------
 # License: BSD 2-Clause "Simplified"
 # Copyright (c) 2010-2024 - Branimir Karadzic
-FetchContent_Declare(bgfx
+FetchContent_Declare(bgfx-cmake
     GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake
     GIT_TAG        v1.128.8808-482
 )
 set(BX_AMALGAMATED             ON  CACHE BOOL "")
 set(BGFX_AMALGAMATED           ON  CACHE BOOL "")
-set(BGFX_BUILD_EXAMPLE_COMMON  OFF CACHE BOOL "")
+set(BGFX_BUILD_EXAMPLES        OFF CACHE BOOL "")
 set(BGFX_BUILD_TESTS           OFF CACHE BOOL "")
 set(BGFX_INSTALL               OFF CACHE BOOL "")
 
-FetchContent_MakeAvailable(bgfx)
+FetchContent_MakeAvailable(bgfx-cmake)
 
 list(APPEND CMAKE_MODULE_PATH ${bgfx_SOURCE_DIR}/cmake)
 include(bgfxToolUtils)

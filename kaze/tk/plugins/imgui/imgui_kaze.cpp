@@ -1,5 +1,6 @@
 #include "imgui_kaze.h"
 
+#include <kaze/core/debug.h>
 #include <kaze/core/input/CursorMgr.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/backend/window.h>

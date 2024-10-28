@@ -4,7 +4,7 @@
 
 KAZE_NAMESPACE_BEGIN
 
-namespace mat4f {
+namespace mathf::mat4f {
     auto lookAt(
         Float *result,
         const Vec3f &eye,

@@ -2,6 +2,8 @@
 
 #include "backend/backend.h"
 
+#include <mutex>
+
 KAZE_NAMESPACE_BEGIN
 
 static int s_timesInit;

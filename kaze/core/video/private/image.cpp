@@ -6,6 +6,8 @@
 #include <bx/allocator.h>
 #include <bx/error.h>
 
+#include <kaze/core/debug.h>
+
 KAZE_NAMESPACE_BEGIN
 
 static bx::DefaultAllocator defaultAlloc{};

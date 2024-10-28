@@ -456,7 +456,7 @@ namespace backend {
         if ( !getWindowCocoaFullscreen(WIN_CAST(window), outFullscreen) )
             return false;
 #else
-        const auto tempFullscreen = static_cast<bool>(glfwGetWindowMonitor(WINCAST(window)));
+        const auto tempFullscreen = static_cast<bool>(glfwGetWindowMonitor(WIN_CAST(window)));
         ERR_CHECK(Error::BE_RuntimeErr, "get fullscreen monitor");
 
         *outFullscreen = tempFullscreen;
@@ -517,8 +517,11 @@ namespace backend {
             auto mode = glfwGetVideoMode(monitor); ERR_CHECK(Error::BE_RuntimeErr, "get video mode");
 
 
-            window::getPosition(window, &data->last.rect.x, &data->last.rect.y);
-            window::getSize(window, &data->last.rect.w, &data->last.rect.h);
+            if ( !window::getPosition(window, &data->last.rect.x, &data->last.rect.y) )
+                return false;
+
+            if ( !window::getSize(window, &data->last.rect.w, &data->last.rect.h) )
+                return false;
 
             glfwSetWindowMonitor(WIN_CAST(window), monitor,
                 0, 0, mode->width, mode->height, mode->refreshRate);
