@@ -4,6 +4,11 @@
 #include <kaze/core/input/CursorMgr.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/BackendInitGuard.h>
+#include <kaze/core/platform/defines.h>
+
+#if KAZE_PLATFORM_EMSCRIPTEN
+#   include <emscripten/emscripten.h>
+#endif
 
 KAZE_TK_NAMESPACE_BEGIN
 
@@ -39,11 +44,17 @@ void App::run()
 
     m->plugins.init(this);
 
+#if KAZE_PLATFORM_EMSCRIPTEN
+    emscripten_set_main_loop_arg([](void *userptr) {
+        auto app = static_cast<App *>(userptr);
+        app->oneTick();
+    }, this, -1, 1);
+#else
     m->isRunning = true;
     do {
         oneTick();
     } while (m->isRunning);
-
+#endif
     close();
     m->plugins.close(this);
     postClose();
@@ -237,9 +248,7 @@ auto App::processWindowEvent(const WindowEvent &e, const Double timestamp) -> vo
         if (m->window.getHandle() == e.window)
         {
             m->graphics.reset(e.data0, e.data1);
-
-            doRender();
-            m->graphics.frame();
+            frame();
             m->graphics.renderFrame();
         }
     } break;
@@ -273,7 +282,6 @@ auto App::oneTick() -> void
     m->deltaTime = currentTime - m->lastTime;
 
     pollEvents();
-
     frame();
 
     m->lastTime = currentTime;

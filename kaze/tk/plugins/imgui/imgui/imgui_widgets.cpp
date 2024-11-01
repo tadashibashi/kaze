@@ -1,4 +1,4 @@
-// dear imgui, v1.91.4
+// dear imgui, v1.91.5 WIP
 // (widgets code)
 
 /*
@@ -495,19 +495,19 @@ bool ImGui::ButtonBehavior(const ImRect& bb, ImGuiID id, bool* out_hovered, bool
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = GetCurrentWindow();
 
+    // Default behavior inherited from item flags
+    // Note that _both_ ButtonFlags and ItemFlags are valid sources, so copy one into the item_flags and only check that.
+    ImGuiItemFlags item_flags = (g.LastItemData.ID == id ? g.LastItemData.ItemFlags : g.CurrentItemFlags);
+    if (flags & ImGuiButtonFlags_AllowOverlap)
+        item_flags |= ImGuiItemFlags_AllowOverlap;
+
     // Default only reacts to left mouse button
     if ((flags & ImGuiButtonFlags_MouseButtonMask_) == 0)
         flags |= ImGuiButtonFlags_MouseButtonLeft;
 
     // Default behavior requires click + release inside bounding box
     if ((flags & ImGuiButtonFlags_PressedOnMask_) == 0)
-        flags |= ImGuiButtonFlags_PressedOnDefault_;
-
-    // Default behavior inherited from item flags
-    // Note that _both_ ButtonFlags and ItemFlags are valid sources, so copy one into the item_flags and only check that.
-    ImGuiItemFlags item_flags = (g.LastItemData.ID == id ? g.LastItemData.ItemFlags : g.CurrentItemFlags);
-    if (flags & ImGuiButtonFlags_AllowOverlap)
-        item_flags |= ImGuiItemFlags_AllowOverlap;
+        flags |= (item_flags & ImGuiItemFlags_ButtonRepeat) ? ImGuiButtonFlags_PressedOnClick : ImGuiButtonFlags_PressedOnDefault_;
 
     ImGuiWindow* backup_hovered_window = g.HoveredWindow;
     const bool flatten_hovered_children = (flags & ImGuiButtonFlags_FlattenChildren) && g.HoveredWindow && g.HoveredWindow->RootWindow == window;
@@ -7017,12 +7017,8 @@ bool ImGui::Selectable(const char* label, bool selected, ImGuiSelectableFlags fl
         const bool highlighted = hovered || (flags & ImGuiSelectableFlags_Highlight);
         if (highlighted || selected)
         {
-            // FIXME-MULTISELECT: Styling: Color for 'selected' elements? ImGuiCol_HeaderSelected
-            ImU32 col;
-            if (selected && !highlighted)
-                col = GetColorU32(ImLerp(GetStyleColorVec4(ImGuiCol_Header), GetStyleColorVec4(ImGuiCol_HeaderHovered), 0.5f));
-            else
-                col = GetColorU32((held && highlighted) ? ImGuiCol_HeaderActive : highlighted ? ImGuiCol_HeaderHovered : ImGuiCol_Header);
+            // Between 1.91.0 and 1.91.4 we made selected Selectable use an arbitrary lerp between _Header and _HeaderHovered. Removed that now. (#8106)
+            ImU32 col = GetColorU32((held && highlighted) ? ImGuiCol_HeaderActive : highlighted ? ImGuiCol_HeaderHovered : ImGuiCol_Header);
             RenderFrame(bb.Min, bb.Max, col, false, 0.0f);
         }
         if (g.NavId == id)
@@ -8815,6 +8811,7 @@ bool ImGui::BeginMenuEx(const char* label, const char* icon, bool enabled)
         float w = label_size.x;
         ImVec2 text_pos(window->DC.CursorPos.x + offsets->OffsetLabel, window->DC.CursorPos.y + window->DC.CurrLineTextBaseOffset);
         pressed = Selectable("", menu_is_open, selectable_flags, ImVec2(w, label_size.y));
+        LogSetNextTextDecoration("[", "]");
         RenderText(text_pos, label);
         PopStyleVar();
         window->DC.CursorPos.x += IM_TRUNC(style.ItemSpacing.x * (-1.0f + 0.5f)); // -1 spacing to compensate the spacing added when Selectable() did a SameLine(). It would also work to call SameLine() ourselves after the PopStyleVar().
@@ -8831,6 +8828,7 @@ bool ImGui::BeginMenuEx(const char* label, const char* icon, bool enabled)
         float extra_w = ImMax(0.0f, GetContentRegionAvail().x - min_w);
         ImVec2 text_pos(window->DC.CursorPos.x + offsets->OffsetLabel, window->DC.CursorPos.y + window->DC.CurrLineTextBaseOffset);
         pressed = Selectable("", menu_is_open, selectable_flags | ImGuiSelectableFlags_SpanAvailWidth, ImVec2(min_w, label_size.y));
+        LogSetNextTextDecoration("", ">");
         RenderText(text_pos, label);
         if (icon_w > 0.0f)
             RenderText(pos + ImVec2(offsets->OffsetIcon, 0.0f), icon);
@@ -9044,6 +9042,7 @@ bool ImGui::MenuItemEx(const char* label, const char* icon, const char* shortcut
             if (shortcut_w > 0.0f)
             {
                 PushStyleColor(ImGuiCol_Text, style.Colors[ImGuiCol_TextDisabled]);
+                LogSetNextTextDecoration("(", ")");
                 RenderText(pos + ImVec2(offsets->OffsetShortcut + stretch_w, 0.0f), shortcut, NULL, false);
                 PopStyleColor();
             }
@@ -10292,6 +10291,7 @@ void ImGui::TabItemLabelAndCloseButton(ImDrawList* draw_list, const ImRect& bb, 
         text_ellipsis_clip_bb.Max.x -= unsaved_marker_visible ? (button_sz * 0.80f) : 0.0f;
         ellipsis_max_x = text_pixel_clip_bb.Max.x;
     }
+    LogSetNextTextDecoration("/", "\\");
     RenderTextEllipsis(draw_list, text_ellipsis_clip_bb.Min, text_ellipsis_clip_bb.Max, text_pixel_clip_bb.Max.x, ellipsis_max_x, label, NULL, &label_size);
 
 #if 0

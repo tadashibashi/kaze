@@ -1,4 +1,4 @@
-// dear imgui, v1.91.4
+// dear imgui, v1.91.5 WIP
 // (demo code)
 
 // Help:
@@ -541,6 +541,15 @@ void ImGui::ShowDemoWindow(bool* p_open)
             ImGui::Checkbox("io.ConfigNavCursorVisibleAlways", &io.ConfigNavCursorVisibleAlways);
             ImGui::SameLine(); HelpMarker("Navigation cursor is always visible.");
 
+            ImGui::SeparatorText("Windows");
+            ImGui::Checkbox("io.ConfigWindowsResizeFromEdges", &io.ConfigWindowsResizeFromEdges);
+            ImGui::SameLine(); HelpMarker("Enable resizing of windows from their edges and from the lower-left corner.\nThis requires ImGuiBackendFlags_HasMouseCursors for better mouse cursor feedback.");
+            ImGui::Checkbox("io.ConfigWindowsMoveFromTitleBarOnly", &io.ConfigWindowsMoveFromTitleBarOnly);
+            ImGui::Checkbox("io.ConfigWindowsCopyContentsWithCtrlC", &io.ConfigWindowsCopyContentsWithCtrlC); // [EXPERIMENTAL]
+            ImGui::SameLine(); HelpMarker("*EXPERIMENTAL* CTRL+C copy the contents of focused window into the clipboard.\n\nExperimental because:\n- (1) has known issues with nested Begin/End pairs.\n- (2) text output quality varies.\n- (3) text output is in submission order rather than spatial order.");
+            ImGui::Checkbox("io.ConfigScrollbarScrollByPage", &io.ConfigScrollbarScrollByPage);
+            ImGui::SameLine(); HelpMarker("Enable scrolling page by page when clicking outside the scrollbar grab.\nWhen disabled, always scroll to clicked location.\nWhen enabled, Shift+Click scrolls to clicked location.");
+
             ImGui::SeparatorText("Widgets");
             ImGui::Checkbox("io.ConfigInputTextCursorBlink", &io.ConfigInputTextCursorBlink);
             ImGui::SameLine(); HelpMarker("Enable blinking cursor (optional as some users consider it to be distracting).");
@@ -548,11 +557,6 @@ void ImGui::ShowDemoWindow(bool* p_open)
             ImGui::SameLine(); HelpMarker("Pressing Enter will keep item active and select contents (single-line only).");
             ImGui::Checkbox("io.ConfigDragClickToInputText", &io.ConfigDragClickToInputText);
             ImGui::SameLine(); HelpMarker("Enable turning DragXXX widgets into text input with a simple mouse click-release (without moving).");
-            ImGui::Checkbox("io.ConfigWindowsResizeFromEdges", &io.ConfigWindowsResizeFromEdges);
-            ImGui::SameLine(); HelpMarker("Enable resizing of windows from their edges and from the lower-left corner.\nThis requires (io.BackendFlags & ImGuiBackendFlags_HasMouseCursors) because it needs mouse cursor feedback.");
-            ImGui::Checkbox("io.ConfigWindowsMoveFromTitleBarOnly", &io.ConfigWindowsMoveFromTitleBarOnly);
-            ImGui::Checkbox("io.ConfigScrollbarScrollByPage", &io.ConfigScrollbarScrollByPage);
-            ImGui::SameLine(); HelpMarker("Enable scrolling page by page when clicking outside the scrollbar grab.\nWhen disabled, always scroll to clicked location.\nWhen enabled, Shift+Click scrolls to clicked location.");
             ImGui::Checkbox("io.ConfigMacOSXBehaviors", &io.ConfigMacOSXBehaviors);
             ImGui::SameLine(); HelpMarker("Swap Cmd<>Ctrl keys, enable various MacOS style behaviors.");
             ImGui::Text("Also see Style->Rendering for rendering options.");
@@ -10220,7 +10224,7 @@ struct ExampleAssetsBrowser
 
             // Rendering parameters
             const ImU32 icon_type_overlay_colors[3] = { 0, IM_COL32(200, 70, 70, 255), IM_COL32(70, 170, 70, 255) };
-            const ImU32 icon_bg_color = ImGui::GetColorU32(ImGuiCol_MenuBarBg);
+            const ImU32 icon_bg_color = ImGui::GetColorU32(IM_COL32(35, 35, 35, 220));
             const ImVec2 icon_type_overlay_size = ImVec2(4.0f, 4.0f);
             const bool display_label = (LayoutItemSize.x >= ImGui::CalcTextSize("999").x);
 

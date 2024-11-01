@@ -1,3 +1,6 @@
+include(kaze/utils/shaders)
+include(kaze/utils/plugins)
+
 # Behaves like `option` but for string values
 # Arguments:
 #     - NAME          : name of the option
@@ -56,79 +59,54 @@ function (string_ends_with STR SUFFIX RESULT_VAR)
     endif()
 endfunction()
 
-# kaze_compile_shaders(
-#   SHADERS filenames (filename part of each entry must end with 'v' for vertex, 'f' for fragment, or 'c' compute. e.g. `shader_v.sc`)
-#   VARYING_DEF filename
-#   OUTPUT_DIR directory
-#   INCLUDE_DIRS directories [optional]
-# )
-#
-# Note: make sure to include kaze/dependencies before calling this function
-function(kaze_compile_shaders)
+
+function(kaze_target_assets IN_TARGET)
     set(options "")
-    set(oneValueArgs VARYING_DEF OUTPUT_DIR)
-    set(multiValueArgs SHADERS INCLUDE_DIRS)
-    cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
-    if (DEFINED ARGS_OUTPUT_DIR)
-        if (NOT EXISTS ${ARGS_OUTPUT_DIR})
-            file(MAKE_DIRECTORY ${ARGS_OUTPUT_DIR})
-        endif()
-    else()
-        message(FATAL_ERROR "kaze_build_shaders: missing required argument: OUTPUT_DIR")
-    endif()
-
-    foreach(SHADER_FILE ${ARGS_SHADERS})
-        get_filename_component(SHADER_FILE_BASENAME ${SHADER_FILE} NAME)
-        get_filename_component(SHADER_FILE_NOEXT ${SHADER_FILE} NAME_WE)
-        get_filename_component(SHADER_FILE_ABSOLUTE ${SHADER_FILE} ABSOLUTE)
-
-        substring_end("${SHADER_FILE_NOEXT}" 1 SHADER_TYPE)
-        if (SHADER_TYPE STREQUAL "v")
-            set(SHADER_TYPE VERTEX)
-        elseif (SHADER_TYPE STREQUAL "f")
-            set(SHADER_TYPE FRAGMENT)
-        elseif (SHADER_TYPE STREQUAL "c")
-            set(SHADER_TYPE COMPUTE)
-        else()
-            message(FATAL_ERROR "Invalid shader type for \"${SHADER_FILE_BASENAME}\": filename must end with 'v', 'f', or 'c'")
-        endif()
-
-        bgfx_compile_shaders(
-            TYPE ${SHADER_TYPE}
-            SHADERS ${SHADER_FILE_ABSOLUTE}
-            VARYING_DEF ${ARGS_VARYING_DEF}
-            OUTPUT_DIR ${ARGS_OUTPUT_DIR}
-            INCLUDE_DIRS ${BGFX_DIR}/src ${ARGS_INCLUDE_DIRS}
-        )
-    endforeach()
-
-endfunction()
-
-function(kaze_target_copy_assets)
-    set(options "")
-    set(oneValueArgs TARGET ASSET_DIR OUTPUT_DIR)
+    set(oneValueArgs ASSET_DIR OUTPUT_DIR)
     set(multiValueArgs ASSETS)
-    cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    if (NOT ARGS_ASSETS)
+    if (NOT IN_ASSETS) # No assets listed
+        message(WARNING "kaze_target_assets was called with zero assets")
         return()
     endif()
 
-    if (NOT ARGS_TARGET)
+    if (NOT IN_TARGET)
         message(FATAL_ERROR "kaze_target_copy_assets is missing a TARGET")
     endif()
 
-    foreach(FILENAME ${ARGS_ASSETS})
-        get_filename_component(FILENAME_ABSOLUTE ${FILENAME} ABSOLUTE)
-        add_custom_command(TARGET ${ARGS_TARGET}
-            DEPENDS ${FILENAME_ABSOLUTE}
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${FILENAME_ABSOLUTE}
-        )
+    if (NOT IN_ASSET_DIR)
+        message(FATAL_ERROR "kaze_target_copy_assets is missing an ASSET_DIR")
+    endif()
 
-        target_sources(${ARGS_TARGET} PRIVATE ${FILENAME_ABSOLUTE})
-    endforeach()
+    if (NOT IN_OUTPUT_DIR)
+        message(FATAL_ERROR "kaze_target_copy_assets is missing an OUTPUT_DIR")
+    endif()
 
+    cmake_path(ABSOLUTE_PATH IN_ASSET_DIR
+        BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        NORMALIZE
+        OUTPUT_VARIABLE ASSET_DIR
+    )
+
+    cmake_path(ABSOLUTE_PATH IN_OUTPUT_DIR
+        BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        NORMALIZE
+        OUTPUT_VARIABLE OUTPUT_DIR
+    )
+
+        foreach(FILENAME ${IN_ASSETS})
+            add_custom_command(OUTPUT "${OUTPUT_DIR}/${IN_TARGET}"
+                DEPENDS "${ASSET_DIR}/${FILENAME}"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ASSET_DIR}/${FILENAME}" "${OUTPUT_DIR}/${FILENAME}"
+            )
+
+            target_sources(${IN_TARGET} PRIVATE "${OUTPUT_DIR}/${IN_TARGET}")
+        endforeach()
+
+        if (KAZE_PLATFORM_EMSCRIPTEN)
+            target_link_options("${IN_TARGET}" PUBLIC "SHELL:--preload-file ${ASSET_DIR}@${IN_ASSET_DIR}")
+        endif()
 endfunction()
 
 # Transform a list of paths to become absolute
@@ -140,234 +118,25 @@ function(kaze_make_paths_absolute)
     set(options "")
     set(oneValueArgs ROOT_DIR OUT_VAR)
     set(multiValueArgs PATHS)
-    cmake_parse_arguments(ARGS "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    if (NOT DEFINED ARGS_OUT_VAR)
+    if (NOT DEFINED IN_OUT_VAR)
         message(FATAL_ERROR "kaze_make_paths_absolute required argument OUT_VAR was undefined")
     endif()
 
-    if (NOT DEFINED ARGS_ROOT_DIR)
+    if (NOT DEFINED IN_ROOT_DIR)
         message(FATAL_ERROR "kaze_make_paths_absolute required argument ROOT_DIR was undefined")
     endif()
 
     set(RESULT "")
-    foreach(PATH ${ARGS_PATHS})
+    foreach(PATH ${IN_PATHS})
         cmake_path(ABSOLUTE_PATH PATH
-            BASE_DIRECTORY ${ARGS_ROOT_DIR}
+            BASE_DIRECTORY ${IN_ROOT_DIR}
             OUTPUT_VARIABLE PATH_ABS
             NORMALIZE
         )
         list(APPEND RESULT ${PATH_ABS})
     endforeach()
 
-    set(${ARGS_OUT_VAR} ${RESULT} PARENT_SCOPE)
-endfunction()
-
-# Add a plugin to a target.
-# Plugins are defined in a CMake file, containing definitions of variables specifying
-# source files, include dirs, libraries, and link/compilations to be injected into a target.
-#
-# Possible variables to define:
-# KAZE_PLUGIN_NAME             => prefix NAME for each variable (required)
-# ${NAME}_SOURCES              => private source files
-# ${NAME}_INCLUDE_DIRS_PUBLIC  => public include files
-# ${NAME}_INCLUDE_DIRS_PRIVATE => private include files
-# ${NAME}_LINK_OPTS_PUBLIC     => public link options
-# ${NAME}_LINK_OPTS_PRIVATE    => private link options
-# ${NAME}_COMPILE_OPTS_PUBLIC  => public compile options
-# ${NAME}_COMPILE_OPTS_PRIVATE => private compile options
-# ${NAME}_LINK_LIBS_PUBLIC     => public link libraries
-# ${NAME}_LINK_LIBS_PRIVATE    => private link libraries
-#
-# Note:
-#   - Paths of sources and include directories may be either absolute or relative
-#
-# Arguments:
-#   TARGET - target to inject the following into. This should be called in the same CmakeLists.txt file as the target.
-#   PATH   - path to a CMake file (must be in the root directory of the plugin) or a directory containing "plugin.cmake" inside of it
-#
-function(kaze_target_plugin TARGET PATH)
-    cmake_path(ABSOLUTE_PATH PATH
-        BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-        NORMALIZE
-        OUTPUT_VARIABLE PATH
-    )
-
-    if (IS_DIRECTORY ${PATH})
-        set(PLUGIN_ROOT ${PATH})
-        set(PATH "${PATH}/plugin.cmake")
-    else()
-        cmake_path(GET PATH PARENT_PATH PLUGIN_ROOT)
-    endif()
-
-    include(${PATH})
-    if (NOT DEFINED KAZE_PLUGIN_NAME)
-        message(FATAL_ERROR "Failed to define KAZE_PLUGIN_NAME in plugin located at ${PATH}")
-    endif()
-
-    set(NAME ${KAZE_PLUGIN_NAME})
-
-    if (DEFINED ${NAME}_SOURCES_PUBLIC)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_SOURCES_PUBLIC}
-                ROOT_DIR ${PLUGIN_ROOT}
-                OUT_VAR SOURCES_ABS)
-        target_sources(${TARGET} PRIVATE ${SOURCES_ABS})
-    endif()
-    if (DEFINED ${NAME}_SOURCES_PRIVATE)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_SOURCES_PRIVATE}
-                ROOT_DIR ${PLUGIN_ROOT}
-                OUT_VAR SOURCES_ABS)
-        target_sources(${TARGET} PRIVATE ${SOURCES_ABS})
-    endif()
-
-    # Add include directories
-    if (DEFINED ${NAME}_INCLUDE_DIRS_PUBLIC)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_INCLUDE_DIRS_PUBLIC}
-                ROOT_DIR ${PLUGIN_ROOT}
-                OUT_VAR INCLUDE_ABS)
-        target_include_directories(${TARGET} PUBLIC ${INCLUDE_ABS})
-    endif()
-    if (DEFINED ${NAME}_INCLUDE_DIRS_PRIVATE)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_INCLUDE_DIRS_PRIVATE}
-                ROOT_DIR ${PLUGIN_ROOT}
-                OUT_VAR INCLUDE_ABS)
-        target_include_directories(${TARGET} PRIVATE ${INCLUDE_ABS})
-    endif()
-
-    # Add link options
-    if (DEFINED ${NAME}_LINK_OPTS_PUBLIC)
-        target_link_options(${TARGET} PUBLIC ${${NAME}_LINK_OPTS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_LINK_OPTS_PRIVATE)
-        target_link_options(${TARGET} PRIVATE ${${NAME}_LINK_OPTS_PRIVATE})
-    endif()
-
-    # Add compile options
-    if (DEFINED ${NAME}_COMPILE_OPTS_PUBLIC)
-        target_compile_options(${TARGET} PUBLIC ${${NAME}_COMPILE_OPTS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_COMPILE_OPTS_PRIVATE)
-        target_compile_options(${TARGET} PRIVATE ${${NAME}_COMPILE_OPTS_PRIVATE})
-    endif()
-
-    # Add link libraries
-    if (DEFINED ${NAME}_LINK_LIBS_PUBLIC)
-        target_link_libraries(${TARGET} PUBLIC ${${NAME}_LINK_LIBS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_LINK_LIBS_PRIVATE)
-        target_link_libraries(${TARGET} PRIVATE ${${NAME}_LINK_LIBS_PRIVATE})
-    endif()
-
-    # Add compile definitions
-    if (DEFINED ${NAME}_COMPILE_DEFS_PUBLIC)
-        target_compile_definitions(${TARGET} PUBLIC ${${NAME}_COMPILE_DEFS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_COMPILE_DEFS_PRIVATE)
-        target_compile_definitions(${TARGET} PRIVATE ${${NAME}_COMPILE_DEFS_PRIVATE})
-    endif()
-
-    unset(KAZE_PLUGIN_NAME PARENT_SCOPE)
-    unset(PLUGIN_ROOT)
-endfunction()
-
-function(kaze_add_subplugin SUBPATH)
-    if (NOT DEFINED TARGET)
-        message(FATAL_ERROR "Missing plugin target, please make sure to only call `kaze_add_subplugin` "
-            "inside a plugin definition file")
-    endif()
-    if (NOT DEFINED PLUGIN_ROOT)
-        message(FATAL_ERROR "Missing plugin root path, please make sure to only call `kaze_add_subplugin` "
-            "inside a plugin definition file")
-    endif()
-    if (NOT DEFINED KAZE_PLUGIN_NAME)
-        message(FATAL_ERROR "Failed to define KAZE_PLUGIN_NAME in plugin located at ${SUBPATH}")
-    endif()
-
-    cmake_path(ABSOLUTE_PATH SUBPATH
-        BASE_DIRECTORY ${PLUGIN_ROOT}
-        NORMALIZE
-        OUTPUT_VARIABLE SUBPATH
-    )
-
-    if (IS_DIRECTORY ${SUBPATH})
-        set(SUBPLUGIN_ROOT ${SUBPATH})
-        set(SUBPATH "${SUBPATH}/plugin.cmake")
-    else()
-        cmake_path(GET PATH PARENT_PATH SUBPLUGIN_ROOT)
-    endif()
-
-    unset(KAZE_PLUGIN_NAME)
-    include(${SUBPATH})
-    if (NOT DEFINED KAZE_PLUGIN_NAME)
-        message(FATAL_ERROR "Failed to define KAZE_PLUGIN_NAME in plugin located at ${PATH}")
-    endif()
-
-    set(NAME ${KAZE_PLUGIN_NAME})
-
-    if (DEFINED ${NAME}_SOURCES_PUBLIC)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_SOURCES_PUBLIC}
-                ROOT_DIR ${SUBPLUGIN_ROOT}
-                OUT_VAR SOURCES_ABS)
-        target_sources(${TARGET} PRIVATE ${SOURCES_ABS})
-    endif()
-    if (DEFINED ${NAME}_SOURCES_PRIVATE)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_SOURCES_PRIVATE}
-                ROOT_DIR ${SUBPLUGIN_ROOT}
-                OUT_VAR SOURCES_ABS)
-        target_sources(${TARGET} PRIVATE ${SOURCES_ABS})
-    endif()
-
-    # Add include directories
-    if (DEFINED ${NAME}_INCLUDE_DIRS_PUBLIC)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_INCLUDE_DIRS_PUBLIC}
-                ROOT_DIR ${SUBPLUGIN_ROOT}
-                OUT_VAR INCLUDE_ABS)
-        target_include_directories(${TARGET} PUBLIC ${INCLUDE_ABS})
-    endif()
-    if (DEFINED ${NAME}_INCLUDE_DIRS_PRIVATE)
-        kaze_make_paths_absolute(
-                PATHS ${${NAME}_INCLUDE_DIRS_PRIVATE}
-                ROOT_DIR ${SUBPLUGIN_ROOT}
-                OUT_VAR INCLUDE_ABS)
-        target_include_directories(${TARGET} PRIVATE ${INCLUDE_ABS})
-    endif()
-
-    # Add link options
-    if (DEFINED ${NAME}_LINK_OPTS_PUBLIC)
-        target_link_options(${TARGET} PUBLIC ${${NAME}_LINK_OPTS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_LINK_OPTS_PRIVATE)
-        target_link_options(${TARGET} PRIVATE ${${NAME}_LINK_OPTS_PRIVATE})
-    endif()
-
-    # Add compile options
-    if (DEFINED ${NAME}_COMPILE_OPTS_PUBLIC)
-        target_compile_options(${TARGET} PUBLIC ${${NAME}_COMPILE_OPTS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_COMPILE_OPTS_PRIVATE)
-        target_compile_options(${TARGET} PRIVATE ${${NAME}_COMPILE_OPTS_PRIVATE})
-    endif()
-
-    # Add link libraries
-    if (DEFINED ${NAME}_LINK_LIBS_PUBLIC)
-        target_link_libraries(${TARGET} PUBLIC ${${NAME}_LINK_LIBS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_LINK_LIBS_PRIVATE)
-        target_link_libraries(${TARGET} PRIVATE ${${NAME}_LINK_LIBS_PRIVATE})
-    endif()
-
-    # Add compile definitions
-    if (DEFINED ${NAME}_COMPILE_DEFS_PUBLIC)
-        target_compile_definitions(${TARGET} PUBLIC ${${NAME}_COMPILE_DEFS_PUBLIC})
-    endif()
-    if (DEFINED ${NAME}_COMPILE_DEFS_PRIVATE)
-        target_compile_definitions(${TARGET} PRIVATE ${${NAME}_COMPILE_DEFS_PRIVATE})
-    endif()
+    set(${IN_OUT_VAR} ${RESULT} PARENT_SCOPE)
 endfunction()

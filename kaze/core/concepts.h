@@ -58,4 +58,10 @@ concept LoadableAsset =
     std::is_same_v<Bool, decltype(std::declval<T>().load(std::declval<K>()))> &&
     std::is_same_v<void, decltype(std::declval<T>().release())>;
 
+template <typename T>
+concept ContainerItem =
+    std::is_default_constructible_v<T> &&
+    std::is_move_constructible_v<T> &&
+    std::is_copy_constructible_v<T>;
+
 KAZE_NAMESPACE_END

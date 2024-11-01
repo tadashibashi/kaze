@@ -93,11 +93,15 @@ FetchContent_Declare(bgfx-cmake
     GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake
     GIT_TAG        v1.128.8808-482
 )
-set(BX_AMALGAMATED             ON  CACHE BOOL "")
-set(BGFX_AMALGAMATED           ON  CACHE BOOL "")
+set(BX_AMALGAMATED             OFF CACHE BOOL "")
+set(BGFX_AMALGAMATED           OFF CACHE BOOL "")
 set(BGFX_BUILD_EXAMPLES        OFF CACHE BOOL "")
 set(BGFX_BUILD_TESTS           OFF CACHE BOOL "")
 set(BGFX_INSTALL               OFF CACHE BOOL "")
+
+if (EMSCRIPTEN)
+    set(BGFX_CONFIG_MULTITHREADED  OFF CACHE BOOL "" FORCE)
+endif()
 
 FetchContent_MakeAvailable(bgfx-cmake)
 

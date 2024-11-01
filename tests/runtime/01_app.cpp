@@ -21,30 +21,6 @@
 USING_KAZE_NAMESPACE;
 USING_KAZE_TK_NAMESPACE;
 
-struct Vertex {
-    Vec3f position;
-    Vec2f uv;
-    Color color;
-};
-
-Vertex rectVertices[] = {
-    { {50, 50, 0.0f},   {0, 0},  Color::White },
-    { {100, 50, 0.0f},  {1, 0},  Color::White },
-    { {100, 100, 0.0f}, {1, 1},  Color::White },
-    { {50, 100, 0.0f},  {0, 1},  Color::White },
-    { {150, 150, 0.0f}, {0, 0},  Color::White },
-    { {300, 150, 0.0f}, {1, 0},  Color::White },
-    { {300, 300, 0.0f}, {1, 1},  Color::White },
-    { {150, 300, 0.0f}, {0, 1},  Color::White },
-};
-
-Uint16 rectTriangles[] = {
-    0, 1, 2,
-    0, 2, 3,
-    4, 5, 6,
-    4, 6, 7,
-};
-
 class Demo final : public App {
 public:
     Demo() : App({
@@ -91,7 +67,7 @@ private:
             return False;
 
         Image image;
-        if ( !image.load("dungeon_tiles.png") )
+        if ( !image.load("assets/dungeon_tiles.png") )
             return False;
 
         if ( !testTexture.loadImage(image) )
@@ -115,7 +91,8 @@ private:
         camera.setOrigin({0, 0});
 
         addPlugin(plugins::imgui::create({
-            .window = window().getHandle()
+            .window = window().getHandle(),
+            .viewId=1,
         }));
 
         return True;

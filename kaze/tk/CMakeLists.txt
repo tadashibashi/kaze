@@ -20,6 +20,10 @@ function (kaze_copy_builtin_assets TARGET OUTPUT_DIR)
             INCLUDE_DIRS ${KAZE_TK_SHADER_ROOT}
     )
 
+    if (KAZE_PLATFORM_EMSCRIPTEN) # Copy all default assets
+        target_link_options(${TARGET} PUBLIC "SHELL:--preload-file ${OUTPUT_DIR}/kaze@/kaze")
+    endif()
+
     target_sources(${TARGET} PRIVATE ${KAZE_TK_SHADER_SOURCES})
 endfunction()
 

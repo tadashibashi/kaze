@@ -1,1 +1,12 @@
-add_subdirectory(kaze_shaderc)
+set (KAZE_TOOLS_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin" CACHE PATH "Runtime output directory for tools")
+
+if (KAZE_TOOLS_OUTPUT_DIRECTORY)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${KAZE_TOOLS_OUTPUT_DIRECTORY})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${KAZE_TOOLS_OUTPUT_DIRECTORY})
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${KAZE_TOOLS_OUTPUT_DIRECTORY})
+endif()
+
+include(kaze/deps/tools)
+
+add_subdirectory(kshaderc)
+add_subdirectory(kz)

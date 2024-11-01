@@ -19,8 +19,8 @@ else()
     set(KAZE_IS_ROOT OFF CACHE BOOL "" FORCE)
 endif()
 
-include(kaze/compiler_detection)
-include(kaze/platform_detection)
+include(kaze/detection/compiler)
+include(kaze/detection/platform)
 include(kaze/utils)
 
 # ===== Options =================================================================
@@ -47,8 +47,14 @@ set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland su
 set(KAZE_TK_IMGUI_PLUGIN  ON CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")
 
 # ===== Projects ==============================================================
-add_subdirectory(kaze)
-add_subdirectory(tools)
-if (KAZE_BUILD_TESTS)
-    add_subdirectory(tests)
+
+if (NOT KAZE_BUILD_TOOLS)
+    add_subdirectory(kaze)
+
+    if (KAZE_BUILD_TESTS)
+        add_subdirectory(tests)
+    endif()
 endif()
+
+add_subdirectory(tools)
+

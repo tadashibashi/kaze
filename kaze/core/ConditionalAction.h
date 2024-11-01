@@ -1,12 +1,13 @@
 #pragma once
 #include <kaze/core/lib.h>
-#include <kaze/core/traits.h>
-
 #include <algorithm>
 #include <ranges>
 
 KAZE_NAMESPACE_BEGIN
 
+/// Forwards events that others can subscribe to.
+/// All callbacks take a user pointer, with optional priority.
+/// Inspired by multi-cast delegates in C#.
 template <typename... Args>
 class ConditionalAction {
     class Callback {

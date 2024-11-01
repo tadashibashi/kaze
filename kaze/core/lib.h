@@ -141,3 +141,6 @@ KAZE_NAMESPACE_END
 #define KAZE_NO_COPY(classname) \
     classname(const classname &) = delete; \
     auto operator=(const classname &)->classname & = delete
+
+#include "concepts.h"
+#include "traits.h"

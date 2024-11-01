@@ -1,8 +1,6 @@
 /// Platform, CPU, and Architecture defines
 /// Check with #if, not #ifdef, since all variables are defined with 0 or 1
 #pragma once
-#ifndef kaze_core_platform_platformdefines_h_
-#define kaze_core_platform_platformdefines_h_
 
 /// ===== Target platform definitions =========================================
 /// Update these as more platforms are supported
@@ -282,5 +280,3 @@
 #else
 #   define KAZE_PLATFORM_MOBILE 0
 #endif
-
-#endif // kaze_core_platform_platformdefines_h_

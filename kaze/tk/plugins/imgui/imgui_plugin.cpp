@@ -176,10 +176,10 @@ namespace plugins::imgui {
                 if (ctx->window != e.window)
                     return True;
                 auto &io = ImGui::GetIO();
-                if (!e.isRepeat)
-                {
+                // if (!e.isRepeat)
+                // {
                     io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)], e.isDown);
-                }
+                // }
 
                 return !io.WantCaptureKeyboard;
             },
@@ -235,18 +235,15 @@ namespace plugins::imgui {
             .windowFilter = [](const WindowEvent &e, Double timestamp, App *app, void *userdata)
             {
                 auto ctx = CONTEXT_CAST(userdata);
-                auto &io = ImGui::GetIO();
                 if (ctx->window != e.window)
                     return True;
+
+                auto &io = ImGui::GetIO();
                 switch(e.type)
                 {
                 case WindowEvent::ResizedFramebuffer:
                     {
-                        if (e.window == ctx->window)
-                        {
-                            ImGui_ImplKaze_SetViewportSize(e.window);
-                        }
-
+                        ImGui_ImplKaze_SetViewportSize(e.window);
                     } break;
 
                 case WindowEvent::FocusGained:

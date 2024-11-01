@@ -1,13 +1,13 @@
 /// \file Window_sdl3.h
 /// SDL3 implementation for functions in the backend::window namespace
 #include "window_sdl3.h"
-#include "SDL3/SDL_keyboard.h"
 #include "common_sdl3.h"
 
 #include <kaze/core/errors.h>
 #include <kaze/core/debug.h>
 
 #include <SDL3/SDL.h>
+#include <SDL3/SDL_keyboard.h>
 
 #ifdef SDL_PLATFORM_IOS
 #include <SDL3/SDL_metal.h>
@@ -93,12 +93,14 @@ namespace backend {
         }
 
     #elif defined(SDL_PLATFORM_ANDROID)
-
         result.windowHandle = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, nullptr);
         result.displayType = result.windowHandle;
 
-    #else
+    #elif defined(SDL_PLATFORM_EMSCRIPTEN)
+        result.windowHandle = (void *)"#canvas";
+        result.displayType = nullptr;
 
+    #else
         result.windowHandle = nullptr;
         result.displayType = nullptr;
 
@@ -110,7 +112,7 @@ namespace backend {
         WindowHandle *outWindow) noexcept -> bool
     {
         auto sdl3Flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
-    #ifdef KAZE_PLATFORM_APPLE
+    #if KAZE_PLATFORM_APPLE
         sdl3Flags |= SDL_WINDOW_METAL;
     #endif
         if (flags & WindowInit::Resizable)

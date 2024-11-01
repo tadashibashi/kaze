@@ -56,6 +56,11 @@ namespace backend {
             .displayType = XOpenDisplay(nullptr),
         };
     #   endif
+    #elif KAZE_PLATFORM_EMSCRIPTEN
+        return {
+            .windowHandle = (void *)"#canvas",
+            .displayType = nullptr,
+        };
     #else
         return {
             .windowHandle = nullptr,
@@ -533,6 +538,8 @@ namespace backend {
                 data->last.rect.w, data->last.rect.h,
                 GLFW_DONT_CARE);
         }
+        ERR_CHECK(Error::BE_RuntimeErr, "setting glfw window monitor");
+        return true;
 #endif
     }
 

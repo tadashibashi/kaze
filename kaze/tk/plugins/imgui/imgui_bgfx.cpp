@@ -29,7 +29,7 @@ void ImGui_Implbgfx_RenderDrawLists(ImDrawData* draw_data)
 {
     // Avoid rendering when minimized, scale coordinates for retina displays
     // (screen coordinates != framebuffer coordinates)
-    ImGuiIO& io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     int fb_width = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
     int fb_height = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
     if (fb_width == 0 || fb_height == 0) {
@@ -45,7 +45,7 @@ void ImGui_Implbgfx_RenderDrawLists(ImDrawData* draw_data)
         BGFX_STATE_BLEND_FUNC(
             BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA);
 
-    const bgfx::Caps* caps = bgfx::getCaps();
+    const bgfx::Caps *caps = bgfx::getCaps();
 
     // Setup viewport, orthographic projection matrix
     float ortho[16];

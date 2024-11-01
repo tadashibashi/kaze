@@ -1,3 +1,0 @@
-CompileFlags:
-  Add: ["-Wno-unknown-warning-option"]
-  Remove: ["-f*", "-g*", "--use-port*"]

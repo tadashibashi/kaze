@@ -3,6 +3,7 @@
 
 #include <kaze/core/debug.h>
 #include <kaze/core/platform/backend/backend.h>
+#include <kaze/core/platform/defines.h>
 #include <kaze/core/video/VertexLayout.h>
 
 #include <bgfx/bgfx.h>
@@ -11,7 +12,8 @@
 #include <mutex>
 
 KAZE_NAMESPACE_BEGIN
-    struct GraphicsMgr::Impl {
+
+struct GraphicsMgr::Impl {
     Impl() { }
     ~Impl() = default;
 
@@ -70,8 +72,9 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
     config.limits.transientIbSize = initConfig.maxTransientIBufferSize;
     config.limits.transientVbSize = initConfig.maxTransientVBufferSize;
 
+#if !KAZE_PLATFORM_EMSCRIPTEN
     bgfx::renderFrame(); // necessary for single-threaded render
-
+#endif
     if ( !bgfx::init(config) )
     {
         KAZE_CORE_ERRCODE(Error::GR_InitErr, "bgfx failed to init");
@@ -118,7 +121,9 @@ auto GraphicsMgr::frame() -> void
 
 auto GraphicsMgr::renderFrame() -> void
 {
+#if !KAZE_PLATFORM_EMSCRIPTEN
     bgfx::renderFrame();
+#endif
 }
 
 auto GraphicsMgr::window() const noexcept -> const Window &

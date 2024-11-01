@@ -251,11 +251,14 @@ namespace backend {
             case SDL_EVENT_MOUSE_WHEEL:
                 {
                     const auto window = SDL_GetWindowFromID(e.wheel.windowID);
-                    const auto offset = (e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) ?
+#if KAZE_PLATFORM_EMSCRIPTEN
+                    auto offset = (e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) ?
+                        Vec2f{ e.wheel.x * 0.01f,  e.wheel.y } :
+                        Vec2f{ e.wheel.x * -0.01f, -e.wheel.y };
+#else
+                    auto offset = (e.wheel.direction == SDL_MOUSEWHEEL_FLIPPED) ?
                         Vec2f{ -e.wheel.x, -e.wheel.y } :
                         Vec2f{ e.wheel.x, e.wheel.y };
-#if KAZE_PLATFORM_EMSCRIPTEN
-                    offset.x *= 0.01f;
 #endif
                     events.emit(MouseScrollEvent {
                         .offset = offset,

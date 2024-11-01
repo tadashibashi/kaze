@@ -4,7 +4,7 @@ else()
     project(kaze LANGUAGES C CXX)
 endif()
 
-include(kaze/core_deps)
+include(kaze/deps/core)
 
 add_library(${PROJECT_NAME}
         concepts.h
@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME}
 
         AssetLoader.h
         Optional.h
+        List.h
         Memory.h
         ServiceProvider.h
         ServiceProvider.cpp
@@ -136,3 +137,14 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 
 target_precompile_headers(${PROJECT_NAME} PUBLIC lib.pch)
 kaze_target_plugin(${PROJECT_NAME} platform)
+
+# Emscripten flags
+if (KAZE_PLATFORM_EMSCRIPTEN)
+    target_link_options(${PROJECT_NAME} PUBLIC
+        -s ALLOW_MEMORY_GROWTH=1)
+
+    if (KAZE_DEBUG)
+        target_link_options(${PROJECT_NAME} PUBLIC
+            -gsource-map)
+    endif()
+endif()

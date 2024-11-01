@@ -1,5 +1,5 @@
 project(kaze_tests)
-include(kaze/test_deps)
+include(kaze/deps/tests)
 
 add_subdirectory(runtime)
 add_subdirectory(unit_tests)

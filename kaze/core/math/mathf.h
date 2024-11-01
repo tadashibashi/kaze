@@ -10,14 +10,20 @@ KAZE_NAMESPACE_BEGIN
     // ===== Basic Math =======================================================
 
     /// Return the greatest of two numbers
+    /// \tparam     T  arithmetic type of the args
+    /// \param[in]  a  first number
+    /// \param[in]  b  second number
+    /// \returns highest of the two numbers
     template <Arithmetic T>
     constexpr auto max(T a, T b) noexcept -> T
     {
         return a > b ? a : b;
     }
 
-    /// Return the greatest of a list of numbers.
-    /// An empty list will result in std::numeric_limits<T>::min()
+    /// Return the greatest of a list of numbers
+    /// \tparam     T      arithmetic type of the args
+    /// \param[in]  list
+    /// \returns highest number, if list is empty => the min value of T
     template <Arithmetic T>
     constexpr auto max(std::initializer_list<T> list) noexcept -> T
     {

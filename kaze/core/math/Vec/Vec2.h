@@ -4,7 +4,6 @@
 
 #include <kaze/core/lib.h>
 #include <kaze/core/math/mathf.h>
-#include <kaze/core/concepts.h>
 
 #include "VecBase.h"
 
