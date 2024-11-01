@@ -349,6 +349,8 @@ namespace backend {
             KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window display size: {}", SDL_GetError());
             return false;
         }
+
+        return true;
     }
 
     auto window::isFullscreen(const WindowHandle window, bool *outFullscreen) noexcept -> bool
