@@ -3,6 +3,7 @@
 #include "window_glfw3.h"
 #include "common_glfw3.h"
 
+#include <iostream>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/backend/window.h>
 #include <kaze/core/platform/defines.h>
@@ -106,13 +107,13 @@ namespace backend {
         events.emit(MouseScrollEvent {
             .offset = {
                 static_cast<float>(xoffset),
-                static_cast<float>(yoffset)
+                -static_cast<float>(yoffset)
             },
             .window = window,
         });
     }
 
-    static auto glfwCursorPosCallback(GLFWwindow *window, const double x, const double y) -> void
+    static auto glfwCursorPosCallback(GLFWwindow *window, double x, double y) -> void
     {
         WindowData *data;
         if ( !getWindowData(window, &data) )
@@ -120,6 +121,12 @@ namespace backend {
 
         int w, h;
         glfwGetWindowSize(window, &w, &h);
+
+        float scaleX=1.f, scaleY=1.f;
+        getContentScale(window, &scaleX, &scaleY);
+
+        x /= scaleX;
+        y /= scaleY;
 
         if (!data->isCapture)
         {
@@ -300,6 +307,8 @@ namespace backend {
             return false;
         }
 
+        window::setSize(window, width, height);
+
         // Set up window callbacks
         glfwSetWindowCloseCallback    ( window, glfwWindowCloseCallback ); WARN_CHECK("set window close callback");
         glfwSetKeyCallback            ( window, glfwKeyCallback );         WARN_CHECK("set window key callback");
@@ -432,9 +441,17 @@ namespace backend {
         return true;
     }
 
-    auto window::setSize(const WindowHandle window, const int width, const int height) noexcept -> bool
+    auto window::setSize(const WindowHandle window, int width, int height) noexcept -> bool
     {
         RETURN_IF_NULL(window);
+
+        if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
+        {
+            if (xscale > 0)
+                width *= xscale;
+            if (yscale > 0)
+                height *= yscale;
+        }
 
         glfwSetWindowSize(WIN_CAST(window), width, height);
         ERR_CHECK(Error::BE_RuntimeErr, "set logical window size");
@@ -448,6 +465,15 @@ namespace backend {
 
         glfwGetWindowSize(WIN_CAST(window), outWidth, outHeight);
         ERR_CHECK(Error::BE_RuntimeErr, "get logical window size");
+
+
+        if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
+        {
+            if (xscale > 0)
+                *outWidth /= xscale;
+            if (yscale > 0)
+                *outHeight /= yscale;
+        }
 
         return true;
     }

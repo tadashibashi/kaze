@@ -1,6 +1,8 @@
 #pragma once
 #include "../defs/BuildType.h"
 
+#include <string_view>
+
 namespace kz::config {
     // TODO: Android, iOS
 

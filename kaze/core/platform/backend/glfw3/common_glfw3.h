@@ -141,6 +141,8 @@ namespace backend {
 
     /// Get error string or nullptr if none. Consumes the error.
     const char *getGlfwErrorStr(int *outCode = nullptr) noexcept;
+
+    auto getContentScale(const WindowHandle window, float *outScaleX, float *outScaleY) -> bool;
 }
 
 KAZE_NAMESPACE_END

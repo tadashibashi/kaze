@@ -2,6 +2,7 @@
 #include "../defs/platform.h"
 
 #include <iostream>
+#include <format>
 
 #if KZ_PLATFORM_WINDOWS
 #include <windows.h>

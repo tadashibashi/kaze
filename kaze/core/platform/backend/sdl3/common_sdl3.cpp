@@ -1,6 +1,7 @@
 /// \file PlatformBackend_globals.cpp
 /// Implementation for constant conversions and global variables
 #include "common_sdl3.h"
+#include "SDL3/SDL_video.h"
 #include "window_sdl3.h"
 #include "private/GamepadConstants.inl"
 #include "private/KeyboardConstants.inl"
@@ -56,6 +57,11 @@ namespace backend {
     auto toSDLMouseBtn(MouseBtn button) noexcept -> Uint8
     {
         return s_toSDLMouseButton[ static_cast<int>(button) ];
+    }
+
+    auto getContentScale(WindowHandle handle) noexcept -> float
+    {
+        return SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(WIN_CAST(handle)));
     }
 
     auto initGlobals() noexcept -> void
@@ -458,16 +464,18 @@ namespace backend {
 
             case SDL_EVENT_MOUSE_MOTION:
                 {
+                    const auto window = SDL_GetWindowFromID(e.motion.windowID);
+                    const auto scale = getContentScale(window);
                     events.emit(MouseMotionEvent {
                         .position = {
-                            e.motion.x,
-                            e.motion.y,
+                            e.motion.x / scale,
+                            e.motion.y / scale,
                         },
                         .relative = {
-                            e.motion.xrel,
-                            e.motion.yrel,
+                            e.motion.xrel / scale,
+                            e.motion.yrel / scale,
                         },
-                        .window = SDL_GetWindowFromID(e.motion.windowID)
+                        .window = window,
                     });
                 } break;
 
@@ -634,6 +642,10 @@ namespace backend {
         float tempX, tempY;
         SDL_GetGlobalMouseState(&tempX, &tempY);
 
+        const auto scale = getContentScale(window);
+        tempX /= scale;
+        tempY /= scale;
+
         int winX, winY;
         if ( !SDL_GetWindowPosition( WIN_CAST(window), &winX, &winY ) )
         {
@@ -651,7 +663,20 @@ namespace backend {
 
     auto cursor::getGlobalPosition(float *x, float *y) noexcept -> bool
     {
-        SDL_GetGlobalMouseState(x, y);
+        float tempX, tempY;
+        SDL_GetGlobalMouseState(&tempX, &tempY);
+
+        SDL_Point point(tempX, tempY);
+        if (auto display = SDL_GetDisplayForPoint(&point))
+        {
+            const auto scale = SDL_GetDisplayContentScale(0);
+            tempX /= scale;
+            tempY /= scale;
+        }
+
+        *x = tempX;
+        *y = tempY;
+
         return true;
     }
 

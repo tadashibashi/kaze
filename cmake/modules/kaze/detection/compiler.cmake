@@ -66,10 +66,10 @@ check_cxx_source_compiles("
 " KAZE_COMPILER_SUPPORTS_SSE4_2)
 
 check_cxx_source_compiles("
-#ifdef __ARM_NEON
+#if defined(__ARM_NEON) || defined(_M_ARM) || defined(_M_ARM64)
     int main() { return 0; }
 #else
-    #error __ARM_NEON is not defined
+    #error arm neon is not defined
 #endif
 " KAZE_COMPILER_SUPPORTS_ARM_NEON)
 

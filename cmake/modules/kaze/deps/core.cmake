@@ -41,6 +41,9 @@ set(GLM_ENABLE_FAST_MATH      ON  CACHE BOOL "Enable fast math optimizations")
 set(GLM_BUILD_LIBRARY         ON  CACHE BOOL "Build dynamic/static library")
 set(GLM_BUILD_TESTS           OFF CACHE BOOL "Build the GLM test programs")
 set(GLM_BUILD_INSTALL         OFF CACHE BOOL "Generate the GLM install target")
+if (MSVC)
+    set(GLM_ENABLE_FAST_MATH      OFF  CACHE BOOL "Fixes a flag mismatch where /Za is incompatible with fast math" FORCE)
+endif()
 
 # Glm Cpu Intrinsic Support
 if (KAZE_COMPILER_SUPPORTS_SSE2)

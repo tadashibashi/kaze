@@ -11,7 +11,7 @@ auto kz::serve::emscripten(BuildType::Enum buildType, std::string_view targetNam
     const auto buildPath = fs::path("build") / "emscripten" / buildTypeName;
 
     json j;
-    if (const auto result = cmake::api::openReplyTargetData(buildPath.native(), buildTypeName, targetName, &j);
+    if (const auto result = cmake::api::openReplyTargetData(buildPath.string(), buildTypeName, targetName, &j);
         !result )
     {
         return result;
@@ -34,11 +34,11 @@ auto kz::serve::emscripten(BuildType::Enum buildType, std::string_view targetNam
             else
             {
                 otherFiles += ' ';
-                otherFiles += buildPath / path;
+                otherFiles += (buildPath / path).string();
             }
         }
 
-        if (const auto result = std::system(std::format("{} {} {}", kserverCommand, htmlFile.native(), otherFiles).c_str());
+        if (const auto result = std::system(std::format("{} {} {}", kserverCommand, htmlFile.string(), otherFiles).c_str());
             result != 0)
         {
             return Result::RuntimeError;

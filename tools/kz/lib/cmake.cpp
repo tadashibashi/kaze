@@ -42,7 +42,7 @@ auto kz::cmake::api::openReplyTargetData(std::string_view buildDir,
         const auto &entry : fs::directory_iterator(replyDir))
     {
         auto curPath = entry.path();
-        if (curPath.filename().native().starts_with(targetStartPath))
+        if (curPath.filename().string().starts_with(targetStartPath))
         {
             targetFilePath = curPath.string();
             break;
@@ -78,7 +78,7 @@ auto kz::cmake::api::openReplyCodeModel(std::string_view buildDir,
         const auto &entry : fs::directory_iterator(replyDir))
     {
         auto curPath = entry.path();
-        if (curPath.filename().native().starts_with(targetStartPath))
+        if (curPath.filename().string().starts_with(targetStartPath))
         {
             targetFilePath = curPath.string();
             break;

@@ -4,16 +4,15 @@
 #include "../defs/Result.h"
 #include "../lib/cmake.h"
 #include "../lib/console.h"
+#include "../lib/fs.h"
 
 #include <nlohmann/json.hpp>
 
-#include <filesystem>
 #include <iostream>
 #include <stdexcept>
 
 namespace kz::run {
     using json = nlohmann::json;
-    namespace fs = std::filesystem;
 
     static auto getTargetPath(
         std::string_view buildType,
@@ -29,7 +28,7 @@ namespace kz::run {
         json j;
         fs::path buildDir = fs::path("build") / platform / buildType;
         if (const auto result = cmake::api::openReplyTargetData(
-                buildDir.native(), buildType, target, &j);
+                buildDir.string(), buildType, target, &j);
             !result)
         {
             return result.code;
@@ -76,7 +75,7 @@ namespace kz::run {
         auto targetPath = fs::path("build") / platformName / buildTypeName / targetPathFromBuildDir;
         auto parentPath = targetPath.parent_path();
 
-        auto command = std::format( "cd {} && ./{}", parentPath.native(), target);
+        auto command = std::format( "cd {} && ./{}", parentPath.string(), target);
 
         if (std::system(command.c_str()) != 0)
             return Result::RuntimeError;
@@ -104,7 +103,7 @@ namespace kz::run {
         auto targetPath = fs::path("build") / platformName / buildTypeName / targetPathFromBuildDir;
         auto parentPath = targetPath.parent_path();
 
-        auto command = std::format( "cd {} && .\\{}", parentPath.native(), target);
+        auto command = std::format( "cd {} && .\\{}", parentPath.string(), target);
         if (std::system(command.c_str()) != 0)
             return Result::RuntimeError;
         return Result::Ok;
@@ -123,7 +122,7 @@ namespace kz::run {
 
         return serve::emscripten(buildType, target,
             std::format("{} {}", runtimeName,
-                (fs::path("tools") / "kserve" / "index.js").native())).code;
+                (fs::path("tools") / "kserve" / "index.js").string())).code;
     }
 
 }  // namespace kz::run

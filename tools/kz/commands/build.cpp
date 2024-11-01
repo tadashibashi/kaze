@@ -69,7 +69,7 @@ namespace kz::build {
                             std::string_view emsdkPath) -> int
     {
         auto buildTypeName = BuildType::getName(buildType);
-        return std::system( std::format("cmake --build build/emscripten/{} --target {}",
+        return std::system( std::format("cmake --build build/emscripten/{} --target {} --parallel",
             buildTypeName, targetName).c_str() );
     }
 
@@ -81,7 +81,7 @@ namespace kz::build {
     auto macos(BuildType::Enum buildType, std::string_view targetName) -> int
     {
         auto buildTypeName = BuildType::getName(buildType);
-        return std::system( std::format("cmake --build build/desktop/{} --target {}",
+        return std::system( std::format("cmake --build build/desktop/{} --target {} --parallel",
             buildTypeName, targetName).c_str() );
     }
 
@@ -95,7 +95,7 @@ namespace kz::build {
         const auto buildPath = fs::path("build") / TargetPlatform::getName(platform) / BuildType::getName(buildType);
         std::vector<std::string> targets;
 
-        if (const auto result = getTargetList(buildPath.native(), &targets);
+        if (const auto result = getTargetList(buildPath.string(), &targets);
             !result)
         {
             return result.code;

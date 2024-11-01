@@ -2,14 +2,12 @@
 
 #include "../lib/console.h"
 #include "../lib/cmake.h"
+#include "../lib/fs.h"
 
 #include <cstdlib>
-#include <filesystem>
 #include <format>
-#include <string_view>
 
 namespace kz::config {
-    namespace fs = std::filesystem;
 
     static auto copyCompileCommands(std::string_view platform, std::string_view buildType) -> int
     {
@@ -36,7 +34,7 @@ namespace kz::config {
         std::string_view buildTypeName = BuildType::getName(buildType);
         std::string_view generator = console::isProgramAvailable("ninja") ? "-G Ninja" : "";
         const auto  cmakeBuildDir = fs::path("build") / "desktop" / buildTypeName;
-        if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.native());
+        if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.string());
             !result )
         {
             return result;
@@ -61,17 +59,20 @@ namespace kz::config {
     auto windows(BuildType::Enum buildType) -> int
     {
         std::string_view buildTypeName = BuildType::getName(buildType);
+        auto ninjaAvailable = console::isProgramAvailable("ninja");
+        std::string_view generator = ninjaAvailable ? "-G Ninja" : "";
+        std::string_view compiler = ninjaAvailable ? "-DCMAKE_CXX_COMPILER=cl" : "";
         const auto  cmakeBuildDir = fs::path("build") / "desktop" / buildTypeName;
-        if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.native());
+        if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.string());
             !result )
         {
             return result;
         }
 
-        if (auto result = std::system(std::format( // CMAKE_BUILD_TYPE set here since CMakeLists depends on it being set.
-                "cmake -B {} -S . -DCMAKE_BUILD_TYPE={} -G \"Visual Studio 17 2022\" "
-                "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
-                cmakeBuildDir.native(), buildTypeName).c_str());
+        if (const auto result = std::system(std::format(
+                "cmake -B build/desktop/{} -S . {} -DCMAKE_BUILD_TYPE={} "
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=1 {}",
+                buildTypeName, generator, buildTypeName, compiler).c_str());
             result != 0)
         {
             return result;
@@ -84,7 +85,7 @@ namespace kz::config {
     {
         std::string_view buildTypeName = BuildType::getName(buildType);
         const auto  cmakeBuildDir = fs::path("build") / "emscripten" / buildTypeName;
-        if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.native());
+        if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.string());
             !result )
         {
             return result;
@@ -95,7 +96,7 @@ namespace kz::config {
             "cmake -B build/emscripten/{} -S . -DCMAKE_BUILD_TYPE={} -DCMAKE_EXPORT_COMPILE_COMMANDS=1 "
             "-DCMAKE_TOOLCHAIN_FILE={} {}",
             buildTypeName, buildTypeName,
-            (fs::path(emsdkPath) / "upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake").native(),
+            (fs::path(emsdkPath) / "upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake").string(),
             generator
         ).c_str());
 

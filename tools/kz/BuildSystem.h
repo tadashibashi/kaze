@@ -8,11 +8,11 @@
 
 #include "lib/Args.h"
 #include "lib/Env.h"
+#include "lib/fs.h"
 
-#include <filesystem>
+#include <string_view>
 
 namespace kz {
-    namespace fs = std::filesystem;
 
     class BuildSystem {
     public:

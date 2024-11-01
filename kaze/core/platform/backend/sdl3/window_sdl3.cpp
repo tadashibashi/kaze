@@ -1,6 +1,7 @@
 /// \file Window_sdl3.h
 /// SDL3 implementation for functions in the backend::window namespace
 #include "window_sdl3.h"
+#include "SDL3/SDL_video.h"
 #include "common_sdl3.h"
 
 #include <kaze/core/errors.h>
@@ -134,6 +135,7 @@ namespace backend {
             KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create SDL3 Window: {}", SDL_GetError());
             return KAZE_FALSE;
         }
+        window::setSize(window, width, height);
 
         const auto props = SDL_GetWindowProperties(window);
         if ( !props )
@@ -304,7 +306,9 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
-        if ( !SDL_SetWindowSize( WIN_CAST(window), x, y ) )
+        const auto scale = SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(WIN_CAST(window)));
+
+        if ( !SDL_SetWindowSize( WIN_CAST(window), x * scale, y * scale) )
         {
             KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "failed to set logical window size: {}", SDL_GetError());
             return false;
@@ -323,6 +327,16 @@ namespace backend {
             return false;
         }
 
+        const auto scale = SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(WIN_CAST(window)));
+        if (scale != 0)
+        {
+            *x /= scale;
+            *y /= scale;
+        }
+
+
+        return true;
+
         return true;
     }
 
@@ -335,8 +349,6 @@ namespace backend {
             KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window display size: {}", SDL_GetError());
             return false;
         }
-
-        return true;
     }
 
     auto window::isFullscreen(const WindowHandle window, bool *outFullscreen) noexcept -> bool

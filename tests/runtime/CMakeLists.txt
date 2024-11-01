@@ -26,4 +26,3 @@ kaze_target_assets(kaze_test_01_app
 
 add_executable(kaze_test_02_ide 02_ide.cpp)
 target_link_libraries(kaze_test_02_ide PRIVATE kaze_tk)
-

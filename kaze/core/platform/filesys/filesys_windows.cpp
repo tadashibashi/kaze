@@ -9,12 +9,12 @@ namespace filesys {
     {
         char path[MAX_PATH];
         GetModuleFileNameA(nullptr, path, sizeof(path));
-
+        return "";
     }
 
     auto getUserDir() -> String
     {
-
+        return "";
     }
 }
 

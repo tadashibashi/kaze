@@ -19,8 +19,9 @@ add_library(${PROJECT_NAME}
         memory.cpp
 
         AssetLoader.h
+        AlignedList.h
         Optional.h
-        List.h
+
         Memory.h
         ServiceProvider.h
         ServiceProvider.cpp

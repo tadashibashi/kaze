@@ -247,6 +247,30 @@ namespace backend {
     {
         return static_cast<Key>(s_glfwKeyToKey[glfwKey]);
     }
+
+
+    static auto getMonitor(const WindowHandle window)
+    {
+        auto monitor = glfwGetWindowMonitor(WIN_CAST(window));
+        if ( !monitor )
+            monitor = glfwGetPrimaryMonitor();
+        return monitor;
+    }
+
+    auto getContentScale(const WindowHandle window, float *outScaleX, float *outScaleY) -> bool
+    {
+        if (const auto monitor = getMonitor(window))
+        {
+            float xscale, yscale;
+            glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+            ERR_CHECK(Error::BE_RuntimeErr, "get monitor content scale");
+
+            *outScaleX = xscale;
+            *outScaleY = yscale;
+        }
+        return true;
+    }
+
     // ===== Static callbacks ===============================================
 
     static void glfwJoystickCallback(const int jid, const int event)
@@ -492,10 +516,13 @@ namespace backend {
         glfwGetCursorPos(WIN_CAST(window), &tempX, &tempY);
         ERR_CHECK(Error::BE_RuntimeErr, "get cursor position");
 
+        float scaleX, scaleY;
+        getContentScale(window, &scaleX, &scaleY);
+
         if (outX)
-            *outX = static_cast<float>(tempX);
+            *outX = static_cast<float>(tempX) * scaleX;
         if (outY)
-            *outY = static_cast<float>(tempY);
+            *outY = static_cast<float>(tempY) * scaleY;
 
         return true;
     }
@@ -512,12 +539,19 @@ namespace backend {
 
             tempX += static_cast<double>(winX);
             tempY += static_cast<double>(winY);
+
+            float scaleX, scaleY;
+            getContentScale(window, &scaleX, &scaleY);
+
+            tempX *= scaleX;
+            tempY *= scaleY;
         }
         else
         {
             KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get current context: {}", getGlfwErrorStr());
             return false;
         }
+
 
         if (outX)
             *outX = static_cast<float>(tempX);

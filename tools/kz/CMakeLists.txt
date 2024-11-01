@@ -43,6 +43,7 @@ add_executable(kz
     lib/console.h
     lib/Env.cpp
     lib/Env.h
+    lib/fs.h
     lib/str.cpp
     lib/str.h
 )

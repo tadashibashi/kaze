@@ -16,6 +16,6 @@ static constexpr Array<Uint8, static_cast<Int>(MouseBtn::Count)> s_toSDLMouseBut
     0,
 };
 
-static Array<MouseBtn, static_cast<Int>(SDL_BUTTON_X2)> s_toMouseButton{};
+static Array<MouseBtn, static_cast<Int>(MouseBtn::Count)> s_toMouseButton{};
 
 KAZE_NAMESPACE_END

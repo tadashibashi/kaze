@@ -24,17 +24,15 @@
 			"name": "kaze app",
 			"request": "launch",
 			"type": "lldb",
-			"program": "$project_path/../build/desktop/tests/runtime/kaze_test_01_app",
-			"cwd": "$project_path/../build/desktop/tests/runtime",
-			"pre_debug_task": "build kaze app",
+			"program": "$project_path/../build/desktop/Debug/tests/runtime/bin/kaze_test_01_app",
+			"cwd": "$project_path/../build/desktop/Debug/tests/runtime/bin",
 		},
 		{
 			"name": "kaze unit tests",
 			"request": "launch",
 			"type": "lldb",
-			"program": "$project_path/../build/desktop/tests/unit_tests/kaze_unit_tests",
-			"cwd": "$project_path/../build/desktop/tests/unit_tests",
-			"pre_debug_task": "build kaze unit tests",
+			"program": "$project_path/../build/desktop/Debug/tests/unit_tests/kaze_unit_tests",
+			"cwd": "$project_path/../build/desktop/Debug/tests/unit_tests",
 		}
 	],
 	"debugger_tasks":
