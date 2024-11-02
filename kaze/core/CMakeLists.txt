@@ -59,7 +59,6 @@ add_library(${PROJECT_NAME}
         math/easings.h
         math/geometry.h
         math/Matrix.h
-        math/mathf.cpp
         math/mathf.h
         math/Rect.h
         math/Rect3D.h

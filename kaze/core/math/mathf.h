@@ -9,11 +9,6 @@ namespace mathf {
 
     // ===== Basic Math =======================================================
 
-
-    /// \returns whether a floating point is nan
-    constexpr auto isNaN(Float n) noexcept -> Bool;
-    constexpr auto isNaN(Double n) noexcept -> Bool;
-
     /// Return the greatest of two numbers
     /// \tparam     T  arithmetic type of the args
     /// \param[in]  a  first number
