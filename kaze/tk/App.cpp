@@ -5,12 +5,15 @@
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/BackendInitGuard.h>
 #include <kaze/core/platform/defines.h>
+#include <thread>
 
 #if KAZE_PLATFORM_EMSCRIPTEN
 #   include <emscripten/emscripten.h>
 #endif
 
 KAZE_TK_NAMESPACE_BEGIN
+
+static constexpr Double targetFrameSec = 1.0 / 62.0;
 
 struct App::Impl
 {
@@ -297,14 +300,25 @@ auto App::doRender() -> void
 
 auto App::oneTick() -> void
 {
-    double currentTime = 0;
-    backend::getTime(&currentTime);
-    m->deltaTime = currentTime - m->lastTime;
+    double startTickTime = 0;
+    backend::getTime(&startTickTime);
+    m->deltaTime = startTickTime - m->lastTime;
 
     pollEvents();
     frame();
 
-    m->lastTime = currentTime;
+    // TODO: make a more robust frame rate tracker, respond to slowdowns / speed ups to stabilize rate
+    double endTickTime;
+    if (backend::getTime(&endTickTime))
+    {
+        const auto elapsed = endTickTime - startTickTime;
+        if (elapsed < targetFrameSec)
+        {
+            std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameSec - elapsed));
+        }
+    }
+
+    m->lastTime = startTickTime;
 }
 
 auto App::doUpdate() -> void
