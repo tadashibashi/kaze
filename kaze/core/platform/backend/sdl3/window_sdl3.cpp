@@ -89,6 +89,7 @@ namespace backend {
         {   // Wayland
             result.windowHandle = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_SURFACE_POINTER, nullptr);
             result.displayType = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WAYLAND_DISPLAY_POINTER, nullptr);
+            result.type = NativePlatformData::WindowType::Wayland;
         }
 
     #elif defined(SDL_PLATFORM_ANDROID)

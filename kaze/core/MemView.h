@@ -1,6 +1,7 @@
 #pragma once
 
 #include <kaze/core/lib.h>
+#include <cstring>
 #include <type_traits>
 
 KAZE_NS_BEGIN

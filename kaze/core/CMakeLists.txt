@@ -21,8 +21,8 @@ add_library(${PROJECT_NAME}
         AssetLoader.h
         AlignedList.h
         Optional.h
+        MemView.h
 
-        Memory.h
         ServiceProvider.h
         ServiceProvider.cpp
 
@@ -59,6 +59,7 @@ add_library(${PROJECT_NAME}
         math/easings.h
         math/geometry.h
         math/Matrix.h
+        math/mathf.cpp
         math/mathf.h
         math/Rect.h
         math/Rect3D.h
@@ -119,6 +120,12 @@ if (KAZE_NO_NAMESPACE)
     set(KAZE_NO_NAMESPACE 1)
 else()
     set(KAZE_NO_NAMESPACE 0)
+endif()
+
+if (KAZE_USE_WAYLAND)
+    set(KAZE_USE_WAYLAND 1)
+else()
+    set(KAZE_USE_WAYLAND 0)
 endif()
 
 target_compile_definitions(${PROJECT_NAME} PUBLIC

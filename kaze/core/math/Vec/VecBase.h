@@ -6,6 +6,8 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/math/mathf.h>
 #include <kaze/core/concepts.h>
+
+#include <cmath>
 #include <type_traits>
 
 KAZE_NS_BEGIN

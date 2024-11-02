@@ -10,6 +10,12 @@ namespace backend::window {
     struct NativePlatformData {
         void *windowHandle;
         void *displayType;
+
+        enum class WindowType {
+            Default = 0,
+            Wayland,
+            Count,
+        } type = WindowType::Default;
     };
 
     /// Open/create a new window

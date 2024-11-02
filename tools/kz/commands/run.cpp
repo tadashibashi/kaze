@@ -9,6 +9,7 @@
 #include <nlohmann/json.hpp>
 
 #include <iostream>
+#include <format>
 #include <stdexcept>
 
 namespace kz::run {

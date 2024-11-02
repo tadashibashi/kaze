@@ -146,18 +146,22 @@ auto Renderable::submit() -> void
 
 auto Renderable::submit(const Uint vertexStart, const Uint vertexCount, const Uint indexStart, const Uint indexCount) const -> void
 {
-    bgfx::TransientVertexBuffer tvb;
-    bgfx::allocTransientVertexBuffer(&tvb, vertexCount, m->layout.getLayout());
-    const auto stride = m->layout.getStride();
-    memory::copy(tvb.data, (Ubyte *)m->vertexData.data() + stride * vertexStart, stride * vertexCount);
-    bgfx::setVertexBuffer(0, &tvb);
+    if (bgfx::getAvailTransientVertexBuffer(vertexCount, m->layout.getLayout()) >= vertexCount &&
+        bgfx::getAvailTransientIndexBuffer(indexCount) >= indexCount)
+    {
+        bgfx::TransientVertexBuffer tvb;
+        bgfx::allocTransientVertexBuffer(&tvb, vertexCount, m->layout.getLayout());
+        const auto stride = m->layout.getStride();
+        memory::copy(tvb.data, (Ubyte *)m->vertexData.data() + stride * vertexStart, stride * vertexCount);
+        bgfx::setVertexBuffer(0, &tvb);
 
-    bgfx::TransientIndexBuffer tib;
-    bgfx::allocTransientIndexBuffer(&tib, indexCount);
-    memory::copy(tib.data, (Ubyte *)m->indexData.data() + sizeof(Uint16) * indexStart, sizeof(Uint16) * indexCount);
-    bgfx::setIndexBuffer(&tib, indexStart, indexCount);
-    bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A); // todo: expose these options later?
-    m->program.submit(m->viewId);
+        bgfx::TransientIndexBuffer tib;
+        bgfx::allocTransientIndexBuffer(&tib, indexCount);
+        memory::copy(tib.data, (Ubyte *)m->indexData.data() + sizeof(Uint16) * indexStart, sizeof(Uint16) * indexCount);
+        bgfx::setIndexBuffer(&tib, indexStart, indexCount);
+        bgfx::setState(BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A); // todo: expose these options later?
+        m->program.submit(m->viewId);
+    }
 }
 
 auto Renderable::setViewId(Int viewId) -> Renderable &

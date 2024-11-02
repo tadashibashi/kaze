@@ -3,6 +3,10 @@
 #include "../defs/TargetPlatform.h"
 #include <string_view>
 
+#ifdef linux
+#undef linux
+#endif
+
 namespace kz::run {
 
 auto macos(TargetPlatform::Enum platform, BuildType::Enum buildType,

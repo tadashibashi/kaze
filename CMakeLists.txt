@@ -1,8 +1,9 @@
-cmake_minimum_required(VERSION 3.28)
+cmake_minimum_required(VERSION 3.20)
 project(kaze_engine LANGUAGES CXX)
 
 # ===== C++ Standard =======================================================
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF) # No C++20 Modules in this project
 
 # ===== Directory Variables ===================================================
@@ -40,7 +41,8 @@ set(KAZE_NAMESPACE      "kaze"                          CACHE STRING "Set the na
 set(KAZE_DEBUG         ${KAZE_DEBUG_DEFAULT} CACHE BOOL   "Build with debug mode: logging and asserts")
 set(KAZE_BUILD_TESTS   ${KAZE_IS_ROOT}       CACHE BOOL   "Make kaze unit tests available for compilation")
 
-set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland support on Linux")
+# This is buggy with BGFX so turned off for now
+set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland support on Linux" FORCE)
 
 
 # ----- Kaze Toolkit Options -----

@@ -106,7 +106,7 @@ auto ImGui_ImplKaze_Init(ImGuiKazeContext *context) -> Bool
 
     // Set platform dependent data
     const auto viewport = ImGui::GetMainViewport();
-    const auto [windowHandle, displayType] = backend::window::getNativeInfo(context->window);
+    const auto [windowHandle, displayType, type] = backend::window::getNativeInfo(context->window);
     viewport->PlatformHandle = context->window;
     viewport->PlatformHandleRaw = windowHandle;
 

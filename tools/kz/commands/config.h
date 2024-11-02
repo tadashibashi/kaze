@@ -3,6 +3,10 @@
 
 #include <string_view>
 
+#ifdef linux
+#undef linux
+#endif
+
 namespace kz::config {
     // TODO: Android, iOS
 

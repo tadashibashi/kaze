@@ -3,6 +3,8 @@
 #include "../lib/fs.h"
 #include "../lib/json.h"
 
+#include <format>
+
 namespace fs = std::filesystem;
 
 auto kz::serve::emscripten(BuildType::Enum buildType, std::string_view targetName, std::string_view kserverCommand) -> Result

@@ -25,6 +25,10 @@ struct App::Impl
 
     AppInit config;
     Window window;
+
+    Bool wasResized{};
+    Vec2i newSize{};
+    float lastResizeTime{};
     App *app;
 };
 
@@ -247,9 +251,17 @@ auto App::processWindowEvent(const WindowEvent &e, const Double timestamp) -> vo
     {
         if (m->window.getHandle() == e.window)
         {
-            m->graphics.reset(e.data0, e.data1);
-            frame();
-            m->graphics.renderFrame();
+            #if !KAZE_PLATFORM_LINUX
+                m->graphics.reset(e.data0, e.data1);
+                frame();
+                doRender();
+                m->graphics.frame();
+                m->graphics.renderFrame();
+            #endif
+
+            m->wasResized = true;
+            m->newSize = {e.data0, e.data1};
+            m->lastResizeTime = time();
         }
     } break;
     default:
@@ -262,6 +274,14 @@ void App::pollEvents()
     m->input.preProcessEvents();
     backend::pollEvents();
     m->input.postProcessEvents();
+
+#if KAZE_PLATFORM_LINUX
+    if (m->wasResized && time() - m->lastResizeTime > .05)
+    {
+        m->graphics.reset(m->newSize.x, m->newSize.y);
+        m->wasResized = false;
+    }
+#endif
 }
 
 auto App::doRender() -> void

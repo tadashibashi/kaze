@@ -3,23 +3,21 @@
 #include "window_glfw3.h"
 #include "common_glfw3.h"
 
-#include <iostream>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/backend/window.h>
 #include <kaze/core/platform/defines.h>
 
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan_core.h>
 
 #if   KAZE_PLATFORM_WINDOWS
 #   define GLFW_EXPOSE_NATIVE_WIN32
 #elif KAZE_PLATFORM_MACOS
 #   define GLFW_EXPOSE_NATIVE_COCOA
 #elif KAZE_PLATFORM_LINUX
-#   if KAZE_USE_WAYLAND
-#       define GLFW_EXPOSE_NATIVE_WAYLAND
-#   else
-#       define GLFW_EXPOSE_NATIVE_X11
-#   endif
+#   define GLFW_EXPOSE_NATIVE_WAYLAND
+#   define GLFW_EXPOSE_NATIVE_X11
+#   define GLFW_EXPOSE_NATIVE_GLX
 # elif KAZE_PLATFORM_EMSCRIPTEN
 // webgl
 #else
@@ -46,17 +44,25 @@ namespace backend {
             .displayType = nullptr,
         };
     #elif KAZE_PLATFORM_LINUX
-    #   if KAZE_USE_WAYLAND
-        return {
-            .windowHandle = glfwGetWaylandWindow(WIN_CAST(window)),
-            .displayType = nullptr,
-        };
-    #   else
-        return {
-            .windowHandle = glfwGetX11Window(WIN_CAST(window)),
-            .displayType = XOpenDisplay(nullptr),
-        };
-    #   endif
+        #if KAZE_USE_WAYLAND
+        if (glfwGetPlatform() == GLFW_PLATFORM_WAYLAND)
+        {
+            KAZE_CORE_LOG("WAYYYLANDDNDNDNDNDNDNDN!!!!");
+            return {
+                .windowHandle = glfwGetWaylandWindow(WIN_CAST(window)),
+                .displayType = glfwGetWaylandDisplay(),
+                .type = NativePlatformData::WindowType::Wayland,
+            };
+        }  
+        else
+        #endif
+        {
+            return {
+                .windowHandle = (void *)(uintptr_t)glfwGetX11Window(WIN_CAST(window)),
+                .displayType = glfwGetX11Display(),
+            };
+        }
+
     #elif KAZE_PLATFORM_EMSCRIPTEN
         return {
             .windowHandle = (void *)"#canvas",

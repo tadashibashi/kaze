@@ -2,6 +2,10 @@
 #include "../defs/BuildType.h"
 #include "../defs/TargetPlatform.h"
 
+#ifdef linux
+#undef linux
+#endif
+
 namespace kz::build {
     // TODO: Android, iOS
 

@@ -7,6 +7,7 @@
 #include <cstdlib>
 #include <format>
 
+
 namespace kz::config {
 
     static auto copyCompileCommands(std::string_view platform, std::string_view buildType) -> int

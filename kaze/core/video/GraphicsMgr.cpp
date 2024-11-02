@@ -3,6 +3,7 @@
 
 #include <kaze/core/debug.h>
 #include <kaze/core/platform/backend/backend.h>
+#include <kaze/core/platform/backend/window.h>
 #include <kaze/core/platform/defines.h>
 #include <kaze/core/video/VertexLayout.h>
 
@@ -66,6 +67,8 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
     bgfx::Init config{};
     config.platformData.ndt = platformData.displayType;
     config.platformData.nwh = platformData.windowHandle;
+    config.platformData.type = platformData.type == backend::window::NativePlatformData::WindowType::Wayland ? 
+        bgfx::NativeWindowHandleType::Wayland : bgfx::NativeWindowHandleType::Default;
     config.resolution.width = width;
     config.resolution.height = height;
     config.resolution.reset = BGFX_RESET_VSYNC;

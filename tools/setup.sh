@@ -1,9 +1,14 @@
-#!/usr/bin/env sh
+#!/bin/sh
+
 # Set up kz
-if [ $0:0:1 = '/' ]; then
-    SCRIPT_PATH=$0
+if [ -n "${BASH_SOURCE[0]}" ]; then
+    SCRIPT_PATH="${BASH_SOURCE[0]}"
 else
-    SCRIPT_PATH="$(pwd)/$0"
+    SCRIPT_PATH="$0"
+fi
+
+if [ $SCRIPT_PATH:0:1 -ne '/' ]; then
+    SCRIPT_PATH="$(pwd)/$SCRIPT_PATH"
 fi
 
 TOOLS_DIR="$(dirname "$SCRIPT_PATH")"
