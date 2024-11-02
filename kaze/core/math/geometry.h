@@ -9,7 +9,7 @@
 #include <kaze/core/math/Rect3D.h>
 #include <kaze/core/math/Vec/Vec2.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace mathf
 {
@@ -89,4 +89,4 @@ namespace mathf
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

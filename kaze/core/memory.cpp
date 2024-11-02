@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstring>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace memory {
 
@@ -12,14 +12,14 @@ auto alloc(const Size bytes) noexcept -> void *
 {
     if (bytes == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "attempted to alloc 0 bytes");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "attempted to alloc 0 bytes");
         return nullptr;
     }
 
     const auto buffer = std::malloc(bytes);
     if ( !buffer )
     {
-        KAZE_CORE_ERRCODE(Error::OutOfMemory, "Out of memory");
+        KAZE_PUSH_ERR(Error::OutOfMemory, "Out of memory");
         return nullptr;
     }
 
@@ -30,7 +30,7 @@ auto allocAlign(Size bytes, Size alignment) noexcept -> void *
 {
     if (bytes == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "Attempted to allocate 0 bytes");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "Attempted to allocate 0 bytes");
         return nullptr;
     }
 
@@ -76,13 +76,13 @@ auto realloc(void *memory, Size size) noexcept -> void *
 {
     if ( !memory )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "required arg `memory` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "required arg `memory` was null");
         return nullptr;
     }
 
     if (size == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "realloc size must be > 0");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "realloc size must be > 0");
         return nullptr;
     }
 
@@ -96,19 +96,19 @@ auto reallocAlign(void *alignedMem, Size oldSize, Size newSize, Size alignment) 
 
     if ( !alignedMem )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "cannot reallocate null `memory`");
+        KAZE_PUSH_ERR(Error::NullArgErr, "cannot reallocate null `memory`");
         return nullptr;
     }
 
     if (oldSize == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "cannot reallocate 0 bytes");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "cannot reallocate 0 bytes");
         return nullptr;
     }
 
     if (newSize == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "cannot shrink buffer to 0 bytes");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "cannot shrink buffer to 0 bytes");
         return nullptr;
     }
 
@@ -128,5 +128,5 @@ auto reallocAlign(void *alignedMem, Size oldSize, Size newSize, Size alignment) 
 }
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 

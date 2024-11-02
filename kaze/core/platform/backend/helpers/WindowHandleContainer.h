@@ -7,7 +7,7 @@
 
 #include <mutex>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend
 {
@@ -81,19 +81,19 @@ namespace backend
             }
             else
             {
-                KAZE_CORE_ERRCODE(Error::BE_LogicError, "A duplicate window was passed to WindowHandleContainer<T>::emplace. Action was prevented.");
+                KAZE_PUSH_ERR(Error::BE_LogicError, "A duplicate window was passed to WindowHandleContainer<T>::emplace. Action was prevented.");
             }
 
             return true;
         }
         catch(const std::exception &e)
         {
-            KAZE_CORE_ERRCODE(Error::StdExcept, "Error thrown while adding WindowHandle to internal HashSet: {}", e.what());
+            KAZE_PUSH_ERR(Error::StdExcept, "Error thrown while adding WindowHandle to internal HashSet: {}", e.what());
             return false;
         }
         catch(...)
         {
-            KAZE_CORE_ERRCODE(Error::Unknown, "Unknown error occurred while adding WindowHandle to internal HashSet");
+            KAZE_PUSH_ERR(Error::Unknown, "Unknown error occurred while adding WindowHandle to internal HashSet");
             return false;
         }
     }
@@ -110,12 +110,12 @@ namespace backend
         }
         catch(const std::exception &e)
         {
-            KAZE_CORE_ERRCODE(Error::StdExcept, "Exception occurred while checking WindowHandle validity: {}", e.what());
+            KAZE_PUSH_ERR(Error::StdExcept, "Exception occurred while checking WindowHandle validity: {}", e.what());
             return false;
         }
         catch(...)
         {
-            KAZE_CORE_ERRCODE(Error::Unknown, "Unknown error was thrown while checking WindowHandle validity");
+            KAZE_PUSH_ERR(Error::Unknown, "Unknown error was thrown while checking WindowHandle validity");
             return false;
         }
     }
@@ -143,14 +143,14 @@ namespace backend
         }
         catch(const std::exception &e)
         {
-            KAZE_CORE_ERRCODE(Error::StdExcept, "Exception occurred while erasing window: {}", e.what());
+            KAZE_PUSH_ERR(Error::StdExcept, "Exception occurred while erasing window: {}", e.what());
             if (outWasErased)
                 *outWasErased = false;
             return false;
         }
         catch(...)
         {
-            KAZE_CORE_ERRCODE(Error::Unknown, "Unknown exception occurred while erasing window");
+            KAZE_PUSH_ERR(Error::Unknown, "Unknown exception occurred while erasing window");
             if (outWasErased)
                 *outWasErased = false;
             return false;
@@ -177,12 +177,12 @@ namespace backend
         }
         catch(const std::exception &e)
         {
-            KAZE_CORE_ERRCODE(Error::StdExcept, "Exception occurred while fetching window data: {}", e.what());
+            KAZE_PUSH_ERR(Error::StdExcept, "Exception occurred while fetching window data: {}", e.what());
             return false;
         }
         catch(...)
         {
-            KAZE_CORE_ERRCODE(Error::Unknown, "Unknown error occurred while fetching window data");
+            KAZE_PUSH_ERR(Error::Unknown, "Unknown error occurred while fetching window data");
             return false;
         }
     }
@@ -206,4 +206,4 @@ namespace backend
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

@@ -4,7 +4,7 @@
 #include <kaze/core/io/io.h>
 #include <kaze/core/video/private/image.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 #define ASSERT_LOADED() KAZE_ASSERT(m_image.isValid(), "Image must be loaded to call this function");
 
@@ -149,4 +149,4 @@ auto Image::isCubeMap() const noexcept -> Bool
     return m_image.isCubeMap();
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

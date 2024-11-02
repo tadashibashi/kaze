@@ -3,7 +3,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/input/GamepadConstants.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend::gamepad {
     /// Get whether a gamepad is connected in a slot (0 - 15)
@@ -65,4 +65,4 @@ namespace backend::gamepad {
     auto getAxesMoved(int index, GamepadAxis axisX, GamepadAxis axisY, float deadzone, bool *outMoved) noexcept -> bool;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

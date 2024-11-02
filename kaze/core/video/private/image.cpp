@@ -8,7 +8,7 @@
 
 #include <kaze/core/debug.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 static bx::DefaultAllocator defaultAlloc{};
 
@@ -16,13 +16,13 @@ auto image::load(const void *data, const Size size) -> ImageHandle
 {
     if ( !data )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required argument `data` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "Required argument `data` was null");
         return {};
     }
 
     if (size == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "size of file data passed to loadImage was 0");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "size of file data passed to loadImage was 0");
         return {};
     }
 
@@ -31,7 +31,7 @@ auto image::load(const void *data, const Size size) -> ImageHandle
     if ( result = bimg::imageParse(&defaultAlloc, data, size, bimg::TextureFormat::RGBA8, &error);
         result == nullptr )
     {
-        KAZE_CORE_ERRCODE(Error::RuntimeErr, "bimg failed to parse image: {}",
+        KAZE_PUSH_ERR(Error::RuntimeErr, "bimg failed to parse image: {}",
             error.getMessage().getCPtr());
         return {};
     }
@@ -47,7 +47,7 @@ auto image::create(Size width, Size height,
             width, height, 0, 1, false, false, nullptr);
     if ( !image )
     {
-        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Failed to allocate bimg::ImageContainer");
+        KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to allocate bimg::ImageContainer");
         return {};
     }
 
@@ -69,7 +69,7 @@ auto image::copy(ImageHandle imageHandle) -> ImageHandle
     auto image = static_cast<bimg::ImageContainer *>(imageHandle.handle);
     if ( !image )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "required arg `image` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "required arg `image` was null");
         return {};
     }
 
@@ -79,7 +79,7 @@ auto image::copy(ImageHandle imageHandle) -> ImageHandle
 
     if ( !newImage )
     {
-        KAZE_CORE_ERRCODE(Error::RuntimeErr, "bimg::imageAlloc failed");
+        KAZE_PUSH_ERR(Error::RuntimeErr, "bimg::imageAlloc failed");
     }
 
     return {.handle = newImage};
@@ -94,5 +94,5 @@ auto image::free(ImageHandle image) -> void
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 

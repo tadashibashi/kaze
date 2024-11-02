@@ -4,7 +4,7 @@
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/debug.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 Window::Window() noexcept : m_window(), m_ownsWindow()
 { }
@@ -76,7 +76,7 @@ auto Window::close() noexcept -> Bool
 {
     if ( !m_ownsWindow )
     {
-        KAZE_CORE_ERRCODE(Error::UnownedPointerCleanup, "Attempted to close non-owned window");
+        KAZE_PUSH_ERR(Error::UnownedPointerCleanup, "Attempted to close non-owned window");
         return KAZE_FALSE;
     }
 
@@ -327,4 +327,4 @@ auto Window::getHandle() -> WindowHandle
     return m_window;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

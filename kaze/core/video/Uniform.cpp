@@ -5,7 +5,7 @@
 #include <kaze/core/debug.h>
 #include <bgfx/bgfx.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 const Uint16 Uniform::InvalidHandle = bgfx::kInvalidHandle;
 
@@ -86,4 +86,4 @@ auto Uniform::name() const noexcept -> String
     return info.name;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

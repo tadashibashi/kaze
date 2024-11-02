@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
 
@@ -29,7 +29,7 @@ namespace backend {
         // check that a slot is available
         if (index >= m_gamepads.size())
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to connect controller with jid {}: too many controllers are open",
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to connect controller with jid {}: too many controllers are open",
                           static_cast<int>(id));
             return CONNECT_FAILED;
         }
@@ -38,7 +38,7 @@ namespace backend {
         const auto gamepad = SDL_OpenGamepad(id);
         if ( !gamepad )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to open gamepad with id {}: {}",
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to open gamepad with id {}: {}",
                           static_cast<int>(id), SDL_GetError());
             return CONNECT_FAILED;
         }
@@ -147,7 +147,7 @@ namespace backend {
         const auto props = SDL_GetGamepadProperties(gamepad);
         if ( !props )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Internal error: failed to get properties from gamepad: {}",
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Internal error: failed to get properties from gamepad: {}",
                 SDL_GetError());
             return nullptr;
         }
@@ -164,7 +164,7 @@ namespace backend {
         const auto props = SDL_GetGamepadProperties(gamepad);
         if ( !props )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Internal error: failed to get properties from gamepad: {}",
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Internal error: failed to get properties from gamepad: {}",
                 SDL_GetError());
             return nullptr;
         }
@@ -180,7 +180,7 @@ namespace backend {
         const auto id = SDL_GetGamepadID(gamepad);
         if (!id)
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get gamepad id: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get gamepad id: {}", SDL_GetError());
             return false;
         }
 
@@ -188,7 +188,7 @@ namespace backend {
         const auto props = SDL_GetGamepadProperties(gamepad);
         if (!props)
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get gamepad properties for joystick id {}: {}",
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get gamepad properties for joystick id {}: {}",
                           static_cast<int>(id), SDL_GetError());
             return false;
         }
@@ -205,7 +205,7 @@ namespace backend {
 
         if ( !result )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set data property on the SDL_Gamepad: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to set data property on the SDL_Gamepad: {}", SDL_GetError());
             delete data; // clean up b/c ownership has not passed to the SDL_Gamepad successfully
             return false;
         }
@@ -302,7 +302,7 @@ namespace backend {
 
 #define GP_IN_RANGE(index) \
     do { if ( !((index) >= 0 && (index) < GamepadMaxSlots) )  { \
-        KAZE_CORE_ERRCODE(Error::OutOfRange, "gamepad index {} is out of range", (index)); \
+        KAZE_PUSH_ERR(Error::OutOfRange, "gamepad index {} is out of range", (index)); \
         return false; \
     } } while(0)
 
@@ -445,4 +445,4 @@ namespace backend {
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

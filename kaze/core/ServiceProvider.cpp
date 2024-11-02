@@ -2,7 +2,7 @@
 
 #include <typeindex>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 // Define the implementation struct
 struct ServiceProvider::Impl {
@@ -112,4 +112,4 @@ Dictionary<std::type_index, void*>::const_iterator ServiceProvider::end() const 
     return m->services.cend();
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

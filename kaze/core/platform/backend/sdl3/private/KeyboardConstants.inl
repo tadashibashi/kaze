@@ -6,7 +6,7 @@
 
 #include <SDL3/SDL_keyboard.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 static constexpr Array<Uint16, static_cast<Size>(Key::Count)> s_keyToSdlKey = {
     SDL_SCANCODE_ESCAPE,
@@ -132,4 +132,4 @@ static constexpr Array<Uint16, static_cast<Size>(Key::Count)> s_keyToSdlKey = {
 
 static Array<Uint16, SDL_SCANCODE_COUNT> s_sdlKeyToKey = {0};
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

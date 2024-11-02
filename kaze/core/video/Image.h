@@ -10,7 +10,7 @@
 #include <kaze/core/MemView.h>
 #include <kaze/core/math/Vec/Vec2.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// RAII container for pixel data, with loading functionality.
 /// Stores pixels in RGBA8 format.
@@ -98,6 +98,6 @@ private:
     ImageHandle m_image;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 
 #endif

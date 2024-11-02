@@ -2,7 +2,7 @@
 #include <bgfx/bgfx.h>
 #include <bx/math.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace mathf::mat4f {
     auto lookAt(
@@ -128,4 +128,4 @@ namespace mathf::mat4f {
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

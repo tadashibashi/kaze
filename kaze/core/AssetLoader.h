@@ -8,7 +8,7 @@
 #include <mutex>
 #include <kaze/core/debug.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <Hashable K, LoadableAsset<K> T>
 class AssetLoader {
@@ -101,7 +101,7 @@ public:
             auto assetIt = m_assets.find(it->second);
             if (assetIt == m_assets.end())
             {
-                KAZE_CORE_ERRCODE(Error::LogicErr, "Internal error, failed to find matching asset in cache: {}",
+                KAZE_PUSH_ERR(Error::LogicErr, "Internal error, failed to find matching asset in cache: {}",
                     it->second);
                 return KAZE_FALSE;
             }
@@ -144,6 +144,6 @@ private:
     std::mutex m_lock;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 
 #endif

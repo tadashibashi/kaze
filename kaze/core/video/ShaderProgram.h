@@ -3,7 +3,7 @@
 #include <kaze/core/lib.h>
 #include "Shader.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class ShaderProgram {
 public:
@@ -38,4 +38,4 @@ private:
     Impl *m;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

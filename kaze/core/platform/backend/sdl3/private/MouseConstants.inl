@@ -3,7 +3,7 @@
 #include <kaze/core/lib.h>
 #include <SDL3/SDL_mouse.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 static constexpr Array<Uint8, static_cast<Int>(MouseBtn::Count)> s_toSDLMouseButton = {
     SDL_BUTTON_LEFT,
@@ -18,4 +18,4 @@ static constexpr Array<Uint8, static_cast<Int>(MouseBtn::Count)> s_toSDLMouseBut
 
 static Array<MouseBtn, static_cast<Int>(MouseBtn::Count)> s_toMouseButton{};
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

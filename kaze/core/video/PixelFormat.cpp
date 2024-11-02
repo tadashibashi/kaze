@@ -1,7 +1,7 @@
 #include "PixelFormat.h"
 #include <kaze/core/memory.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 Int PixelFormat::getStride(Enum format) noexcept
 {
@@ -193,4 +193,4 @@ auto PixelFormat::toRGBA8(Ubyte *dest, const Ubyte *src, Size pixelCount, PixelF
     return true;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

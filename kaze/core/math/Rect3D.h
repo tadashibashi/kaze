@@ -4,7 +4,7 @@
 #include <kaze/core/concepts.h>
 #include <kaze/core/math/Vec/Vec3.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Axis-aligned 3D rectangular prism
 template <Arithmetic T>
@@ -75,4 +75,4 @@ using Rect3Di = Rect3D<Int>;
 using Rect3Df = Rect3D<Float>;
 using Rect3Dd = Rect3D<Double>;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

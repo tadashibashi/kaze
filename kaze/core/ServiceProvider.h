@@ -6,7 +6,7 @@
 
 #include <typeindex>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Contains various concrete "services" that you can provide to a scope of your application
 class ServiceProvider {
@@ -138,4 +138,4 @@ private:
 };
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

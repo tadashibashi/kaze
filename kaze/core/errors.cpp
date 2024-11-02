@@ -3,7 +3,7 @@
 #include "errors.h"
 #include <utility>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 thread_local Error s_curError{Error::Ok};
 
@@ -46,4 +46,4 @@ bool hasError() noexcept
     return s_curError.code != Error::Code::Ok;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

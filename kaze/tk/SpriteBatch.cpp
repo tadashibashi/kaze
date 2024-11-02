@@ -53,7 +53,7 @@ struct SpriteBatch::Impl
 
         if ( !graphics.wasInit())
         {
-            KAZE_CORE_ERRCODE(Error::RuntimeErr, "GraphicsMgr passed to SpriteBatch::init is required to be "
+            KAZE_PUSH_ERR(Error::RuntimeErr, "GraphicsMgr passed to SpriteBatch::init is required to be "
                 "initialized: was not init");
             return KAZE_FALSE;
         }

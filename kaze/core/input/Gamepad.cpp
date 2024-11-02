@@ -1,7 +1,7 @@
 #include "Gamepad.h"
 #include <kaze/core/platform/backend/backend.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 auto Gamepad::isUp(const GamepadBtn btn) const noexcept -> Bool
 {
@@ -74,4 +74,4 @@ auto Gamepad::getAxesMoved(const GamepadAxis axisX, const GamepadAxis axisY, con
     return axesMoved;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

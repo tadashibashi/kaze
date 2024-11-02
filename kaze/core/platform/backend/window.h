@@ -3,7 +3,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/video/WindowConstants.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend::window {
     /// Window native platform pointers
@@ -293,4 +293,4 @@ namespace backend::window {
     auto isTextInputActive(WindowHandle window, bool *outValue) noexcept -> bool;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

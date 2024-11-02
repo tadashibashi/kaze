@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <windows.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace filesys {
     auto getBaseDir() -> String
@@ -20,5 +20,5 @@ namespace filesys {
 
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 

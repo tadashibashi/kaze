@@ -1,11 +1,11 @@
 /// \file Vec1.h
 /// Vec1 math class specialization
 #pragma once
-
+#include <kaze/core/lib.h>
 #include <kaze/core/concepts.h>
 #include "VecBase.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <Arithmetic T>
 struct Vec<T, 1> : VecBase<T, 1>
@@ -23,30 +23,28 @@ struct Vec<T, 1> : VecBase<T, 1>
     template <Char C>
     struct is_valid_component { static constexpr bool value = C == 'x'; };
 
-    constexpr Vec &set(T x)
+    constexpr auto set(T x) -> Vec &
     {
         this->x = x;
         return *this;
     }
 
-    constexpr Vec &setX(T x)
+    constexpr auto setX(T x) -> Vec &
     {
         this->x = x;
         return *this;
     }
 
-    [[nodiscard]] constexpr T &operator[](const Size index)
+    [[nodiscard]]
+    constexpr auto operator[](const Size index) -> T &
     {
-        if (index == 0)
-            return x;
-        throw std::out_of_range("index is out of Vec<T, 1> range");
+        return x;
     }
 
-    [[nodiscard]] constexpr const T &operator[] ( const Size index ) const
+    [[nodiscard]]
+    constexpr auto operator[] (const Size index) const -> const T &
     {
-        if (index == 0)
-            return x;
-        throw std::out_of_range("index is out of Vec<T, 1> range");
+        return x;
     }
 
     static constinit Vec Zero;
@@ -66,4 +64,4 @@ using Vec1d = Vec<Double, 1>;
 template <Arithmetic T>
 using Vec1 = Vec<T, 1>;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

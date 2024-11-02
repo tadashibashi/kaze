@@ -6,7 +6,7 @@
 #include <kaze/core/video/Image.h>
 #include <kaze/core/video/WindowConstants.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Cursor manager for a window
 class CursorMgr {
@@ -51,4 +51,4 @@ private:
     Map<String, CursorHandle> m_customCursors;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

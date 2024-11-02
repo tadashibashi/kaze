@@ -3,7 +3,7 @@
 
 #include <bgfx/bgfx.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct ShaderProgram::Impl {
     Impl() : program{.idx=bgfx::kInvalidHandle} {}
@@ -54,7 +54,7 @@ auto ShaderProgram::link(const Shader &vertShader, const Shader &fragShader) -> 
     const auto program = bgfx::createProgram(vert, frag);
     if ( program.idx == bgfx::kInvalidHandle)
     {
-        KAZE_CORE_ERRCODE(Error::ShaderLinkErr, "Failed to link shader program");
+        KAZE_PUSH_ERR(Error::ShaderLinkErr, "Failed to link shader program");
         return KAZE_FALSE;
     }
 
@@ -89,4 +89,4 @@ auto ShaderProgram::submit(Int viewId) -> void
     bgfx::submit(viewId, m->program);
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

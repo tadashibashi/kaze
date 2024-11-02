@@ -7,7 +7,7 @@
 #include <kaze/core/math/Matrix.h>
 #include <kaze/core/math/Rect.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class Renderable {
 public:
@@ -58,4 +58,4 @@ private:
     Impl *m;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

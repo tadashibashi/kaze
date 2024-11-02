@@ -15,14 +15,14 @@
 /// Ensures a parameter is not null, passes a NullArgErr and returns false if so
 /// Used in most backend functions, since they all return success and fail state via boolean.
 #define RETURN_IF_NULL(obj) do { if ( !(obj) ) { \
-    KAZE_CORE_ERRCODE(Error::NullArgErr, "required argument `{}` was null", #obj); \
+    KAZE_PUSH_ERR(Error::NullArgErr, "required argument `{}` was null", #obj); \
     return false; \
 } } while(0)
 
 /// Convenience macro to cast void * => SDL_Window *
 #define WIN_CAST(window) static_cast<SDL_Window *>(window)
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
     /// Convert an SDL button to a GamepadBtn
@@ -78,4 +78,4 @@ namespace backend {
     extern GamepadMgr gamepads;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

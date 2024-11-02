@@ -4,7 +4,7 @@
 #include <kaze/core/concepts.h>
 #include "Vec/Vec2.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <Arithmetic T>
 struct Rect
@@ -162,4 +162,4 @@ using Recti = Rect<Int>;
 using Rectf = Rect<Float>;
 using Rectd = Rect<Double>;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

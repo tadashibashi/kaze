@@ -9,7 +9,7 @@
 #include <SDL3/SDL_events.h>
 #include <SDL3/SDL_gamepad.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend
 {
@@ -78,4 +78,4 @@ namespace backend
 
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

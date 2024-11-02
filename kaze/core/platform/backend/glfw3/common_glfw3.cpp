@@ -6,7 +6,7 @@
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/defines.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
     WindowHandleContainer<WindowData> windows{};
@@ -299,7 +299,7 @@ namespace backend {
     {
         if ( !glfwInit() )
         {
-            KAZE_CORE_ERRCODE(Error::BE_InitErr, "Failed to initialize glfw3: {}", getGlfwErrorStr());
+            KAZE_PUSH_ERR(Error::BE_InitErr, "Failed to initialize glfw3: {}", getGlfwErrorStr());
             return false;
         }
 
@@ -386,7 +386,7 @@ namespace backend {
         const auto text = glfwGetClipboardString(nullptr);
         if ( !text )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get clipboard string: {}", getGlfwErrorStr());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get clipboard string: {}", getGlfwErrorStr());
             return false;
         }
 
@@ -422,7 +422,7 @@ namespace backend {
         const auto cursor = glfwCreateStandardCursor(s_toGlfwCursorType[static_cast<int>(type)]);
         if ( !cursor)
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create cursor: {}", getGlfwErrorStr());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create cursor: {}", getGlfwErrorStr());
             return false;
         }
 
@@ -445,7 +445,7 @@ namespace backend {
         const auto cursor = glfwCreateCursor(&glfwImage, anchorX, anchorY);
         if ( !cursor )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create custom cursor: {}", getGlfwErrorStr());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create custom cursor: {}", getGlfwErrorStr());
             return false;
         }
 
@@ -497,7 +497,7 @@ namespace backend {
         const auto window = windows.getMainWindow();
         if ( !window )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "failed to get current window context, no window was open");
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "failed to get current window context, no window was open");
             return false;
         }
 
@@ -548,7 +548,7 @@ namespace backend {
         }
         else
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get current context: {}", getGlfwErrorStr());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get current context: {}", getGlfwErrorStr());
             return false;
         }
 
@@ -575,7 +575,7 @@ namespace backend {
 
 #define GP_INDEX_IN_RANGE(index) \
     do { if ( !((index) >= 0 && (index) < GamepadMaxSlots) ) { \
-        KAZE_CORE_ERRCODE(Error::OutOfRange, "gamepad index `{}` is out of range", (index)); \
+        KAZE_PUSH_ERR(Error::OutOfRange, "gamepad index `{}` is out of range", (index)); \
         return false; \
     } } while(0)
 
@@ -691,4 +691,4 @@ namespace backend {
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

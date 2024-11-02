@@ -4,7 +4,7 @@
 
 #include <kaze/core/debug.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 CursorMgr::~CursorMgr()
 {
@@ -15,7 +15,7 @@ auto CursorMgr::create(const String &key, const Image &image, Vec2i anchor) -> B
 {
     if (m_customCursors.contains(key)) // guard against duplicates
     {
-        KAZE_CORE_ERRCODE(Error::DuplicateKey, "Key \"{}\" already exists in CursorMgr", key);
+        KAZE_PUSH_ERR(Error::DuplicateKey, "Key \"{}\" already exists in CursorMgr", key);
         return False;
     }
 
@@ -31,14 +31,14 @@ auto CursorMgr::set(const String &key) -> Bool
 {
     if ( !m_window )
     {
-        KAZE_CORE_ERRCODE(Error::LogicErr, "window must be set before CursorMgr can set cursor");
+        KAZE_PUSH_ERR(Error::LogicErr, "window must be set before CursorMgr can set cursor");
         return False;
     }
 
     if (const auto it = m_customCursors.find(String(key));
         it == m_customCursors.end())
     {
-        KAZE_CORE_ERRCODE(Error::MissingKeyErr,
+        KAZE_PUSH_ERR(Error::MissingKeyErr,
             "Attempted to set cursor with key \"{}\", but it does not exist.", key);
         return False;
     }
@@ -52,7 +52,7 @@ auto CursorMgr::set(CursorType type) -> Bool
 {
     if ( !m_window )
     {
-        KAZE_CORE_ERRCODE(Error::LogicErr, "window must be set before CursorMgr can set cursor");
+        KAZE_PUSH_ERR(Error::LogicErr, "window must be set before CursorMgr can set cursor");
         return False;
     }
 
@@ -83,7 +83,7 @@ auto CursorMgr::erase(const String &key) -> Bool
     auto it = m_customCursors.find(key);
     if (it == m_customCursors.end())
     {
-        KAZE_CORE_ERRCODE(Error::MissingKeyErr, "Cursor::erase: key \"{}\" does not exist in container", key);
+        KAZE_PUSH_ERR(Error::MissingKeyErr, "Cursor::erase: key \"{}\" does not exist in container", key);
         return False;
     }
 
@@ -113,5 +113,5 @@ auto CursorMgr::clear() -> void
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 

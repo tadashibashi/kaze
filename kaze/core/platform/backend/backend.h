@@ -16,7 +16,7 @@
 #include "keyboard.h" // IWYU pragma: export
 #include "window.h"   // IWYU pragma: export
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class Image;
 
@@ -83,4 +83,4 @@ namespace backend {
 
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

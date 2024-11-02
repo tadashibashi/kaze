@@ -7,7 +7,7 @@
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunsequenced"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace easings {
     template <FloatingPoint T>
@@ -197,6 +197,6 @@ namespace easings {
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 
 #pragma clang diagnostic pop

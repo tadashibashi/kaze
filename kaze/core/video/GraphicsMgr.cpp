@@ -11,7 +11,7 @@
 
 #include <mutex>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct GraphicsMgr::Impl {
     Impl() { }
@@ -47,12 +47,12 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
     std::lock_guard lockGuard(GraphicsMgr::Impl::initLock);
     if (GraphicsMgr::Impl::wasInit)
     {
-        KAZE_CORE_ERRCODE(Error::GR_InitErr, "bgfx was already initialized");
+        KAZE_PUSH_ERR(Error::GR_InitErr, "bgfx was already initialized");
         return False;
     }
     if ( !window )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "`window` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "`window` was null");
         return False;
     }
 
@@ -77,7 +77,7 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
 #endif
     if ( !bgfx::init(config) )
     {
-        KAZE_CORE_ERRCODE(Error::GR_InitErr, "bgfx failed to init");
+        KAZE_PUSH_ERR(Error::GR_InitErr, "bgfx failed to init");
         return KAZE_FALSE;
     }
 
@@ -151,4 +151,4 @@ auto GraphicsMgr::getAvailTransientIBuffer(Uint requestedCount) const noexcept -
     return bgfx::getAvailTransientIndexBuffer(requestedCount);
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

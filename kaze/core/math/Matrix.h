@@ -10,7 +10,7 @@
 
 #include "private/mat4f.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 template <FloatingPoint T, Size Cols, Size Rows>
 struct alignas(16) Matrix {
     static_assert(Cols > 0, "Matrix must have an X-axis length greater than 0");
@@ -405,4 +405,4 @@ using Mat4f = Matrix<Float, 4, 4>;
 using Mat4d = Matrix<Double, 4, 4>;
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

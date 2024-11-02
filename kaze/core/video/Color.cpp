@@ -1,6 +1,6 @@
 #include "Color.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 // ----- grays -----
 const Color Color::White = Color(255, 255, 255);
@@ -25,4 +25,4 @@ const Color Color::Azure = Color(0, 128, 255);
 const Color Color::Violet = Color(128, 0, 255);
 const Color Color::Rose = Color(255, 0, 128);
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

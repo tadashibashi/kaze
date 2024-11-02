@@ -2,7 +2,7 @@
 
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct ImageHandle {
     void *handle{};
@@ -52,4 +52,4 @@ struct ImageHandle {
     auto isCubeMap() const noexcept -> Bool;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

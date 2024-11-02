@@ -1,7 +1,7 @@
 #include "ImageHandle.h"
 #include <bimg/bimg.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 #define GET_IMG() static_cast<bimg::ImageContainer *>(handle)
 #define ASSERT_IMG() KAZE_ASSERT(handle, "ImageHandle must be loaded")
@@ -60,4 +60,4 @@ auto ImageHandle::isCubeMap() const noexcept -> Bool
     return GET_IMG()->m_cubeMap;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

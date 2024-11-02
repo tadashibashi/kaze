@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <ranges>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// @description
 /// Container of callbacks with no return value.
@@ -220,4 +220,4 @@ private:
     Bool m_wasAdded;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

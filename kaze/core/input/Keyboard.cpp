@@ -2,7 +2,7 @@
 
 #include <kaze/core/platform/backend/backend.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 #define ASSERT_KEY_RANGE(key) KAZE_ASSERT(static_cast<Int>(key) >= 0 && static_cast<Int>(key) < static_cast<Int>(Key::Count))
 
@@ -72,4 +72,4 @@ auto Keyboard::postProcessEvents() -> void
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

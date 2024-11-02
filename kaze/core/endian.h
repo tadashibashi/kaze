@@ -4,7 +4,7 @@
 #include <kaze/core/lib.h>
 #include <bit>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct Endian
 {
@@ -72,4 +72,4 @@ struct Endian
     }
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

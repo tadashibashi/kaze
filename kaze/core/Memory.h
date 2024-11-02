@@ -3,7 +3,7 @@
 #pragma once
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace memory {
 
@@ -70,4 +70,4 @@ namespace memory {
     auto set(void *memory, Int value, Size size) noexcept -> void;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

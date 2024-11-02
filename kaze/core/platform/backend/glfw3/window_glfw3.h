@@ -11,7 +11,7 @@
 
 #include <GLFW/glfw3.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
 
@@ -48,4 +48,4 @@ namespace backend {
 
 } // namespace backend
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

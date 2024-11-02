@@ -30,7 +30,7 @@
 #include <GLFW/glfw3native.h>
 #endif
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
     window::NativePlatformData window::getNativeInfo(const WindowHandle window) noexcept
@@ -84,7 +84,7 @@ namespace backend {
             return false;
         if ( !data )
         {
-            KAZE_CORE_ERRCODE(Error::BE_LogicError, "missing window data");
+            KAZE_PUSH_ERR(Error::BE_LogicError, "missing window data");
             return false;
         }
 
@@ -303,7 +303,7 @@ namespace backend {
         const auto window = glfwCreateWindow(width, height, title, nullptr, nullptr); ERR_CHECK(Error::BE_RuntimeErr, "create GLFWwindow");
         if ( !window )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create window: {}", getGlfwErrorStr());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create window: {}", getGlfwErrorStr());
             return false;
         }
 
@@ -359,7 +359,7 @@ namespace backend {
     {
         if ( !window )
         {
-            KAZE_CORE_ERRCODE(Error::BE_InvalidWindowHandle, "WindowHandle was null");
+            KAZE_PUSH_ERR(Error::BE_InvalidWindowHandle, "WindowHandle was null");
             return false;
         }
 
@@ -369,7 +369,7 @@ namespace backend {
 
         if ( !wasErased )
         {
-            KAZE_CORE_ERRCODE(Error::BE_InvalidWindowHandle, "WindowHandle was invalid");
+            KAZE_PUSH_ERR(Error::BE_InvalidWindowHandle, "WindowHandle was invalid");
             return false;
         }
 
@@ -424,7 +424,7 @@ namespace backend {
         const auto title = glfwGetWindowTitle(WIN_CAST(window));
         if ( !title )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window title: {}", getGlfwErrorStr());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window title: {}", getGlfwErrorStr());
             return false;
         }
 
@@ -634,7 +634,7 @@ namespace backend {
         else
         {
             // this probably shouldn't ever occur
-            KAZE_CORE_ERRCODE(Error::BE_LogicError, "window data fullscreen mode value is invalid");
+            KAZE_PUSH_ERR(Error::BE_LogicError, "window data fullscreen mode value is invalid");
             return false;
         }
 
@@ -1016,7 +1016,7 @@ namespace backend {
         case CursorMode::Hidden: glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
         case CursorMode::Relative: glfwCursorMode = GLFW_CURSOR_HIDDEN; break;
         default:
-            KAZE_CORE_ERRCODE(Error::InvalidEnum, "Unknown `CursorMode` passed to `window::setCurosrMode`");
+            KAZE_PUSH_ERR(Error::InvalidEnum, "Unknown `CursorMode` passed to `window::setCurosrMode`");
             return false;
         }
 
@@ -1048,7 +1048,7 @@ namespace backend {
         case GLFW_CURSOR_NORMAL:   *outMode = CursorMode::Visible; break;
         case GLFW_CURSOR_HIDDEN:   *outMode = CursorMode::Hidden; break;
         default:
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr,
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr,
                 "Internal error: unsupported or unknown cursor mode retrieved from window: {}",
                 glfwCursorMode);
             return false;
@@ -1078,4 +1078,4 @@ namespace backend {
 
 } // namespace backend
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

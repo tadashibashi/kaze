@@ -2,7 +2,7 @@
 
 #include <bgfx/bgfx.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct VertexLayout::Impl {
     bgfx::VertexLayout layout{};
@@ -83,4 +83,4 @@ auto VertexLayout::getStride() const -> Uint16
     return m->layout.getStride();
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

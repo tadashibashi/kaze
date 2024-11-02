@@ -7,7 +7,7 @@
 #include <kaze/core/concepts.h>
 #include "VecBase.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <Arithmetic T>
 struct Vec<T, 3> : VecBase<T, 3>
@@ -32,11 +32,10 @@ struct Vec<T, 3> : VecBase<T, 3>
         T ptr[3];
     };
 
-
     template <Char C>
     struct is_valid_component { static constexpr bool value = C == 'x' || C == 'y' || C == 'z'; };
 
-    Vec &set(const T px, const T py, const T pz) noexcept
+    auto set(const T px, const T py, const T pz) noexcept -> Vec &
     {
         this->x = px;
         this->y = py;
@@ -44,30 +43,32 @@ struct Vec<T, 3> : VecBase<T, 3>
         return *this;
     }
 
-    Vec &setX(const T value) noexcept
+    auto setX(const T value) noexcept -> Vec &
     {
         this->x = value;
         return *this;
     }
 
-    Vec &setY(const T value) noexcept
+    auto setY(const T value) noexcept -> Vec &
     {
         this->y = value;
         return *this;
     }
 
-    Vec &setZ(const T value) noexcept
+    auto setZ(const T value) noexcept -> Vec &
     {
         this->z = value;
         return *this;
     }
 
-    [[nodiscard]] constexpr T &operator[](const Size index) noexcept
+    [[nodiscard]]
+    constexpr auto operator[](const Size index) noexcept -> T &
     {
         return ptr[index];
     }
 
-    [[nodiscard]] constexpr const T &operator[](const Size index) const noexcept
+    [[nodiscard]]
+    constexpr auto operator[](const Size index) const noexcept -> const T &
     {
         return ptr[index];
     }
@@ -85,7 +86,11 @@ struct Vec<T, 3> : VecBase<T, 3>
 
     // ===== Static factory functions =====
 
-    [[nodiscard]] constexpr static Vec fromAngle(const T angle, const T distance = static_cast<T>(1), const T zValue = 0)
+    [[nodiscard]]
+    constexpr static auto fromAngle(
+        const T angle,
+        const T distance = static_cast<T>(1),
+        const T zValue = 0) -> Vec
     {
         Vec v{};
         v.z = zValue;
@@ -94,12 +99,17 @@ struct Vec<T, 3> : VecBase<T, 3>
         return v;
     }
 
-    [[nodiscard]] constexpr static Vec fromDegrees(const T degrees, const T distance = static_cast<T>(1), const T zValue = 0)
+    [[nodiscard]]
+    constexpr static auto fromDegrees(
+        const T degrees,
+        const T distance = static_cast<T>(1),
+        const T zValue = 0) -> Vec
     {
         return Vec::fromAngle(mathf::toRadians(degrees), distance, zValue);
     }
 
-    [[nodiscard]] constexpr static Vec createFilled(const T value)
+    [[nodiscard]]
+    constexpr static auto createFilled(const T value) -> Vec
     {
         return { value, value, value };
     }
@@ -136,4 +146,4 @@ using Vec3i = Vec<Int, 3>;
 template <Arithmetic T>
 using Vec3 = Vec<T, 3>;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

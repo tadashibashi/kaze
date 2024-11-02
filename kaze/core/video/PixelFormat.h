@@ -1,7 +1,7 @@
 #pragma once
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Source pixel formats
 struct PixelFormat {
@@ -33,4 +33,4 @@ struct PixelFormat {
     static auto toRGBA8(Ubyte *dest, const Ubyte *src, Size pixelCount, Enum srcFormat) -> Bool;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

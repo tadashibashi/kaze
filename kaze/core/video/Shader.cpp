@@ -5,7 +5,7 @@
 
 #include <filesystem>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct Shader::Impl {
     bgfx::ShaderHandle handle{.idx=bgfx::kInvalidHandle};
@@ -67,7 +67,7 @@ String Shader::makePath(const StringView folder, const StringView shaderName)
     case bgfx::RendererType::Direct3D11: subFolder = "dx11"; break;
     case bgfx::RendererType::Direct3D12: subFolder = "dx12"; break;
     default:
-        KAZE_CORE_ERRCODE(Error::Unsupported, "shader language not supported for renderer type: {}",
+        KAZE_PUSH_ERR(Error::Unsupported, "shader language not supported for renderer type: {}",
             bgfx::getRendererName(bgfx::getRendererType()));
         return {};
     }
@@ -80,7 +80,7 @@ auto Shader::compile(const Mem mem) -> Bool
     const auto handle = bgfx::createShader( bgfx::makeRef(mem.data(), mem.size()) );
     if ( !bgfx::isValid(handle) )
     {
-        KAZE_CORE_ERRCODE(Error::ShaderCompileErr, "Shader failed to compile. Check the logs for info.");
+        KAZE_PUSH_ERR(Error::ShaderCompileErr, "Shader failed to compile. Check the logs for info.");
         return KAZE_FALSE;
     }
 
@@ -96,7 +96,7 @@ auto Shader::compile(const StringView path) -> Bool
         const auto handle = bgfx::createShader( bgfx::copy(file.data(), file.size()) );
         if ( !bgfx::isValid(handle) )
         {
-            KAZE_CORE_ERRCODE(Error::ShaderCompileErr, "Shader failed to compile. Check the logs for info.");
+            KAZE_PUSH_ERR(Error::ShaderCompileErr, "Shader failed to compile. Check the logs for info.");
             return KAZE_FALSE;
         }
 
@@ -126,4 +126,4 @@ auto Shader::id() const noexcept -> Uint
     return static_cast<Uint>(m->handle.idx);
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

@@ -5,10 +5,10 @@ static thread_local kaze::String s_curError{};
 #if KAZE_DEBUG
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace debug {
-    spdlog::logger *getLogger()
+    auto getLogger() -> spdlog::logger *
     {
         static std::shared_ptr<spdlog::logger> s_logger;
         if (!s_logger)
@@ -23,7 +23,7 @@ namespace debug {
 
 
 
-    spdlog::logger *getClientLogger()
+    auto getClientLogger() -> spdlog::logger *
     {
         static std::shared_ptr<spdlog::logger> s_logger;
         if (!s_logger)
@@ -38,6 +38,6 @@ namespace debug {
 }
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 
 #endif

@@ -1,11 +1,10 @@
 /// \file Vec4.h
 /// Vec4 math class specialization
 #pragma once
-
 #include <kaze/core/lib.h>
 #include "VecBase.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <Arithmetic T>
 struct alignas(16) Vec<T, 4> : VecBase<T, 4>
@@ -33,11 +32,10 @@ struct alignas(16) Vec<T, 4> : VecBase<T, 4>
         T ptr[4];
     };
 
-
     template <Char C>
     struct is_valid_component { static constexpr bool value = C == 'x' || C == 'y' || C == 'z' || C == 'w'; };
 
-    constexpr Vec &set(const T px, const T py, const T pz, const T pw) noexcept
+    constexpr auto set(const T px, const T py, const T pz, const T pw) noexcept -> Vec &
     {
         this->x = px;
         this->y = py;
@@ -46,36 +44,36 @@ struct alignas(16) Vec<T, 4> : VecBase<T, 4>
         return *this;
     }
 
-    constexpr Vec &setX(const T value) noexcept
+    constexpr auto setX(const T value) noexcept -> Vec &
     {
         this->x = value;
         return *this;
     }
 
-    constexpr Vec &setY(const T value) noexcept
+    constexpr auto setY(const T value) noexcept -> Vec &
     {
         this->y = value;
         return *this;
     }
 
-    constexpr Vec &setZ(const T value) noexcept
+    constexpr auto setZ(const T value) noexcept -> Vec &
     {
         this->z = value;
         return *this;
     }
 
-    constexpr Vec &setW(const T value) noexcept
+    constexpr auto setW(const T value) noexcept -> Vec &
     {
         this->w = value;
         return *this;
     }
 
-    [[nodiscard]] constexpr T &operator[](const Size index) noexcept
+    [[nodiscard]] constexpr auto operator[](const Size index) noexcept -> T &
     {
         return ptr[index];
     }
 
-    [[nodiscard]] constexpr const T &operator[](const Size index) const noexcept
+    [[nodiscard]] constexpr auto operator[](const Size index) const noexcept -> const T &
     {
         return ptr[index];
     }
@@ -100,12 +98,11 @@ struct alignas(16) Vec<T, 4> : VecBase<T, 4>
         return Vec::fromAngle(mathf::toRadians(degrees), distance);
     }
 
-    [[nodiscard]] constexpr static Vec createFilled(T value) noexcept
+    [[nodiscard]] constexpr static auto createFilled(T value) noexcept -> Vec
     {
         return {value, value, value, value};
     }
 };
-
 
 template <Arithmetic T>
 constinit Vec<T, 4> Vec<T, 4>::Zero = Vec(0, 0, 0, 0);
@@ -119,13 +116,13 @@ constinit Vec<T, 4> Vec<T, 4>::One = Vec(
 );
 
 template <Arithmetic T, Arithmetic U>
-constexpr Vec<T, 4> operator *(U scalar, Vec<T, 4> v)
+constexpr auto operator *(U scalar, Vec<T, 4> v) -> Vec<T, 4>
 {
     return v * scalar;
 }
 
 template <Arithmetic T, Arithmetic U>
-constexpr Vec<T, 4> operator /(U scalar, Vec<T, 4> v)
+constexpr auto operator /(U scalar, Vec<T, 4> v) -> Vec<T, 4>
 {
     return Vec<T, 4>(scalar, scalar, scalar, scalar) / v;
 }
@@ -137,4 +134,4 @@ using Vec4i = Vec<Int, 4>;
 template <Arithmetic T>
 using Vec4 = Vec<T, 4>;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

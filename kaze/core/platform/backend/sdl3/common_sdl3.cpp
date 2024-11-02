@@ -13,7 +13,7 @@
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_surface.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
     /// singleton gamepads manager
@@ -148,7 +148,7 @@ namespace backend {
     {
         if ( !SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMEPAD) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to initialize SDL3: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to initialize SDL3: {}", SDL_GetError());
             return KAZE_FALSE;
         }
 
@@ -183,7 +183,7 @@ namespace backend {
             if ( !cstr || *cstr == '\0') // failed to get text
             {
                 SDL_free(cstr);
-                KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get clipboard text: {}", SDL_GetError());
+                KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get clipboard text: {}", SDL_GetError());
                 return false;
             }
 
@@ -514,13 +514,13 @@ namespace backend {
     {
         if ( !outCursor)
         {
-            KAZE_CORE_ERRCODE(Error::NullArgErr, "Required argument `outCursor` was null");
+            KAZE_PUSH_ERR(Error::NullArgErr, "Required argument `outCursor` was null");
             return false;
         }
 
         if (type >= CursorType::Count || type < CursorType::Arrow)
         {
-            KAZE_CORE_ERRCODE(Error::InvalidEnum, "CursorType was out of range");
+            KAZE_PUSH_ERR(Error::InvalidEnum, "CursorType was out of range");
             return false;
         }
 
@@ -528,7 +528,7 @@ namespace backend {
         const auto cursor = SDL_CreateSystemCursor(sdlCursorType);
         if ( !cursor )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create SDL System Cursor: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create SDL System Cursor: {}", SDL_GetError());
             return false;
         }
 
@@ -540,26 +540,26 @@ namespace backend {
     {
         if ( !image )
         {
-            KAZE_CORE_ERRCODE(Error::NullArgErr, "Required arg `image` was null");
+            KAZE_PUSH_ERR(Error::NullArgErr, "Required arg `image` was null");
             return false;
         }
 
         if ( !outCursor )
         {
-            KAZE_CORE_ERRCODE(Error::NullArgErr, "Required arg `outCursor` was null");
+            KAZE_PUSH_ERR(Error::NullArgErr, "Required arg `outCursor` was null");
             return false;
         }
 
         const auto sdlSurf = SDL_CreateSurface(image.width(), image.height(), SDL_PIXELFORMAT_RGBA8888);
         if ( !sdlSurf )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create SDL_Surface: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create SDL_Surface: {}", SDL_GetError());
             return false;
         }
 
         if ( !SDL_LockSurface(sdlSurf) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to lock SDL_Surface: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to lock SDL_Surface: {}", SDL_GetError());
             SDL_DestroySurface(sdlSurf);
             return false;
         }
@@ -602,7 +602,7 @@ namespace backend {
         {
             if ( !SDL_SetCursor(static_cast<SDL_Cursor *>(cursor.handle)) )
             {
-                KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set cursor: {}", SDL_GetError());
+                KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to set cursor: {}", SDL_GetError());
                 return false;
             }
         }
@@ -625,7 +625,7 @@ namespace backend {
         const auto keys = SDL_GetKeyboardState(nullptr);
         if ( !keys )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get keyboard state: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get keyboard state: {}", SDL_GetError());
             return false;
         }
 
@@ -649,7 +649,7 @@ namespace backend {
         int winX, winY;
         if ( !SDL_GetWindowPosition( WIN_CAST(window), &winX, &winY ) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window position: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window position: {}", SDL_GetError());
             return false;
         }
 
@@ -690,4 +690,4 @@ namespace backend {
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

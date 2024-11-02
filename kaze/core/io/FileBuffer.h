@@ -2,7 +2,7 @@
 
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
     /// Handles file loading into memory. Loads it all at once instead of a streaming interface
 class FileBuffer {
 public:
@@ -42,4 +42,4 @@ public:
     Size m_dataSize; ///< length of the data in the buffer
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

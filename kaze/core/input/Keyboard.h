@@ -7,7 +7,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/video/WindowConstants.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 struct KeyboardEvent;
 
 /// Provides ease of use for an app to poll keyboard state.
@@ -59,4 +59,4 @@ private:
     WindowHandle m_window{};
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

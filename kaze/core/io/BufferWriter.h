@@ -7,7 +7,7 @@
 
 #include <kaze/core/errors.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct BufferWriterInit {
     Size initialSize = 1024;
@@ -180,4 +180,4 @@ private:
     Endian::Type m_stringEndian = Endian::Big;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

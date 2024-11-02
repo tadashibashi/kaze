@@ -3,7 +3,7 @@
 #include <kaze/core/lib.h>
 #include <type_traits>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 using std::declval;
 
@@ -64,4 +64,4 @@ concept ContainerItem =
     std::is_move_constructible_v<T> &&
     std::is_copy_constructible_v<T>;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

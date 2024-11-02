@@ -1,7 +1,7 @@
 #pragma once
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Intermediary Cursor type
 struct CursorHandle {
@@ -40,4 +40,4 @@ enum class CursorType {
     Count       ///< number of cursor types, also a default "unknown" value
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

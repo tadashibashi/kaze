@@ -1,32 +1,30 @@
 /// \file Window_sdl3.h
 /// SDL3 implementation for functions in the backend::window namespace
 #include "window_sdl3.h"
-#include "SDL3/SDL_video.h"
 #include "common_sdl3.h"
 
 #include <kaze/core/errors.h>
 #include <kaze/core/debug.h>
 
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_keyboard.h>
 
 #ifdef SDL_PLATFORM_IOS
 #include <SDL3/SDL_metal.h>
 #endif
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
 
-    bool getWindowData(const WindowHandle window,
-                                         WindowData **outData)
+    auto getWindowData(const WindowHandle window,
+                                         WindowData **outData) -> bool
     {
         KAZE_ASSERT(window);
         KAZE_ASSERT(outData);
 
         const auto props = SDL_GetWindowProperties(WIN_CAST(window));
         if (!props) {
-        KAZE_CORE_ERRCODE(Error::BE_RuntimeErr,
+        KAZE_PUSH_ERR(Error::BE_RuntimeErr,
                           "Failed to get window properties: {}", SDL_GetError());
         return false;
         }
@@ -34,7 +32,7 @@ namespace backend {
         const auto data = static_cast<WindowData *>(
             SDL_GetPointerProperty(props, "WindowData", nullptr));
         if (!data) {
-            KAZE_CORE_ERRCODE(Error::BE_LogicError, "Missing WindowData on SDL_Window");
+            KAZE_PUSH_ERR(Error::BE_LogicError, "Missing WindowData on SDL_Window");
             return false;
         }
 
@@ -48,7 +46,7 @@ namespace backend {
         auto props = SDL_GetWindowProperties( WIN_CAST(window) );
         if (props == 0)
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to retrieve SDL_Window properties: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to retrieve SDL_Window properties: {}", SDL_GetError());
             return {};
         }
 
@@ -132,7 +130,7 @@ namespace backend {
         const auto window = SDL_CreateWindow(title, width, height, sdl3Flags);
         if ( !window )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to create SDL3 Window: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create SDL3 Window: {}", SDL_GetError());
             return KAZE_FALSE;
         }
         window::setSize(window, width, height);
@@ -140,7 +138,7 @@ namespace backend {
         const auto props = SDL_GetWindowProperties(window);
         if ( !props )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
             SDL_DestroyWindow(window);
             return KAZE_FALSE;
         }
@@ -219,7 +217,7 @@ namespace backend {
         auto windows = SDL_GetWindows(&windowCount);
         if ( !windows )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get windows: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get windows: {}", SDL_GetError());
             return false;
         }
 
@@ -243,13 +241,13 @@ namespace backend {
         const auto props = SDL_GetWindowProperties( WIN_CAST(window) );
         if ( !props )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
             return false;
         }
 
         if ( !SDL_SetPointerProperty(props, "userptr", data) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set userptr pointer property: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to set userptr pointer property: {}", SDL_GetError());
             return false;
         }
 
@@ -264,7 +262,7 @@ namespace backend {
         const auto props = SDL_GetWindowProperties( WIN_CAST(window) );
         if ( !props )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
             return false;
         }
 
@@ -279,7 +277,7 @@ namespace backend {
 
         if ( !SDL_SetWindowTitle( WIN_CAST(window), title ) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set window title: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to set window title: {}", SDL_GetError());
             return false;
         }
 
@@ -294,7 +292,7 @@ namespace backend {
         const auto title = SDL_GetWindowTitle(WIN_CAST(window));
         if ( !title )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window title: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window title: {}", SDL_GetError());
             return false;
         }
 
@@ -310,7 +308,7 @@ namespace backend {
 
         if ( !SDL_SetWindowSize( WIN_CAST(window), x * scale, y * scale) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "failed to set logical window size: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "failed to set logical window size: {}", SDL_GetError());
             return false;
         }
 
@@ -323,7 +321,7 @@ namespace backend {
 
         if ( !SDL_GetWindowSize(WIN_CAST(window), x, y) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window size: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window size: {}", SDL_GetError());
             return false;
         }
 
@@ -334,9 +332,6 @@ namespace backend {
             *y /= scale;
         }
 
-
-        return true;
-
         return true;
     }
 
@@ -346,7 +341,7 @@ namespace backend {
 
         if ( !SDL_GetWindowSizeInPixels(WIN_CAST(window), x, y) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window display size: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window display size: {}", SDL_GetError());
             return false;
         }
 
@@ -368,7 +363,7 @@ namespace backend {
 
         if ( !SDL_SetWindowFullscreen(WIN_CAST(window), value) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set fullscreen to {}", value);
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to set fullscreen to {}", value);
             return false;
         }
 
@@ -631,7 +626,7 @@ namespace backend {
 
         if ( !result )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to set window to {}: {}",
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to set window to {}: {}",
                 value ? "hidden" : "shown", SDL_GetError());
             return false;
         }
@@ -778,7 +773,7 @@ namespace backend {
     {
         if ( !SDL_GetWindowMaximumSize( WIN_CAST(window), maxWidth, maxHeight) )
         {
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get window maximum size: {}", SDL_GetError());
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window maximum size: {}", SDL_GetError());
             return false;
         }
 
@@ -805,7 +800,7 @@ namespace backend {
             data->cursorVisibleMode = false;
             return SDL_SetWindowRelativeMouseMode(WIN_CAST(window), true);
         default:
-            KAZE_CORE_ERRCODE(Error::InvalidEnum, "Invalid CursorMode passed to window::setCursorMode");
+            KAZE_PUSH_ERR(Error::InvalidEnum, "Invalid CursorMode passed to window::setCursorMode");
             return false;
         }
     }
@@ -854,5 +849,5 @@ namespace backend {
 
 } // namespace backend
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 

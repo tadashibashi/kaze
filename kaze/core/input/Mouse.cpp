@@ -2,7 +2,7 @@
 
 #include <kaze/core/platform/backend/backend.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 auto Mouse::isDown(MouseBtn button) const noexcept -> Bool
 {
@@ -113,4 +113,4 @@ auto Mouse::getMode() const noexcept -> CursorMode
     return captureMode;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

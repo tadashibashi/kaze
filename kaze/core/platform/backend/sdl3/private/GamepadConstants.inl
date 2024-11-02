@@ -7,7 +7,7 @@
 
 #include <SDL3/SDL_gamepad.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 static Array<int, static_cast<Size>(GamepadBtn::Count)> s_gamepadButtonToSDL = {
     SDL_GAMEPAD_BUTTON_SOUTH,
@@ -39,4 +39,4 @@ static Array<int, static_cast<Size>(GamepadAxis::Count)> s_gamepadAxisToSDL = {
 static Array<int, SDL_GAMEPAD_BUTTON_COUNT> s_sdlToGamepadButton = {};
 static Array<int, SDL_GAMEPAD_AXIS_COUNT> s_sdlToGamepadAxis = {};
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

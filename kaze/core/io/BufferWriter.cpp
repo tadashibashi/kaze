@@ -2,7 +2,7 @@
 
 #include <kaze/core/debug.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 BufferWriter::BufferWriter(const BufferWriterInit &initConfig) :
     m_mem(), m_head(), m_end(),
@@ -100,13 +100,13 @@ auto BufferWriter::writeRaw(const void *data, const Size byteCount,
 {
     if ( !data )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "required arg `data` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "required arg `data` was null");
         return 0;
     }
 
     if (byteCount == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "can't write 0 bytes");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "can't write 0 bytes");
         return 0;
     }
 
@@ -136,4 +136,4 @@ auto BufferWriter::writeRaw(const void *data, const Size byteCount,
     return byteCount;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

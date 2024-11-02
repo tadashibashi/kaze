@@ -5,7 +5,7 @@
 #include <filesystem>
 #include <fstream>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Number of bytes read in iterations, as opposed to all at once
 constexpr int BytesPerRead = 1024;
@@ -16,19 +16,19 @@ static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
 {
     if ( !data )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outData` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "Required param `outData` was null");
         return KAZE_FALSE;
     }
 
     if ( !size )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outSize` was 0");
+        KAZE_PUSH_ERR(Error::NullArgErr, "Required param `outSize` was 0");
         return KAZE_FALSE;
     }
 
     if ( !file.is_open() )
     {
-        KAZE_CORE_ERRCODE(Error::FileOpenErr, "std::ifstream provided was not open");
+        KAZE_PUSH_ERR(Error::FileOpenErr, "std::ifstream provided was not open");
         return KAZE_FALSE;
     }
 
@@ -39,7 +39,7 @@ static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
     {
         if ( !file.read((char *)data + b, BytesPerRead) )
         {
-            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
+            KAZE_PUSH_ERR(Error::FileReadErr, "Failure during file read call");
             memory::free(data);
             return KAZE_FALSE;
         }
@@ -50,7 +50,7 @@ static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
     {
         if ( !file.read((char *)data + b, size - b) )
         {
-            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
+            KAZE_PUSH_ERR(Error::FileReadErr, "Failure during file read call");
             memory::free(data);
             return KAZE_FALSE;
         }
@@ -63,14 +63,14 @@ auto file::load(StringView path, Ubyte **outData, Size *outSize) -> Bool
 {
     if ( !path.data() )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `path.data()` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "Required param `path.data()` was null");
         return KAZE_FALSE;
     }
 
     std::ifstream file(path.data(), std::ios::in | std::ios::binary);
     if ( !file.is_open() )
     {
-        KAZE_CORE_ERRCODE(Error::FileOpenErr, "failed to open file at: \"{}\"", path);
+        KAZE_PUSH_ERR(Error::FileOpenErr, "failed to open file at: \"{}\"", path);
         return KAZE_FALSE;
     }
 
@@ -78,20 +78,20 @@ auto file::load(StringView path, Ubyte **outData, Size *outSize) -> Bool
     Size byteLength = 0;
     if ( !file.seekg(0, std::ios::end) )
     {
-        KAZE_CORE_ERRCODE(Error::FileSeekErr, "Failed to seek to end of file");
+        KAZE_PUSH_ERR(Error::FileSeekErr, "Failed to seek to end of file");
         return KAZE_FALSE;
     }
 
     byteLength = file.tellg();
     if ( !file.seekg(0, std::ios::beg) ) // seek back to beginning to read entire file
     {
-        KAZE_CORE_ERRCODE(Error::FileSeekErr, "Failed to seek to beginning of file");
+        KAZE_PUSH_ERR(Error::FileSeekErr, "Failed to seek to beginning of file");
         return KAZE_FALSE;
     }
 
     if (byteLength == 0)
     {
-        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Empty file: file must have more than 0 bytes");
+        KAZE_PUSH_ERR(Error::RuntimeErr, "Empty file: file must have more than 0 bytes");
         return KAZE_FALSE;
     }
 
@@ -128,7 +128,7 @@ auto file::write(StringView path, const Mem mem) -> Bool
     std::ofstream file(path.data(), std::ios::out | std::ios::trunc | std::ios::binary);
     if ( !file.is_open() )
     {
-        KAZE_CORE_ERRCODE(Error::FileOpenErr, "Failed to open file for writing at: {}", path);
+        KAZE_PUSH_ERR(Error::FileOpenErr, "Failed to open file for writing at: {}", path);
         return KAZE_FALSE;
     }
 
@@ -139,7 +139,7 @@ auto file::write(StringView path, const Mem mem) -> Bool
     {
         if ( !file.write(data + b, BytesPerWrite) )
         {
-            KAZE_CORE_ERRCODE(Error::FileWriteErr, "Failed to write file for writing at: {}, byte {}", path, b);
+            KAZE_PUSH_ERR(Error::FileWriteErr, "Failed to write file for writing at: {}, byte {}", path, b);
             return KAZE_FALSE;
         }
     }
@@ -149,7 +149,7 @@ auto file::write(StringView path, const Mem mem) -> Bool
     {
         if ( !file.write(data + b, size - b) )
         {
-            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failure during file read call");
+            KAZE_PUSH_ERR(Error::FileReadErr, "Failure during file read call");
             return KAZE_FALSE;
         }
     }
@@ -157,4 +157,4 @@ auto file::write(StringView path, const Mem mem) -> Bool
     return KAZE_TRUE;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

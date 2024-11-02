@@ -9,7 +9,7 @@
 
 #define ASSERT_CONTROLLER_INDEX(index) KAZE_ASSERT((index) >= 0 && ((index) < GamepadMaxSlots))
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct InputMgr::Impl {
     WindowHandle window{};
@@ -223,4 +223,4 @@ auto InputMgr::getScroll() const noexcept -> Vec2f
     return m->mouse.getScroll();
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

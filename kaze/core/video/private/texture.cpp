@@ -7,7 +7,7 @@
 #include <bgfx/bgfx.h>
 #include <bimg/bimg.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 auto texture::fromImage(ImageHandle image, Bool freeImage) -> TextureHandle
 {
@@ -38,19 +38,19 @@ auto texture::fromImage(ImageHandle image, Bool freeImage) -> TextureHandle
     }
     catch(const std::exception &e)
     {
-        KAZE_CORE_ERRCODE(Error::StdExcept, "Exception thrown from bgfx::createTexture2D: {}",
+        KAZE_PUSH_ERR(Error::StdExcept, "Exception thrown from bgfx::createTexture2D: {}",
             e.what());
         return {};
     }
     catch(...)
     {
-        KAZE_CORE_ERRCODE(Error::Unknown, "Unknown error thrown from bgfx::createTexture2D");
+        KAZE_PUSH_ERR(Error::Unknown, "Unknown error thrown from bgfx::createTexture2D");
         return {};
     }
 
     if ( !bgfx::isValid(texture) )
     {
-        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Failed to create bgfx texture2d");
+        KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to create bgfx texture2d");
         return {};
     }
 
@@ -62,21 +62,21 @@ auto texture::fromPixels(MemView<void> data, Vec2<Uint> dimensions,
 {
     if (data.size() == 0) // memory must have substance: no empty textures
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "Memory passed was null");
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "Memory passed was null");
         return {};
     }
 
     const auto srcStride = PixelFormat::getStride(srcFormat);
     if (srcStride == 0)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidEnum, "Invalid PixelFormat::Enum");
+        KAZE_PUSH_ERR(Error::InvalidEnum, "Invalid PixelFormat::Enum");
         return {};
     }
 
     const auto pixelCount = data.size() / srcStride;
     if (pixelCount != dimensions.x * dimensions.y)
     {
-        KAZE_CORE_ERRCODE(Error::InvalidArgErr, "calculated invalid image size to pixel count: "
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "calculated invalid image size to pixel count: "
             "{} * {} != {}", dimensions.x, dimensions.y, pixelCount);
         return {};
     }
@@ -107,7 +107,7 @@ auto texture::fromPixels(MemView<void> data, Vec2<Uint> dimensions,
 
     if ( !bgfx::isValid(texture) )
     {
-        KAZE_CORE_ERRCODE(Error::RuntimeErr, "bgfx::createTexture2D failed");
+        KAZE_PUSH_ERR(Error::RuntimeErr, "bgfx::createTexture2D failed");
         memory::free(dest);
         return {};
     }
@@ -128,4 +128,4 @@ auto texture::isValid(TextureHandle texture) noexcept -> Bool
     return texture.handle != bgfx::kInvalidHandle;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

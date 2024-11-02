@@ -2,7 +2,7 @@
 
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 using WindowHandle = void *;
 using ConstWindowHandle = const void *;
@@ -33,4 +33,4 @@ constexpr WindowInit::Flags operator |(const WindowInit::Flags a, const WindowIn
     return static_cast<WindowInit::Flags>(static_cast<Uint>(a) | static_cast<Uint>(b));
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

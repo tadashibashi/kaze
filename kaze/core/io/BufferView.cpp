@@ -5,7 +5,7 @@
 #include <kaze/core/memory.h>
 
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 BufferView::BufferView(const MemView<void> mem, const BufferViewOpts &opts) noexcept :
     m_begin(static_cast<const Ubyte *>(mem.data())),
@@ -34,7 +34,7 @@ auto BufferView::read(String *string, const BufferViewReadStringOpts &opts) -> I
 
     if ( !string )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `string` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "Required param `string` was null");
         return 0;
     }
 
@@ -75,7 +75,7 @@ auto BufferView::read(String *string, Int64 length,
 {
     if ( !string )
     {
-        KAZE_CORE_ERRCODE(Error::NullArgErr, "Required arg `string` was null");
+        KAZE_PUSH_ERR(Error::NullArgErr, "Required arg `string` was null");
         return 0;
     }
 
@@ -91,7 +91,7 @@ auto BufferView::read(void *data, Int64 bytes, Bool reverse) noexcept -> Int64
 {
     if (m_isEof)
     {
-        KAZE_CORE_ERRCODE(Error::FileReadErr, "Attempted to read from BufferView in eof state");
+        KAZE_PUSH_ERR(Error::FileReadErr, "Attempted to read from BufferView in eof state");
         return 0;
     }
 
@@ -171,4 +171,4 @@ BufferView::operator bool()
     return m_begin != nullptr && !m_isEof;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

@@ -10,7 +10,7 @@
 #include <typeindex>
 #include <type_traits>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct StructLayoutInit {
     /// Default endianness of source arithmetic data types
@@ -427,7 +427,7 @@ public:
     {
         if ( m_beginCalled )
         {
-            KAZE_CORE_ERRCODE(Error::LogicErr, "StructLayout::begin()/end() mismatch. "
+            KAZE_PUSH_ERR(Error::LogicErr, "StructLayout::begin()/end() mismatch. "
                 "Did you forget to call `end`?");
             return *this;
         }
@@ -446,7 +446,7 @@ public:
     {
         if ( !m_beginCalled )
         {
-            KAZE_CORE_ERRCODE(Error::LogicErr, "StructLayout::begin()/end() mismatch. "
+            KAZE_PUSH_ERR(Error::LogicErr, "StructLayout::begin()/end() mismatch. "
                 "Did you forget to call `begin`?");
             return *this;
         }
@@ -478,7 +478,7 @@ public:
     auto getEntries() const noexcept -> const List<Entry> &
     {
         if (m_beginCalled)
-            KAZE_CORE_ERRCODE(Error::LogicErr,
+            KAZE_PUSH_ERR(Error::LogicErr,
                 "StructLayout::end() was not called before calling `getEntries`");
         return m_entries;
     }
@@ -529,13 +529,13 @@ private:
     {
         if ( !m_beginCalled )
         {
-            KAZE_CORE_ERRCODE(Error::LogicErr, "StructLayout::begin() must be called before calling `add`");
+            KAZE_PUSH_ERR(Error::LogicErr, "StructLayout::begin() must be called before calling `add`");
             return KAZE_FALSE;
         }
 
         if ( !checkClass(type) )
         {
-            KAZE_CORE_ERRCODE(Error::LogicErr, "StructLayout class/struct type mismatch: "
+            KAZE_PUSH_ERR(Error::LogicErr, "StructLayout class/struct type mismatch: "
                 "was expecting {}, but got {}", m_class.name(), type.name());
             return KAZE_FALSE;
         }
@@ -562,4 +562,4 @@ private:
     mutable std::type_index m_class = typeid(void);
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

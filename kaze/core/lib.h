@@ -20,6 +20,8 @@
 #define KAZE_NAMESPACE kaze
 #endif
 
+#define KAZE_NS KAZE_NAMESPACE
+
 #if KAZE_NO_NAMESPACE
 #define KAZE_NAMESPACE_BEGIN
 #define KAZE_NAMESPACE_END
@@ -30,7 +32,11 @@
 #define USING_KAZE_NAMESPACE using namespace KAZE_NAMESPACE
 #endif
 
-KAZE_NAMESPACE_BEGIN
+#define KAZE_NS_BEGIN KAZE_NAMESPACE_BEGIN
+#define KAZE_NS_END   KAZE_NAMESPACE_END
+#define USING_KAZE_NS USING_KAZE_NAMESPACE
+
+KAZE_NS_BEGIN
 
 using Int8 = int8_t;
 using Int16 = int16_t;
@@ -91,7 +97,7 @@ Size byteOffsetOf(T Class::*member)
 constexpr Bool True = static_cast<Bool>(1);
 constexpr Bool False = static_cast<Bool>(0);
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 
 #if KAZE_COMPILER_CLANG || KAZE_COMPILER_GCC
 #   define KAZE_PACKED __attribute__((packed))

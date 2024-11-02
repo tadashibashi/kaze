@@ -2,7 +2,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/endian.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 #pragma pack(push, 1)
 class Color
 {
@@ -201,4 +201,4 @@ public:
 /// for British programmers
 using Colour = Color;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

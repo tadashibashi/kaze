@@ -9,7 +9,7 @@
 #include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/math/Rect.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Represents a window and functionality about it
 class Window {
@@ -237,4 +237,4 @@ private:
     bool m_ownsWindow;     ///< whether the Window owns its handle
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

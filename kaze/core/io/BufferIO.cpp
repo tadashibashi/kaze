@@ -1,6 +1,6 @@
 #include "BufferIO.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Only for use in readNumeric
 #define CHECK_NTYPE(t) do { \
@@ -28,7 +28,7 @@ static auto readSize(void *source, std::type_index type, Bool reverse,
     CHECK_NTYPE(Float);
     CHECK_NTYPE(Double);
 
-    KAZE_CORE_ERRCODE(Error::InvalidArgErr,
+    KAZE_PUSH_ERR(Error::InvalidArgErr,
         "Unsupported arithmetic type: {}",
         type.name());
     return 0;
@@ -77,7 +77,7 @@ static auto readImpl(void *dest,
             const auto layout = entry.composite.layout;
             if ( !layout )
             {
-                KAZE_CORE_ERRCODE(Error::RuntimeErr, "Missing composite layout");
+                KAZE_PUSH_ERR(Error::RuntimeErr, "Missing composite layout");
                 view.seek(startSrcByte, SeekBase::Start);
                 return 0;
             }
@@ -88,7 +88,7 @@ static auto readImpl(void *dest,
 
                 if ( !entry.getDataPtr )
                 {
-                    KAZE_CORE_ERRCODE(Error::RuntimeErr, "Missing expected `getDataPtr` field in entry");
+                    KAZE_PUSH_ERR(Error::RuntimeErr, "Missing expected `getDataPtr` field in entry");
                     view.seek(startSrcByte, SeekBase::Start);
                     return 0;
                 }
@@ -100,7 +100,7 @@ static auto readImpl(void *dest,
 
                     if ( !entry.setDataElemSize )
                     {
-                        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Missing expected `setDataElemSize` field in varying list entry");
+                        KAZE_PUSH_ERR(Error::RuntimeErr, "Missing expected `setDataElemSize` field in varying list entry");
                         view.seek(startSrcByte, SeekBase::Start);
                         return 0;
                     }
@@ -108,7 +108,7 @@ static auto readImpl(void *dest,
                     // get the count from another member
                     if ( !readSize((Ubyte *)dest + entry.countMemberOffset, entry.countMemberType, KAZE_FALSE, &count) )
                     {
-                        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Failed to read varying list element count");
+                        KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to read varying list element count");
                         view.seek(startSrcByte, SeekBase::Start);
                         return 0;
                     }
@@ -185,7 +185,7 @@ static auto writeImpl(const void *src, BufferWriter &writer, const StructLayout 
             const auto layout = entry.composite.layout;
             if ( !layout )
             {
-                KAZE_CORE_ERRCODE(Error::RuntimeErr, "Missing composite layout");
+                KAZE_PUSH_ERR(Error::RuntimeErr, "Missing composite layout");
                 writer.skipBackTo(startByte);
                 return 0;
             }
@@ -196,7 +196,7 @@ static auto writeImpl(const void *src, BufferWriter &writer, const StructLayout 
 
                 if ( !entry.getDataPtr )
                 {
-                    KAZE_CORE_ERRCODE(Error::RuntimeErr, "Missing expected `getDataPtr` field in entry");
+                    KAZE_PUSH_ERR(Error::RuntimeErr, "Missing expected `getDataPtr` field in entry");
                     writer.skipBackTo(startByte);
                     return 0;
                 }
@@ -208,7 +208,7 @@ static auto writeImpl(const void *src, BufferWriter &writer, const StructLayout 
 
                     if ( !entry.setDataElemSize )
                     {
-                        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Missing expected `setDataElemSize` field in entry");
+                        KAZE_PUSH_ERR(Error::RuntimeErr, "Missing expected `setDataElemSize` field in entry");
                         writer.skipBackTo(startByte);
                         return 0;
                     }
@@ -216,7 +216,7 @@ static auto writeImpl(const void *src, BufferWriter &writer, const StructLayout 
                     // get the count from another member
                     if ( !readSize((Ubyte *)src + entry.countMemberOffset, entry.countMemberType, KAZE_FALSE, &count) )
                     {
-                        KAZE_CORE_ERRCODE(Error::RuntimeErr, "Failed to read varying list element count");
+                        KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to read varying list element count");
                         writer.skipBackTo(startByte);
                         return 0;
                     }
@@ -268,5 +268,5 @@ auto BufferIO::writeLayout(const void *dest, BufferWriter &writer, const StructL
     return writeImpl(dest, writer, layout);
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 

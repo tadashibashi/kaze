@@ -4,7 +4,7 @@
 
 #include <mutex>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 static int s_timesInit;
 static std::mutex s_lock;
@@ -37,4 +37,4 @@ BackendInitGuard::~BackendInitGuard()
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

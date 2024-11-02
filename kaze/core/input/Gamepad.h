@@ -6,7 +6,7 @@
 #include <kaze/core/math/Vec/Vec2.h>
 
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class Gamepad {
 public:
@@ -43,4 +43,4 @@ private:
 };
 
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

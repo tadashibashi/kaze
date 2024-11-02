@@ -8,7 +8,7 @@
 #include <kaze/core/concepts.h>
 #include <type_traits>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Default Vector class if there are no specializations available (e.g. the non-specialized Vec<Float, 5>).
 /// Since it is not derived from the VecBase class, it's essentially just a fixed-length C-array.
@@ -17,8 +17,35 @@ struct Vec
 {
     constexpr Vec() noexcept : data() {}
 
-    constexpr T &operator[](Size i) { return data[i]; }
-    constexpr const T &operator[](Size i) const { return data[i]; }
+    [[nodiscard]]
+    constexpr auto operator[](Size i) -> T &
+    {
+        KAZE_ASSERT(i < S, "index must be in range");
+        return data[i];
+    }
+
+    [[nodiscard]]
+    constexpr auto operator[](Size i) const -> const T &
+    {
+        KAZE_ASSERT(i < S, "index must be in range");
+        return data[i];
+    }
+
+    [[nodiscard]]
+    constexpr auto at(Size i) -> T &
+    {
+        if (i >= S)
+            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
+        return data[i];
+    }
+
+    [[nodiscard]]
+    constexpr auto at(Size i) const -> const T &
+    {
+        if (i >= S)
+            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
+        return data[i];
+    }
 
 private:
     T data[S];
@@ -29,37 +56,86 @@ template <Arithmetic T, Size S>
 struct VecBase
 {
 private:
-    constexpr Vec<T, S> &derived() noexcept { return static_cast<Vec<T, S> &>(*this); }
-    constexpr const Vec<T, S> &derived() const noexcept { return static_cast<const Vec<T, S> &>(*this); }
+    /// \returns this object cast to the base class
+    [[nodiscard]]
+    constexpr auto derived() noexcept -> Vec<T, S> &
+    {
+        return static_cast<Vec<T, S> &>(*this);
+    }
 
-public:
-    using floating_t = std::conditional_t<std::is_floating_point_v<T>, T, Double>;
+    /// \returns this object cast to the base class
+    [[nodiscard]]
+    constexpr auto derived() const noexcept -> const Vec<T, S> &
+    {
+        return static_cast<const Vec<T, S> &>(*this);
+    }
 
     template <Arithmetic T2>
     struct make_diff
     {
         using type = std::conditional_t<std::is_signed_v<T2>, T2, Int64>;
     };
+
+public:
+    using floating_t = std::conditional_t<std::is_floating_point_v<T>, T, Double>;
     using diff_t = typename make_diff<T>::type;
 
+    /// Sentinel type for not-a-number
     static constexpr T NaN = std::numeric_limits<T>::has_quiet_NaN ? std::numeric_limits<T>::quiet_NaN()
         : std::numeric_limits<T>::has_infinity ? std::numeric_limits<T>::infinity()
         : std::numeric_limits<T>::max();
 
+    /// Get a component value
+    /// \param[in]  i   index of the component to get
+    /// \returns value of component at `i`
+    [[nodiscard]]
+    constexpr auto operator[](const Size i) ->  T &
+    {
+        KAZE_ASSERT(i < S, "index must be in range");
+        return derived()[i];
+    }
 
-    /// May throw if an invalid value
-    constexpr T &operator[](Size i)
+    /// Get a component value
+    /// \param[in]  i   index of the component to get
+    /// \returns value of component at `i`
+    [[nodiscard]]
+    constexpr auto operator[](const Size i) const -> const T &
     {
+        KAZE_ASSERT(i < S, "index must be in range");
         return derived()[i];
     }
-    constexpr const T &operator[](Size i) const
+
+    /// Get component, with runtime check that throws if out of range
+    /// \param[in]  i    index of component, must be less than size
+    /// \returns value of component
+    [[nodiscard]]
+    constexpr auto at(const Size i) -> T &
     {
+        if (i >= S)
+            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
         return derived()[i];
     }
+
+    /// Get component, with runtime check that throws if out of range
+    /// \param[in]  i    index of component, must be less than size
+    /// \returns value of component
+    [[nodiscard]]
+    constexpr auto at(const Size i) const -> const T &
+    {
+        if (i >= S)
+            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
+        return derived()[i];
+    }
+
+    /// \returns the number of components in this vector
+    [[nodiscard]]
+    constexpr auto size() const noexcept -> Size { return S; }
 
     // ===== Getters =====
 
-    [[nodiscard]] constexpr bool isNaN() const noexcept
+    /// \returns whether this vector has any component set to NaN
+    [[nodiscard]]
+    constexpr auto isNaN() const noexcept -> bool
     {
         for (Size i = 0; i < S; ++i)
         {
@@ -78,7 +154,9 @@ public:
         return false;
     }
 
-    [[nodiscard]] constexpr auto magnitude() const noexcept
+    /// \returns the collective magnitude or length of each component
+    [[nodiscard]]
+    constexpr auto magnitude() const noexcept
     {
         if constexpr (S == 0)
             return 0;
@@ -98,7 +176,8 @@ public:
     }
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr auto distanceTo(const VecBase<U, S> &other) const noexcept
+    [[nodiscard]]
+    constexpr auto distanceTo(const VecBase<U, S> &other) const noexcept
     {
         if constexpr (S == 0)
             return 0;
@@ -113,29 +192,41 @@ public:
         }
     }
 
+    /// \returns 2D angle in radians, using the first two components of the Vec
     template <Size S2 = S>
-    [[nodiscard]] constexpr auto angle() const noexcept -> std::enable_if_t<S2 >= 2, floating_t>
+    [[nodiscard]]
+    constexpr auto angle() const noexcept -> std::enable_if_t<S2 >= 2, floating_t>
     {
         return mathf::coordsToAngle<T>(operator[](0), operator[](1));
     }
 
+    /// \returns angle in radians to another Vec, using the first two components of the Vec
+    /// \param[in]  to  vector to measure angle to
     template <Size S2 = S>
-    [[nodiscard]] constexpr auto angleTo(const VecBase<T, S> &other) const noexcept -> std::enable_if_t<S2 >= 2, floating_t>
+    [[nodiscard]]
+    constexpr auto angleTo(const VecBase<T, S> &to) const noexcept -> std::enable_if_t<S2 >= 2, floating_t>
     {
-        return mathf::coordsToAngle<T>(operator[](0), operator[](1), other[0], other[1]);
+        return mathf::coordsToAngle<T>(operator[](0), operator[](1), to[0], to[1]);
     }
 
-    [[nodiscard]] constexpr auto degreesTo(const VecBase<T, S> &to) const noexcept
+    /// \returns the difference of degrees from this Vec to another
+    /// \param[in]  to   the other vector to measure the angle to
+    [[nodiscard]]
+    constexpr auto degreesTo(const VecBase<T, S> &to) const noexcept
     {
         return mathf::toDegrees(this->angleTo(to));
     }
 
-    /// Get angle (in degrees) between {0, 0} and this vec's x and y coordinates
-    [[nodiscard]] constexpr auto degrees() const noexcept
+    /// \returns the angle (in degrees) between {0, 0} and this vec's x and y coordinates
+    [[nodiscard]]
+    constexpr auto degrees() const noexcept
     {
         return mathf::toDegrees(this->angle());
     }
 
+    /// Rotate the `Vec` on the x and y coordinates
+    /// \param[in]  radians  the number of radians to rotate
+    /// \returns this object
     template <Arithmetic U = T>
     constexpr auto rotate(const T radians) noexcept -> std::enable_if_t<S >= 2 && std::is_floating_point_v<U>, Vec<T, S> &>
     {
@@ -143,12 +234,18 @@ public:
         return derived();
     }
 
+    /// Rotate the `Vec` on the x and y coordinates
+    /// \param[in]  degrees  the number of degrees to rotate
+    /// \returns this object
     template <Arithmetic U = T>
     constexpr auto rotateDegrees(const T degrees) noexcept -> std::enable_if_t<S >= 2 && std::is_floating_point_v<U>, Vec<T, S> &>
     {
         return this->rotate(mathf::toRadians(degrees));
     }
 
+    /// Make a rotated copy of this object on the x and y coordinates
+    /// \param[in]  radians  the number of radians to rotate
+    /// \returns a rotated copy
     template <Arithmetic U = T>
     [[nodiscard]] constexpr auto rotated(const T radians) const noexcept -> std::enable_if_t<S >= 2 && std::is_floating_point_v<U>, Vec<T, S>>
     {
@@ -158,13 +255,19 @@ public:
         return v;
     }
 
+    /// Make a rotated copy of this object on the x and y coordinates
+    /// \param[in]  degrees  the number of degrees to rotate
+    /// \returns a rotated copy
     template <Arithmetic U = T>
     [[nodiscard]] constexpr auto rotatedDegrees(const T degrees) const noexcept -> std::enable_if_t<S >= 2 && std::is_floating_point_v<U>, Vec<T, S>>
     {
         return this->rotated(mathf::toRadians(degrees));
     }
 
-    constexpr Vec<T, S> min(const VecBase<T, S> &other) const noexcept
+    /// Make a copy containing minimum values of each component between two Vectors
+    /// \param[in]  other  other VecBase to use
+    /// \returns a minimized copy
+    constexpr auto min(const VecBase<T, S> &other) const noexcept -> Vec<T, S>
     {
         Vec<T, S> result;
         for (Size i = 0; i < S; ++i)
@@ -177,7 +280,10 @@ public:
         return result;
     }
 
-    constexpr Vec<T, S> max(const VecBase<T, S> &other) const noexcept
+    /// Make a copy containing maximum values of each component between two Vectors
+    /// \param[in]  other  other VecBase to use
+    /// \returns a maximized copy
+    constexpr auto max(const VecBase<T, S> &other) const noexcept -> Vec<T, S>
     {
         Vec<T, S> result;
         for (Size i = 0; i < S; ++i)
@@ -190,7 +296,11 @@ public:
         return result;
     }
 
-    constexpr Vec<T, S> &clamp(const VecBase<T, S> &bounds0, const VecBase<T, S> &bounds1) noexcept
+    /// Clamp this VecBase between two bounds, mutating the internals
+    /// \param[in]  bounds0  first bounds to clamp by
+    /// \param[in]  bounds1  second bounds to clamp by
+    /// \returns this object, clamped
+    constexpr auto clamp(const VecBase<T, S> &bounds0, const VecBase<T, S> &bounds1) noexcept -> Vec<T, S> &
     {
         constexpr auto minBounds = bounds0->min(bounds1);
         constexpr auto maxBounds = bounds0->max(bounds1);
@@ -212,7 +322,11 @@ public:
 
     // ===== Transformation functions =====
 
-    constexpr Vec<T, S> &moveToward(const VecBase<T, S> &target, diff_t maxDistanceDelta) noexcept
+    /// Move toward a target vector by a specific delta, without moving beyond it
+    /// \param[in]  target             goal to reach
+    /// \param[in]  maxDistanceDelta   amount to move by without crossing the target boundary
+    /// \returns this altered object
+    constexpr auto moveToward(const VecBase<T, S> &target, diff_t maxDistanceDelta) noexcept -> Vec<T, S> &
     {
         Vec<diff_t, S> diff;
         if constexpr (std::is_signed_v<T>)
@@ -248,7 +362,8 @@ public:
         return operator+=(diff);
     }
 
-    /// Normalizes the vector if its magnitude is greater than 0. Returns whether operation was performed.
+    /// Normalizes the vector if its magnitude is greater than 0.
+    /// \returns whether operation was performed
     template <Arithmetic U = T>
     constexpr auto tryNormalize() noexcept -> std::enable_if_t<std::is_floating_point_v<U>, bool>
     {
@@ -262,6 +377,8 @@ public:
         return false;
     }
 
+    /// Normalizes the vector to a length of 1
+    /// \returns this object
     template <Arithmetic U = T>
     constexpr auto normalize() noexcept -> std::enable_if_t<std::is_floating_point_v<U>, Vec<T, S> &>
     {
@@ -278,8 +395,10 @@ public:
         return derived();
     }
 
+    /// \returns a normalized copy the vector to a length of 1
     template <Arithmetic U = T>
-    [[nodiscard]] constexpr auto normalized() const noexcept -> std::enable_if_t<std::is_floating_point_v<U>, Vec<T, S>>
+    [[nodiscard]]
+    constexpr auto normalized() const noexcept -> std::enable_if_t<std::is_floating_point_v<U>, Vec<T, S>>
     {
         Vec<T, S> result = derived();
         if (auto mag = magnitude(); mag != 0)
@@ -297,7 +416,8 @@ public:
 
     // ===== Equality operators =====
 
-    [[nodiscard]] constexpr bool operator==(const VecBase &other) const noexcept
+    [[nodiscard]]
+    constexpr auto operator==(const VecBase &other) const noexcept -> bool
     {
         for (Size i = 0; i < S; ++i)
         {
@@ -308,13 +428,15 @@ public:
         return true;
     }
 
-    [[nodiscard]] constexpr bool operator!=(const VecBase &other) const noexcept
+    [[nodiscard]]
+    constexpr auto operator!=(const VecBase &other) const noexcept -> bool
     {
         return !operator==(other);
     }
 
     // ===== Unary sign operators =====
-    [[nodiscard]] constexpr Vec<T, S> operator-() const noexcept
+    [[nodiscard]]
+    constexpr auto operator-() const noexcept -> Vec<T, S>
     {
         Vec<T, S> result = derived();
         for (Size i = 0; i < S; ++i)
@@ -322,7 +444,8 @@ public:
         return result;
     }
 
-    [[nodiscard]] constexpr Vec<T, S> operator+() const noexcept
+    [[nodiscard]]
+    constexpr auto operator+() const noexcept -> Vec<T, S>
     {
         return derived();
     }
@@ -330,7 +453,8 @@ public:
     // ===== Casting operator =====
 
     template <Arithmetic U, Size S2>
-    [[nodiscard]] constexpr explicit operator Vec<U, S2>() const noexcept
+    [[nodiscard]]
+    constexpr explicit operator Vec<U, S2>() const noexcept
     {
         constexpr auto MaxIndex = (S2 > S) ? S : S2;
         Vec<U, S2> v{};
@@ -342,7 +466,8 @@ public:
     // ===== Vector math operators =====
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr Vec<T, S> operator +(const VecBase<U, S> &other) const noexcept
+    [[nodiscard]]
+    constexpr auto operator +(const VecBase<U, S> &other) const noexcept -> Vec<T, S>
     {
         auto result = derived();
         for (Size i = 0; i < S; ++i)
@@ -352,7 +477,8 @@ public:
     }
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr Vec<diff_t, S> operator -(const VecBase<U, S> &other) const noexcept
+    [[nodiscard]]
+    constexpr auto operator -(const VecBase<U, S> &other) const noexcept -> Vec<diff_t, S>
     {
         Vec<diff_t, S> result = derived();
         for (Size i = 0; i < S; ++i)
@@ -362,7 +488,8 @@ public:
     }
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr Vec<T, S> operator *(const VecBase<U, S> &other) const noexcept
+    [[nodiscard]]
+    constexpr auto operator *(const VecBase<U, S> &other) const noexcept -> Vec<T, S>
     {
         auto result = derived();
         for (Size i = 0; i < S; ++i)
@@ -372,7 +499,8 @@ public:
     }
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr Vec<T, S> operator /(const VecBase<U, S> &other) const noexcept
+    [[nodiscard]]
+    constexpr auto operator /(const VecBase<U, S> &other) const noexcept -> Vec<T, S>
     {
         auto result = derived();
         for (Size i = 0; i < S; ++i)
@@ -386,7 +514,7 @@ public:
     }
 
     template <Arithmetic U>
-    constexpr Vec<T, S> &operator +=(const VecBase<U, S> &other) noexcept
+    constexpr auto operator +=(const VecBase<U, S> &other) noexcept -> Vec<T, S> &
     {
         for (Size i = 0; i < S; ++i)
             operator[](i) += static_cast<T>(other[i]);
@@ -396,7 +524,7 @@ public:
 
     /// You should be careful when subtract-assigning with unsigned types
     template <Arithmetic U>
-    constexpr Vec<T, S> &operator -=(const VecBase<U, S> &other) noexcept
+    constexpr auto operator -=(const VecBase<U, S> &other) noexcept -> Vec<T, S> &
     {
         for (Size i = 0; i < S; ++i)
             operator[](i) -= static_cast<diff_t>(other[i]);
@@ -405,7 +533,7 @@ public:
     }
 
     template <Arithmetic U>
-    constexpr Vec<T, S> &operator *=(const VecBase<U, S> &other) noexcept
+    constexpr auto operator *=(const VecBase<U, S> &other) noexcept -> Vec<T, S> &
     {
         for (Size i = 0; i < S; ++i)
             operator[](i) *= static_cast<T>(other[i]);
@@ -414,7 +542,7 @@ public:
     }
 
     template <Arithmetic U>
-    constexpr Vec<T, S> &operator /=(const VecBase<U, S> &other) noexcept
+    constexpr auto operator /=(const VecBase<U, S> &other) noexcept -> Vec<T, S> &
     {
         for (Size i = 0; i < S; ++i)
         {
@@ -429,7 +557,8 @@ public:
     // ===== Scalar Math Operators =====
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr Vec<T, S> operator *(const U scalar) const noexcept
+    [[nodiscard]]
+    constexpr auto operator *(const U scalar) const noexcept ->  Vec<T, S>
     {
         auto result = derived();
         for (Size i = 0; i < S; ++i)
@@ -438,7 +567,7 @@ public:
     }
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr Vec<T, S> operator /(const U scalar) const noexcept
+    [[nodiscard]] constexpr auto operator /(const U scalar) const noexcept -> Vec<T, S>
     {
         auto result = derived();
         if (scalar == 0)
@@ -456,7 +585,7 @@ public:
     }
 
     template <Arithmetic U>
-    constexpr Vec<T, S> &operator *=(const U scalar) noexcept
+    constexpr auto operator *=(const U scalar) noexcept -> Vec<T, S> &
     {
         for (Size i = 0; i < S; ++i)
             operator[](i) *= scalar;
@@ -464,7 +593,7 @@ public:
     }
 
     template <Arithmetic U>
-    constexpr Vec<T, S> &operator /=(const U scalar) noexcept
+    constexpr auto operator /=(const U scalar) noexcept -> Vec<T, S> &
     {
         if (scalar == 0)
         {
@@ -484,7 +613,7 @@ public:
 
 private:
     template <Char C>
-    constexpr T getValueFromChar() const noexcept
+    constexpr auto getValueFromChar() const noexcept -> T
     {
         if constexpr (S >= 1 && C == 'x')
             return operator[](0);
@@ -508,20 +637,20 @@ private:
     };
 public:
     template <Char... Cs> requires are_components_valid<Cs...>::value
-    constexpr Vec<T, sizeof...(Cs)> swizzle() const noexcept
+    constexpr auto swizzle() const noexcept -> Vec<T, sizeof...(Cs)>
     {
         return Vec<T, sizeof...(Cs)>{getValueFromChar<Cs>()...};
     }
 };
 
 template <Arithmetic T, Arithmetic U, Size S>
-[[nodiscard]] constexpr Vec<T, S> operator *(U scalar, Vec<T, S> v) noexcept
+[[nodiscard]] constexpr auto operator *(U scalar, Vec<T, S> v) noexcept -> Vec<T, S>
 {
     return v * scalar; // associative property of multiplication
 }
 
 template <Arithmetic T, Arithmetic U, Size S>
-[[nodiscard]] constexpr Vec<T, S> operator /(U scalar, Vec<T, S> v) noexcept
+[[nodiscard]] constexpr auto operator /(U scalar, Vec<T, S> v) noexcept -> Vec<T, S>
 {
     Vec<T, S> result;
     for (Size i = 0; i < S; ++i)
@@ -531,4 +660,4 @@ template <Arithmetic T, Arithmetic U, Size S>
     return result / v;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

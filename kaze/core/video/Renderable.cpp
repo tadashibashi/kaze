@@ -6,7 +6,7 @@
 #include <bgfx/bgfx.h>
 #include <kaze/core/memory.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
     struct Renderable::Impl {
     Int viewId{};
     ShaderProgram program{};
@@ -30,7 +30,7 @@ auto Renderable::init(const Init &config) -> Bool
     //     config.layout.getLayout(), BGFX_BUFFER_ALLOW_RESIZE);
     // if (vertexBuffer.idx == bgfx::kInvalidHandle)
     // {
-    //     KAZE_CORE_ERRCODE(Error::RuntimeErr, "bgfx::createDynamicVertexBuffer failed");
+    //     KAZE_PUSH_ERR(Error::RuntimeErr, "bgfx::createDynamicVertexBuffer failed");
     //     return KAZE_FALSE;
     // }
 
@@ -38,7 +38,7 @@ auto Renderable::init(const Init &config) -> Bool
     //     BGFX_BUFFER_ALLOW_RESIZE);
     // if ( !bgfx::isValid(indexBuffer) )
     // {
-    //     KAZE_CORE_ERRCODE(Error::RuntimeErr, "bgfx::createDynamicIndexBuffer failed");
+    //     KAZE_PUSH_ERR(Error::RuntimeErr, "bgfx::createDynamicIndexBuffer failed");
     //     bgfx::destroy(vertexBuffer);
     //     return KAZE_FALSE;
     // }
@@ -176,4 +176,4 @@ auto Renderable::getLayout() const noexcept -> const VertexLayout &
     return m->layout;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

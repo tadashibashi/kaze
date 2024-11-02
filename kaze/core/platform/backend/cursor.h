@@ -6,7 +6,7 @@
 #include <kaze/core/video/ImageHandle.h>
 #include <kaze/core/video/WindowConstants.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend::cursor {
     /// Create a standard system cursor e.g. pointer, text input, etc.
@@ -62,4 +62,4 @@ namespace backend::cursor {
     auto isDown(WindowHandle window, MouseBtn button, bool *outDown) noexcept -> bool;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

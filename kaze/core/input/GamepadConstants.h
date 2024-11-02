@@ -1,7 +1,7 @@
 #pragma once
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 constexpr int GamepadMaxSlots = 16;
 
@@ -38,5 +38,5 @@ enum class GamepadAxis {
     Count
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
 

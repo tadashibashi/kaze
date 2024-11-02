@@ -2,7 +2,7 @@
 
 #include <kaze/core/io/io.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 FileBuffer::FileBuffer() : m_data(), m_dataSize() { }
 FileBuffer::~FileBuffer()
@@ -82,4 +82,4 @@ auto FileBuffer::close() -> void
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

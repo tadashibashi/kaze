@@ -7,10 +7,10 @@
 #include <kaze/core/video/Texture2D.h>
 #include <kaze/core/video/UniformMgr.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 class GraphicsMgr;
 class Window;
-KAZE_NAMESPACE_END
+KAZE_NS_END
 
 KAZE_TK_NAMESPACE_BEGIN
 

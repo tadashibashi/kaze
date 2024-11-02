@@ -10,7 +10,7 @@
 #include <stdexcept>
 
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
     struct SeekBase {
     enum Enum {
         Start,
@@ -109,13 +109,13 @@ public:
     {
         if ( !outValue )
         {
-            KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outValue` was null");
+            KAZE_PUSH_ERR(Error::NullArgErr, "Required param `outValue` was null");
             return KAZE_FALSE;
         }
 
         if ( !*this || readNumber(outValue, sizeof(T), m_arithmeticEndian) != sizeof(T))
         {
-            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failed to read from BufferView");
+            KAZE_PUSH_ERR(Error::FileReadErr, "Failed to read from BufferView");
             return KAZE_FALSE;
         }
 
@@ -131,13 +131,13 @@ public:
     {
         if ( !outValue )
         {
-            KAZE_CORE_ERRCODE(Error::NullArgErr, "Required param `outValue` was null");
+            KAZE_PUSH_ERR(Error::NullArgErr, "Required param `outValue` was null");
             return KAZE_FALSE;
         }
 
         if ( !*this || !read(outValue, opts) )
         {
-            KAZE_CORE_ERRCODE(Error::FileReadErr, "Failed to read from BufferView");
+            KAZE_PUSH_ERR(Error::FileReadErr, "Failed to read from BufferView");
             return KAZE_FALSE;
         }
 
@@ -193,4 +193,4 @@ public:
     Endian::Type m_stringEndian;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <new>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <typename T, size_t AlignmentBytes>
 struct AlignedAllocator {
@@ -41,4 +41,4 @@ struct AlignedAllocator {
     bool operator!=(const AlignedAllocator &) const noexcept { return false; }
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

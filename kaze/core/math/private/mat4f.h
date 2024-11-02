@@ -3,7 +3,7 @@
 #include <kaze/core/math/Vec/Vec3.h>
 #include <kaze/core/math/Vec/Vec4.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Wrapper around bgfx matrix functions due to handling platform-based normalization
 namespace mathf::mat4f {
@@ -65,4 +65,4 @@ namespace mathf::mat4f {
         Float offset) -> void;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

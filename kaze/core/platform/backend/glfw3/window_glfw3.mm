@@ -15,20 +15,20 @@
 #include <GLFW/glfw3native.h>
 
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
     auto getWindowCocoaFullscreen(GLFWwindow *window, bool *outFullscreen) noexcept -> bool
     {
         if (outFullscreen == nullptr)
         {
-            KAZE_CORE_ERRCODE(Error::NullArgErr, "Required argument outFullscreen was null");
+            KAZE_PUSH_ERR(Error::NullArgErr, "Required argument outFullscreen was null");
             return false;
         }
 
         if (window == nullptr)
         {
-            KAZE_CORE_ERRCODE(Error::NullArgErr, "Required argument window was null");
+            KAZE_PUSH_ERR(Error::NullArgErr, "Required argument window was null");
             return false;
         }
 
@@ -37,7 +37,7 @@ namespace backend {
         {
             const char *errMessage;
             glfwGetError(&errMessage);
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get Cocoa window: {}", errMessage);
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get Cocoa window: {}", errMessage);
             return false;
         }
 
@@ -56,7 +56,7 @@ namespace backend {
         {
             const char *errMessage;
             glfwGetError(&errMessage);
-            KAZE_CORE_ERRCODE(Error::BE_RuntimeErr, "Failed to get Cocoa window: {}", errMessage);
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get Cocoa window: {}", errMessage);
 
             return false;
         }
@@ -65,4 +65,4 @@ namespace backend {
         return true;
     }
 }
-KAZE_NAMESPACE_END
+KAZE_NS_END

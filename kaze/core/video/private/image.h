@@ -5,7 +5,7 @@
 #include <kaze/core/video/ImageHandle.h>
 #include <kaze/core/video/PixelFormat.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace image {
     /// Load image from file data
@@ -36,4 +36,4 @@ namespace image {
     auto free(ImageHandle image) -> void;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

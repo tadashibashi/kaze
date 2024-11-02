@@ -3,7 +3,7 @@
 #include <filesystem>
 #include <kaze/core/debug.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace filesys {
     auto getBaseDir() -> String
@@ -29,7 +29,7 @@ namespace filesys {
                 }
                 else
                 {
-                    KAZE_CORE_ERRCODE(Error::PlatformErr, "MacOS-specific error: failed to get executable path");
+                    KAZE_PUSH_ERR(Error::PlatformErr, "MacOS-specific error: failed to get executable path");
                 }
             }
         }
@@ -39,14 +39,20 @@ namespace filesys {
 
     auto getUserDir(StringView companyName, StringView appName) -> String
     {
-        std::filesystem::path path = std::format("~/Library/Application Support/{}/{}", companyName, appName);
-        if ( !std::filesystem::exists(path) )
-        {
-            std::filesystem::create_directories(path);
+        String homeDir;
+        @autoreleasepool {
+            NSString *tempHomeDir = NSHomeDirectory();
+            homeDir = String([tempHomeDir UTF8String], [tempHomeDir length]);
         }
 
-        return path.string();
+        const auto fullPath = std::format("{}/Library/Application Support/{}/{}", homeDir, companyName, appName);
+        if ( !std::filesystem::exists(fullPath) )
+        {
+            std::filesystem::create_directories(fullPath);
+        }
+
+        return fullPath;
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

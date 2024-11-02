@@ -4,7 +4,7 @@
 
 #include <gcem.hpp>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
     namespace mathf {
 
     // ===== Basic Math =======================================================
@@ -367,4 +367,4 @@ KAZE_NAMESPACE_BEGIN
     }
 } // namespace mathf
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

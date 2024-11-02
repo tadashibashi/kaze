@@ -1,6 +1,6 @@
 #include "KeyboardConstants.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 static Array<Cstring, static_cast<Int>(Key::Count)> s_keyNames =
 {
@@ -112,4 +112,4 @@ Cstring toCstring(Key key)
     return s_keyNames[ static_cast<Int>(key) ];
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

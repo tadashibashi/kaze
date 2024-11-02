@@ -7,7 +7,7 @@ namespace bgfx {
     struct VertexLayout;
 }
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Vertex attribute enum.
 struct Attrib
@@ -89,4 +89,4 @@ private:
     Impl *m;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

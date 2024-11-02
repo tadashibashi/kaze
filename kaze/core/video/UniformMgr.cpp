@@ -4,7 +4,7 @@
 
 #include <bgfx/bgfx.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct UniformMgr::Impl {
 
@@ -66,14 +66,14 @@ struct UniformMgr::Impl {
         case UniformType::Mat4: bgfxType = bgfx::UniformType::Mat4; break;
         case UniformType::Mat3: bgfxType = bgfx::UniformType::Mat3; break;
         default:
-            KAZE_CORE_ERRCODE(Error::InvalidEnum, "Invlaid UniformType passed");
+            KAZE_PUSH_ERR(Error::InvalidEnum, "Invlaid UniformType passed");
             return Uniform{};
         }
 
         const auto handle = bgfx::createUniform(name.data(), bgfxType);
         if ( !bgfx::isValid(handle) )
         {
-            KAZE_CORE_ERRCODE(Error::RuntimeErr, "Failed to create uniform");
+            KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to create uniform");
             return Uniform{};
         }
 
@@ -91,7 +91,7 @@ struct UniformMgr::Impl {
             return Uniform{it->second.idx};
         }
 
-        KAZE_CORE_ERRCODE(Error::MissingKeyErr, "No uniform with key: \"{}\"", name);
+        KAZE_PUSH_ERR(Error::MissingKeyErr, "No uniform with key: \"{}\"", name);
         return Uniform{};
     }
 
@@ -191,4 +191,4 @@ auto UniformMgr::operator[](const String &name) const -> Uniform
     return getUniform(name);
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

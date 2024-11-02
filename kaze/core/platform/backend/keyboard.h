@@ -3,7 +3,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/input/KeyboardConstants.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend::keyboard {
     /// Get whether a key is currently down
@@ -14,4 +14,4 @@ namespace backend::keyboard {
     auto isDown(Key key, bool *outDown) noexcept -> bool;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

@@ -3,7 +3,7 @@
 #include <kaze/core/math/Matrix.h>
 #include <kaze/core/math/Vec/Vec4.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class Color;
 class Texture2D;
@@ -84,4 +84,4 @@ private:
    Uint16 m_handle;   ///< low level uniform handle id
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

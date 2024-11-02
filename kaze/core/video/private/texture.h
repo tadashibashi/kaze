@@ -6,7 +6,7 @@
 #include <kaze/core/video/PixelFormat.h>
 #include <kaze/core/video/TextureHandle.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace texture {
     /// Create a GPU texture from an image.
@@ -28,4 +28,4 @@ namespace texture {
     auto isValid(TextureHandle texture) noexcept -> Bool;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

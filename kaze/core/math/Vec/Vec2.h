@@ -7,7 +7,7 @@
 
 #include "VecBase.h"
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <Arithmetic T>
 struct Vec<T, 2> : VecBase<T, 2>
@@ -32,31 +32,33 @@ struct Vec<T, 2> : VecBase<T, 2>
     template <Char C>
     struct is_valid_component { static constexpr bool value = C == 'x' || C == 'y'; };
 
-    constexpr Vec &set(T x, T y) noexcept
+    constexpr auto set(T x, T y) noexcept -> Vec &
     {
         this->x = x;
         this->y = y;
         return *this;
     }
 
-    constexpr Vec &setX(T value) noexcept
+    constexpr auto setX(T value) noexcept -> Vec &
     {
         this->x = value;
         return *this;
     }
 
-    constexpr Vec &setY(T value) noexcept
+    constexpr auto setY(T value) noexcept -> Vec &
     {
         this->y = value;
         return *this;
     }
 
-    [[nodiscard]] constexpr T &operator[](const Size index)
+    [[nodiscard]]
+    constexpr auto operator[](const Size index) -> T &
     {
         return ptr[index];
     }
 
-    [[nodiscard]] constexpr const T &operator[](const Size index) const
+    [[nodiscard]]
+    constexpr auto operator[](const Size index) const -> const T &
     {
         return ptr[index];
     }
@@ -76,7 +78,8 @@ struct Vec<T, 2> : VecBase<T, 2>
     /// Creates a vec from an angle and distance, filling in its x and y fields.
     /// If the vec is of a size larger than 2 dimensions, the rest will be populated with 0's.
     /// For integral types, value precision will be truncated.
-    [[nodiscard]] constexpr static auto fromAngle(T angle, T distance = static_cast<T>(1)) noexcept
+    [[nodiscard]]
+    constexpr static auto fromAngle(T angle, T distance = static_cast<T>(1)) noexcept
     {
         Vec v{};
         mathf::angleToCoords(angle, distance, &v.x, &v.y);
@@ -84,12 +87,14 @@ struct Vec<T, 2> : VecBase<T, 2>
         return v;
     }
 
-    [[nodiscard]] constexpr static auto fromDegrees(T degrees, T distance = static_cast<T>(1)) noexcept
+    [[nodiscard]]
+    constexpr static auto fromDegrees(T degrees, T distance = static_cast<T>(1)) noexcept
     {
         return Vec::fromAngle(mathf::toRadians(degrees), distance);
     }
 
-    [[nodiscard]] constexpr static Vec createFilled(T value) noexcept
+    [[nodiscard]]
+    constexpr static auto createFilled(T value) noexcept -> Vec
     {
         return { value, value };
     }
@@ -121,4 +126,4 @@ using Vec2d = Vec<Double, 2>;
 template <Arithmetic T>
 using Vec2 = Vec<T, 2>;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <ranges>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Forwards events that others can subscribe to.
 /// All callbacks take a user pointer, with optional priority.
@@ -221,4 +221,4 @@ private:
     Bool m_wasAdded;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

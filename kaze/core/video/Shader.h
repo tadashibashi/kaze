@@ -2,7 +2,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/MemView.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class Shader
 {
@@ -52,4 +52,4 @@ private:
     Impl *m;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

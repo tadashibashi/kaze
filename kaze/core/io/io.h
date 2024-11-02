@@ -4,7 +4,7 @@
 #include <kaze/core/memory.h>
 #include <kaze/core/MemView.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace file {
     /// Load a file from the file system
@@ -22,4 +22,4 @@ namespace file {
     auto write(StringView path, Mem mem) -> Bool;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

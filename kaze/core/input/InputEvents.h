@@ -8,7 +8,7 @@
 #include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/video/WindowConstants.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Window-related events
 struct WindowEvent
@@ -98,4 +98,4 @@ struct TextInputEvent {
     WindowHandle window;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

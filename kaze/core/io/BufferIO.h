@@ -8,7 +8,7 @@
 #include <kaze/core/io/BufferView.h>
 #include <kaze/core/io/StructLayout.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// For now this object just contains static functions for conversion
 /// between binary and structs
@@ -47,7 +47,7 @@ public:
     {
         if (layout.getClassType() != typeid(T))
         {
-            KAZE_CORE_ERRCODE(Error::InvalidArgErr, "BufferIO::read: type T must match the "
+            KAZE_PUSH_ERR(Error::InvalidArgErr, "BufferIO::read: type T must match the "
                 "StructLayout type. Expected {}, but got {}",
                 layout.getClassType().name(), typeid(T).name());
             return 0;
@@ -61,7 +61,7 @@ public:
     {
         if (layout.getClassType() != typeid(T))
         {
-            KAZE_CORE_ERRCODE(Error::InvalidArgErr, "BufferIO::read: type T must match the "
+            KAZE_PUSH_ERR(Error::InvalidArgErr, "BufferIO::read: type T must match the "
                 "StructLayout type. Expected {}, but got {}",
                 layout.getClassType().name(), typeid(T).name());
             return 0;
@@ -75,4 +75,4 @@ private:
     static auto writeLayout(const void *src, BufferWriter &writer, const StructLayout &layout) -> Size;
 };
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

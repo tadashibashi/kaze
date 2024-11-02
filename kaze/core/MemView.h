@@ -3,7 +3,7 @@
 #include <kaze/core/lib.h>
 #include <type_traits>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Wrapper around const memory for a convenient unified, and type-safe interface
 /// See {@link `makeRef`} for overloads to conveniently create Mem objects from various containers and arrays.
@@ -74,4 +74,4 @@ auto makeRef(const ContainerType &container)
     return MemView<T>(container.data(), container.size() * sizeof(T));
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

@@ -12,7 +12,7 @@
 #include <bgfx/bgfx.h>
 
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 Texture2D::Texture2D() : m_texture()
 { }
@@ -133,4 +133,4 @@ auto Texture2D::release() -> void
     }
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

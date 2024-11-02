@@ -56,7 +56,7 @@ static auto toCursorType(const ImGuiMouseCursor cursor) -> CursorType
     case ImGuiMouseCursor_Hand: return CursorType::Pointer;
     case ImGuiMouseCursor_NotAllowed: return CursorType::NotAllowed;
     default:
-        KAZE_CORE_ERRCODE(Error::InvalidEnum, "Invalid ImGuiMouseCursor value passed: {}", cursor);
+        KAZE_PUSH_ERR(Error::InvalidEnum, "Invalid ImGuiMouseCursor value passed: {}", cursor);
         return CursorType::Arrow;
     }
 }

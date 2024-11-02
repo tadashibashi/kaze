@@ -21,7 +21,7 @@
     const char *message_for_error_check; \
     auto err = glfwGetError(&message_for_error_check); \
     if (err != GLFW_NO_ERROR && message_for_error_check) { \
-        KAZE_CORE_ERRCODE((code), "Failed to {}: {}", (actionStr), message_for_error_check); \
+        KAZE_PUSH_ERR((code), "Failed to {}: {}", (actionStr), message_for_error_check); \
         return false; \
     } \
 } while(0)
@@ -57,12 +57,12 @@
 #endif
 
 #define RETURN_IF_NULL(obj) do { if ( !static_cast<bool>(obj) ) { \
-    KAZE_CORE_ERRCODE(Error::NullArgErr, "{}:{}: required parameter {} was null", __FILE__, __LINE__, #obj); \
+    KAZE_PUSH_ERR(Error::NullArgErr, "{}:{}: required parameter {} was null", __FILE__, __LINE__, #obj); \
     return false; \
 } } while(0)
 
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace backend {
         /// GLFW gamepad data per controller slot
@@ -145,4 +145,4 @@ namespace backend {
     auto getContentScale(const WindowHandle window, float *outScaleX, float *outScaleY) -> bool;
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

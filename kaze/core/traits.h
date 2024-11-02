@@ -2,7 +2,7 @@
 
 #include <kaze/core/lib.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 template <typename T>
 struct funcptr;
@@ -15,4 +15,4 @@ struct funcptr<R(TArgs...)> {
 template <typename T>
 using funcptr_t = typename funcptr<T>::type;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

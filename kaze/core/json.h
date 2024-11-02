@@ -7,8 +7,8 @@
 #include <kaze/core/lib.h>
 #include <nlohmann/json.hpp>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 using json = nlohmann::json;
 
-KAZE_NAMESPACE_END
+KAZE_NS_END

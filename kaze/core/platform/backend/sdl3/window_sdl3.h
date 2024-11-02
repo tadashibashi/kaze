@@ -5,7 +5,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/platform/backend/backend.h>
 
-KAZE_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 namespace backend {
 
     /// Data associated with each window
@@ -25,4 +25,4 @@ namespace backend {
     bool getWindowData(const WindowHandle window, WindowData **outData);
 }
 
-KAZE_NAMESPACE_END
+KAZE_NS_END
