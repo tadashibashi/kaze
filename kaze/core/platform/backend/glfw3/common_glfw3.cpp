@@ -502,7 +502,7 @@ namespace backend {
         if ( !window::getContentScale(window, &scaleX, &scaleY) )
             return false;
         tempX *= static_cast<double>(scaleX);
-        tempY *= static_cast<dobule>(scaleY);
+        tempY *= static_cast<double>(scaleY);
 #endif
         if (outX)
             *outX = static_cast<float>(tempX);
