@@ -26,7 +26,11 @@ public:
     [[nodiscard]]
     auto getAverageFps() const -> Double;
 
-   private:
+    /// \returns time passed in the last frame, in seconds
+    [[nodiscard]]
+    auto getDeltaTime() const -> Double;
+
+private:
     List<Double> m_samples;
     Double *m_head;
     Double m_total;

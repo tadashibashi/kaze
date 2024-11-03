@@ -4,7 +4,8 @@
 KAZE_NS_BEGIN
 
 FramerateCounter::FramerateCounter(const FramerateCounterInit &config) :
-    m_samples(config.samples, {}), m_total(0)
+    m_samples(config.samples, 0), m_total(0), m_framesCounted(0),
+    m_head(), m_now()
 {
     KAZE_ASSERT(config.samples > 1);
 
@@ -27,7 +28,7 @@ auto FramerateCounter::frameEnd() -> void
     *m_head = seconds;
 
     // shift window
-    const auto end = &(*m_samples.end());
+    const auto end = m_samples.data() + m_samples.size();
     if (m_head + 1 >= end)
         m_head = m_samples.data();
     else
@@ -49,6 +50,11 @@ auto kaze::FramerateCounter::getAverageFps() const -> Double
 {
     const auto spf = getAverageSpf();
     return (spf == 0) ? 0 : 1.0 / spf;
+}
+
+auto kaze::FramerateCounter::getDeltaTime() const -> Double
+{
+    return *m_head;
 }
 
 KAZE_NS_END
