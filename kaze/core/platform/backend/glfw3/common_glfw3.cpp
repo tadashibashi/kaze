@@ -497,14 +497,17 @@ namespace backend {
         glfwGetCursorPos(WIN_CAST(window), &tempX, &tempY);
         ERR_CHECK(Error::BE_RuntimeErr, "get cursor position");
 
+#if !KAZE_PLATFORM_MACOS
         float scaleX, scaleY;
         if ( !window::getContentScale(window, &scaleX, &scaleY) )
             return false;
-
+        tempX *= static_cast<double>(scaleX);
+        tempY *= static_cast<dobule>(scaleY);
+#endif
         if (outX)
-            *outX = static_cast<float>(tempX) * scaleX;
+            *outX = static_cast<float>(tempX);
         if (outY)
-            *outY = static_cast<float>(tempY) * scaleY;
+            *outY = static_cast<float>(tempY);
 
         return true;
     }
@@ -522,12 +525,14 @@ namespace backend {
             tempX += static_cast<double>(winX);
             tempY += static_cast<double>(winY);
 
+#if !KAZE_PLATFORM_MACOS
             float scaleX, scaleY;
             if ( !window::getContentScale(window, &scaleX, &scaleY) )
                 return false;
 
             tempX *= scaleX;
             tempY *= scaleY;
+#endif
         }
         else
         {

@@ -79,12 +79,14 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
     float scaleX, scaleY;
     uint16_t viewWidth, viewHeight;
 
+#if !KAZE_PLATFORM_MACOS // for some reason mac doesn't need scaling, using logical values instead
     if (backend::window::getContentScale(window, &scaleX, &scaleY))
     {
         viewWidth = static_cast<uint16_t>(width * scaleX);
         viewHeight = static_cast<uint16_t>(height * scaleY);
     }
     else
+#endif
     {
         viewWidth = static_cast<uint16_t>(width);
         viewHeight = static_cast<uint16_t>(height);

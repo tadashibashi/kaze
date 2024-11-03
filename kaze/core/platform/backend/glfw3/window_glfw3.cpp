@@ -48,7 +48,6 @@ namespace backend {
         #if KAZE_USE_WAYLAND
         if (glfwGetPlatform() == GLFW_PLATFORM_WAYLAND)
         {
-            KAZE_CORE_LOG("WAYYYLANDDNDNDNDNDNDNDN!!!!");
             return {
                 .windowHandle = glfwGetWaylandWindow(WIN_CAST(window)),
                 .displayType = glfwGetWaylandDisplay(),
@@ -129,11 +128,13 @@ namespace backend {
         int w, h;
         glfwGetWindowSize(window, &w, &h);
 
+#if !KAZE_PLATFORM_MACOS
         float scaleX=1.f, scaleY=1.f;
         window::getContentScale(window, &scaleX, &scaleY);
 
         x /= scaleX;
         y /= scaleY;
+#endif
 
         if (!data->isCapture)
         {
@@ -452,6 +453,7 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
+#if !KAZE_PLATFORM_MACOS // Mac uses logical size values, it doesn't need scaling
         if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
         {
             if (xscale > 0)
@@ -459,6 +461,7 @@ namespace backend {
             if (yscale > 0)
                 height *= yscale;
         }
+#endif
 
         glfwSetWindowSize(WIN_CAST(window), width, height);
         ERR_CHECK(Error::BE_RuntimeErr, "set logical window size");
@@ -473,7 +476,7 @@ namespace backend {
         glfwGetWindowSize(WIN_CAST(window), outWidth, outHeight);
         ERR_CHECK(Error::BE_RuntimeErr, "get logical window size");
 
-
+#if !KAZE_PLATFORM_MACOS // Mac uses logical sizes, doesn't need scaling (TODO: check this behavior for iOS also)
         if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
         {
             if (xscale > 0)
@@ -481,6 +484,7 @@ namespace backend {
             if (yscale > 0)
                 *outHeight /= yscale;
         }
+#endif
 
         return true;
     }

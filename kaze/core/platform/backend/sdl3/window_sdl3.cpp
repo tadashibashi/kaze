@@ -306,6 +306,11 @@ namespace backend {
         RETURN_IF_NULL(window);
 
         const auto scale = SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(WIN_CAST(window)));
+        if (scale == 0)
+        {
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr, "failed to get display content scale: {}", SDL_GetError());
+            return false;
+        }
 
         if ( !SDL_SetWindowSize( WIN_CAST(window), x * scale, y * scale) )
         {

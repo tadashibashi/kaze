@@ -21,6 +21,14 @@
 	"debugger_configurations":
 	[
 		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "kaze app RelWithDebInfo",
+			"program": "$project_path/../build/desktop/RelWithDebInfo/tests/runtime/bin/kaze_test_01_app",
+			"args": [],
+			"cwd": "$project_path/../build/desktop/RelWithDebInfo/tests/runtime/bin"
+		},
+		{
 			"name": "kaze app",
 			"request": "launch",
 			"type": "lldb",
