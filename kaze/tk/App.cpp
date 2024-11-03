@@ -305,19 +305,18 @@ auto App::oneTick() -> void
 
     pollEvents();
     frame();
+    m->framerate.frameEnd();
 
-    // TODO: make a more robust frame rate tracker, respond to slowdowns / speed ups to stabilize rate
     double endTickTime;
     if (backend::getTime(&endTickTime))
     {
         const auto elapsed = endTickTime - startTickTime;
-        if (elapsed < targetFrameSec)
+        if (m->framerate.getAverageSpf() < targetFrameSec - .01 && elapsed < targetFrameSec)
         {
             std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameSec - elapsed));
         }
     }
 
-    m->framerate.frameEnd();
     m->lastTime = startTickTime;
 }
 
