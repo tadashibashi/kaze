@@ -1,7 +1,6 @@
+#include <cstring>
 #include <doctest/doctest.h>
-
 #include <kaze/core/macros/enum.h>
-
 #include <sstream>
 
 USING_KAZE_NAMESPACE;

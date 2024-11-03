@@ -41,6 +41,19 @@ GraphicsMgr::~GraphicsMgr()
     delete m;
 }
 
+static auto toBgfxNativeWindowType(
+    backend::window::NativePlatformData::WindowType type) -> bgfx::NativeWindowHandleType::Enum
+{
+    using WindowType = backend::window::NativePlatformData::WindowType;
+    switch(type)
+    {
+        case WindowType::Default: return bgfx::NativeWindowHandleType::Default;
+        case WindowType::Wayland: return bgfx::NativeWindowHandleType::Wayland;
+        default:
+            return bgfx::NativeWindowHandleType::Count;
+    }
+}
+
 auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
 {
     auto window = initConfig.window;
@@ -63,14 +76,30 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
         return False;
     }
 
+    float scaleX, scaleY;
+    uint16_t viewWidth, viewHeight;
+
+    if (backend::window::getContentScale(window, &scaleX, &scaleY))
+    {
+        viewWidth = static_cast<uint16_t>(width * scaleX);
+        viewHeight = static_cast<uint16_t>(height * scaleY);
+    }
+    else
+    {
+        viewWidth = static_cast<uint16_t>(width);
+        viewHeight = static_cast<uint16_t>(height);
+    }
+
     const auto platformData = backend::window::getNativeInfo(window);
     bgfx::Init config{};
+#if KAZE_PLATFORM_LINUX  // Vulkan crashes when resizing window, it may be a vulkan consideration and not just linux...
+    config.type = bgfx::RendererType::OpenGL;
+#endif
     config.platformData.ndt = platformData.displayType;
     config.platformData.nwh = platformData.windowHandle;
-    config.platformData.type = platformData.type == backend::window::NativePlatformData::WindowType::Wayland ? 
-        bgfx::NativeWindowHandleType::Wayland : bgfx::NativeWindowHandleType::Default;
-    config.resolution.width = width;
-    config.resolution.height = height;
+    config.platformData.type =  toBgfxNativeWindowType(platformData.type);
+    config.resolution.width = viewWidth;
+    config.resolution.height = viewHeight;
     config.resolution.reset = BGFX_RESET_VSYNC;
     config.limits.transientIbSize = initConfig.maxTransientIBufferSize;
     config.limits.transientVbSize = initConfig.maxTransientVBufferSize;
@@ -84,7 +113,7 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
         return KAZE_FALSE;
     }
 
-    bgfx::setViewRect(0, 0, 0, static_cast<uint16_t>(width), static_cast<uint16_t>(height));
+    bgfx::setViewRect(0, 0, 0, viewWidth, viewHeight);
     bgfx::setViewClear(0, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH, initConfig.clearColor.toRGBA8(), 1.f);
     bgfx::touch(0);
     bgfx::frame();

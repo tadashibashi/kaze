@@ -80,9 +80,8 @@ public:
         return value;
     }
 
-    template<>
     [[nodiscard]]
-    auto read<String>() -> String
+    auto readString() -> String
     {
         String str;
         if ( !read(&str) )
@@ -90,9 +89,8 @@ public:
         return str;
     }
 
-    template<>
     [[nodiscard]]
-    auto read<String>(const BufferViewReadStringOpts &opts) -> String
+    auto readString(const BufferViewReadStringOpts &opts) -> String
     {
         String str;
         if ( !read(&str, opts) )

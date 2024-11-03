@@ -70,8 +70,6 @@ namespace backend {
     /// \returns related SDL_BUTTON_* value
     [[nodiscard]] auto toSDLMouseBtn(MouseBtn button) noexcept -> Uint8;
 
-    [[nodiscard]] auto getContentScale(WindowHandle handle) noexcept -> float;
-
     /// Initialize the backend global variable internals. Must be called before calling any constant conversion func.
     auto initGlobals() noexcept -> void;
 

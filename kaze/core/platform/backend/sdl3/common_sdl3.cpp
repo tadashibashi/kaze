@@ -1,7 +1,6 @@
 /// \file PlatformBackend_globals.cpp
 /// Implementation for constant conversions and global variables
 #include "common_sdl3.h"
-#include "SDL3/SDL_video.h"
 #include "window_sdl3.h"
 #include "private/GamepadConstants.inl"
 #include "private/KeyboardConstants.inl"
@@ -12,6 +11,7 @@
 
 #include <SDL3/SDL_mouse.h>
 #include <SDL3/SDL_surface.h>
+#include <SDL3/SDL_video.h>
 
 KAZE_NS_BEGIN
 
@@ -57,11 +57,6 @@ namespace backend {
     auto toSDLMouseBtn(MouseBtn button) noexcept -> Uint8
     {
         return s_toSDLMouseButton[ static_cast<int>(button) ];
-    }
-
-    auto getContentScale(WindowHandle handle) noexcept -> float
-    {
-        return SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(WIN_CAST(handle)));
     }
 
     auto initGlobals() noexcept -> void
@@ -231,6 +226,11 @@ namespace backend {
         }
 
         return codepoint;
+    }
+
+    static auto getContentScale(WindowHandle window) noexcept -> float
+    {
+        return SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(WIN_CAST(window)));
     }
 
     auto pollEvents() noexcept -> bool

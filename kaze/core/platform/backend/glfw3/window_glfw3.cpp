@@ -8,14 +8,15 @@
 #include <kaze/core/platform/defines.h>
 
 #include <GLFW/glfw3.h>
-#include <vulkan/vulkan_core.h>
 
 #if   KAZE_PLATFORM_WINDOWS
 #   define GLFW_EXPOSE_NATIVE_WIN32
 #elif KAZE_PLATFORM_MACOS
 #   define GLFW_EXPOSE_NATIVE_COCOA
 #elif KAZE_PLATFORM_LINUX
+#if KAZE_USE_WAYLAND
 #   define GLFW_EXPOSE_NATIVE_WAYLAND
+#endif
 #   define GLFW_EXPOSE_NATIVE_X11
 #   define GLFW_EXPOSE_NATIVE_GLX
 # elif KAZE_PLATFORM_EMSCRIPTEN
@@ -129,7 +130,7 @@ namespace backend {
         glfwGetWindowSize(window, &w, &h);
 
         float scaleX=1.f, scaleY=1.f;
-        getContentScale(window, &scaleX, &scaleY);
+        window::getContentScale(window, &scaleX, &scaleY);
 
         x /= scaleX;
         y /= scaleY;
@@ -481,6 +482,43 @@ namespace backend {
                 *outHeight /= yscale;
         }
 
+        return true;
+    }
+
+    static auto getMonitor(const WindowHandle window, GLFWmonitor **outMonitor) -> bool
+    {
+        KAZE_ASSERT(window);
+        KAZE_ASSERT(outMonitor);
+
+        auto monitor = glfwGetWindowMonitor(WIN_CAST(window));
+        if ( !monitor )
+        {
+            clearGlfwError();
+            monitor = glfwGetPrimaryMonitor();
+            ERR_CHECK(Error::BE_RuntimeErr, "get glfw monitor for window");
+        }
+        KAZE_ASSERT(monitor);
+
+        *outMonitor = monitor;
+        return true;
+    }
+
+    auto window::getContentScale(const WindowHandle window, float *outScaleX, float *outScaleY) -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        GLFWmonitor *monitor;
+        if ( !getMonitor(window, &monitor))
+            return false;
+
+        float xscale, yscale;
+        glfwGetMonitorContentScale(monitor, &xscale, &yscale);
+        ERR_CHECK(Error::BE_RuntimeErr, "get monitor content scale");
+
+        if (outScaleX)
+            *outScaleX = xscale;
+        if (outScaleY)
+            *outScaleY = yscale;
         return true;
     }
 

@@ -1,20 +1,18 @@
-#!/bin/sh
-
 # Set up kz
-if [ -n "${BASH_SOURCE[0]}" ]; then
-    SCRIPT_PATH="${BASH_SOURCE[0]}"
+if [[ -n "$BASH_SOURCE" ]]; then
+    SCRIPT_PATH="${BASH_SOURCE}"
 else
     SCRIPT_PATH="$0"
 fi
 
-if [ $SCRIPT_PATH:0:1 -ne '/' ]; then
+if [ "$(expr substr "$SCRIPT_PATH" 1 1)" != "/" ]; then
     SCRIPT_PATH="$(pwd)/$SCRIPT_PATH"
 fi
 
 TOOLS_DIR="$(dirname "$SCRIPT_PATH")"
 KAZE_DIR="$(dirname "$TOOLS_DIR")"
 
-which ninja
+which ninja > /dev/null
 if [ $? = 0 ]; then
     GENERATOR="-G Ninja"
 else

@@ -1,8 +1,11 @@
 /// \file common_glfw3.cpp
 /// Top-level Glfw3 backend implementation
 #include "common_glfw3.h"
+#include "window_glfw3.h"
+
 #include "GLFW/glfw3.h"
 
+#include <build/desktop/Debug/_deps/glfw3-src/include/GLFW/glfw3.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/defines.h>
 
@@ -248,28 +251,6 @@ namespace backend {
         return static_cast<Key>(s_glfwKeyToKey[glfwKey]);
     }
 
-
-    static auto getMonitor(const WindowHandle window)
-    {
-        auto monitor = glfwGetWindowMonitor(WIN_CAST(window));
-        if ( !monitor )
-            monitor = glfwGetPrimaryMonitor();
-        return monitor;
-    }
-
-    auto getContentScale(const WindowHandle window, float *outScaleX, float *outScaleY) -> bool
-    {
-        if (const auto monitor = getMonitor(window))
-        {
-            float xscale, yscale;
-            glfwGetMonitorContentScale(monitor, &xscale, &yscale);
-            ERR_CHECK(Error::BE_RuntimeErr, "get monitor content scale");
-
-            *outScaleX = xscale;
-            *outScaleY = yscale;
-        }
-        return true;
-    }
 
     // ===== Static callbacks ===============================================
 
@@ -517,7 +498,8 @@ namespace backend {
         ERR_CHECK(Error::BE_RuntimeErr, "get cursor position");
 
         float scaleX, scaleY;
-        getContentScale(window, &scaleX, &scaleY);
+        if ( !window::getContentScale(window, &scaleX, &scaleY) )
+            return false;
 
         if (outX)
             *outX = static_cast<float>(tempX) * scaleX;
@@ -541,7 +523,8 @@ namespace backend {
             tempY += static_cast<double>(winY);
 
             float scaleX, scaleY;
-            getContentScale(window, &scaleX, &scaleY);
+            if ( !window::getContentScale(window, &scaleX, &scaleY) )
+                return false;
 
             tempX *= scaleX;
             tempY *= scaleY;

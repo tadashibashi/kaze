@@ -349,6 +349,22 @@ namespace backend {
         return true;
     }
 
+    auto window::getContentScale(WindowHandle window, float *outScaleX, float *outScaleY) -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        const auto scale = SDL_GetDisplayContentScale(SDL_GetDisplayForWindow(WIN_CAST(window)));
+        if (scale == 0)
+            return false;
+
+        if (outScaleX)
+            *outScaleX = scale;
+        if (outScaleY)
+            *outScaleY = scale;
+
+        return true;
+    }
+
     auto window::isFullscreen(const WindowHandle window, bool *outFullscreen) noexcept -> bool
     {
         RETURN_IF_NULL(window);

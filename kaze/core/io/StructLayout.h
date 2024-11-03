@@ -191,10 +191,10 @@ public:
             .getDataPtr = [](void *ptr) { return (void *)((List<T> *)ptr)->data(); },
             .setDataElemSize = [](void *ptr, Size size) { ((List<T> *)ptr)->assign(size, {}); },
             .count = VaryingLength,
-            .type = typeid(T),
-            .isPrimitive = KAZE_TRUE,
             .countMemberOffset = byteOffsetOf(countMember),
             .countMemberType = typeid(std::remove_const_t<ListSize>),
+            .type = typeid(T),
+            .isPrimitive = KAZE_TRUE,
             .primitive = {
                 .size = sizeof(T),
                 .srcEndian = endian == Endian::Unknown ? m_arithmeticEndian : endian,

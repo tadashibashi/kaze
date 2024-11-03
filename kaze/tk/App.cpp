@@ -244,29 +244,24 @@ auto App::preInit() -> Bool
  /// Standard window behavior
 auto App::processWindowEvent(const WindowEvent &e, const Double timestamp) -> void
 {
+    if (m->window.getHandle() != e.window)
+        return;
+
     switch (e.type)
     {
     case WindowEvent::Closed:
-        if (m->window.getHandle() == e.window)
-            m->isRunning = false;
-        break;
-    case WindowEvent::ResizedFramebuffer:
-    {
-        if (m->window.getHandle() == e.window)
         {
-            #if !KAZE_PLATFORM_LINUX
-                m->graphics.reset(e.data0, e.data1);
-                frame();
-                doRender();
-                m->graphics.frame();
-                m->graphics.renderFrame();
-            #endif
+            m->isRunning = false;
+        } break;
 
-            m->wasResized = true;
-            m->newSize = {e.data0, e.data1};
-            m->lastResizeTime = time();
-        }
-    } break;
+    case WindowEvent::ResizedFramebuffer:
+        {
+            m->graphics.reset(e.data0, e.data1);
+            frame();
+        #if KAZE_PLATFORM_APPLE
+            m->graphics.renderFrame();
+        #endif
+        } break;
     default:
         break;
     }
@@ -277,14 +272,6 @@ void App::pollEvents()
     m->input.preProcessEvents();
     backend::pollEvents();
     m->input.postProcessEvents();
-
-#if KAZE_PLATFORM_LINUX
-    if (m->wasResized && time() - m->lastResizeTime > .05)
-    {
-        m->graphics.reset(m->newSize.x, m->newSize.y);
-        m->wasResized = false;
-    }
-#endif
 }
 
 auto App::doRender() -> void
@@ -335,6 +322,9 @@ auto App::frame() -> void
     doRender();
     m->graphics.frame();
     m->plugins.postFrame.reverseInvoke(this);
+
+    if (m->wasResized)
+        m->graphics.reset(m->newSize.x, m->newSize.y);
 }
 
 KAZE_TK_NAMESPACE_END

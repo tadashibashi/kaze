@@ -18,15 +18,15 @@
 
 #include <imgui/imgui.h>
 
-USING_KAZE_NAMESPACE;
-USING_KAZE_TK_NAMESPACE;
+USING_KAZE_NS;
+USING_KAZE_TK_NS;
 
 class Demo final : public App {
 public:
     Demo() : App({
         .title = "App Demo",
         .size = {640, 480},
-        .flags = WindowInit::Resizable,
+        .flags = WindowInit::Resizable | WindowInit::Transparent,
     }) { }
 
     ~Demo() override { }

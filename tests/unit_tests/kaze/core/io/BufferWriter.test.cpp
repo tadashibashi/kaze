@@ -41,8 +41,8 @@ TEST_SUITE("BufferWriter")
         CHECK(writer.size() == a.size() + 1 + b.size() + 1);
 
         BufferView view(writer.data(), writer.size());
-        CHECK(view.read<String>() == a);
-        CHECK(view.read<String>() == b);
+        CHECK(view.readString() == a);
+        CHECK(view.readString() == b);
     }
 
     TEST_CASE("Write fixed block string")
@@ -69,7 +69,7 @@ TEST_SUITE("BufferWriter")
             CHECK(writer.size() == 3);
 
             BufferView view(writer.data(), writer.size());
-            CHECK(view.read<String>() == "abc");
+            CHECK(view.readString() == "abc");
         }
     }
 
@@ -86,7 +86,7 @@ TEST_SUITE("BufferWriter")
         CHECK(writer.size() == str.length() + 1);
         BufferView view(writer.data(), writer.size());
 
-        CHECK(view.read<String>() == str);
+        CHECK(view.readString() == str);
     }
 
     TEST_CASE("Combine string and numeric data using << operator")
@@ -102,10 +102,10 @@ TEST_SUITE("BufferWriter")
         CHECK(writer.size() == a.size() + 1 + sizeof(Int) + sizeof(Float) + d.size() + 1);
 
         BufferView view(writer.data(), writer.size());
-        CHECK(view.read<String>() == a);
+        CHECK(view.readString() == a);
         CHECK(view.read<Int>() == b);
         CHECK(view.read<Float>() == c);
-        CHECK(view.read<String>() == d);
+        CHECK(view.readString() == d);
     }
 
     TEST_CASE("Swap default endian")
@@ -122,8 +122,8 @@ TEST_SUITE("BufferWriter")
         writer << a << b << c << d;
 
         BufferView view(writer.data(), writer.size());
-        CHECK(view.read<String>() == b);
-        CHECK(view.read<String>() == a);
+        CHECK(view.readString() == b);
+        CHECK(view.readString() == a);
         CHECK(view.read<Int>() == d);
         CHECK(view.read<Int>() == c);
     }
@@ -140,7 +140,7 @@ TEST_SUITE("BufferWriter")
         writer.write(c, Endian::opposite(Endian::Native));
 
         BufferView view(writer.data(), writer.size());
-        CHECK(view.read<String>() == b);
+        CHECK(view.readString() == b);
         CHECK(view.read<Int>() == d);
     }
 
@@ -158,7 +158,7 @@ TEST_SUITE("BufferWriter")
 
         writer.clear();
 
-        CHECK( writer.empty() );
+        CHECK(writer.empty());
         CHECK(writer.size() == 0);
     }
 }

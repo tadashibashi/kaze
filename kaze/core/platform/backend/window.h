@@ -98,6 +98,16 @@ namespace backend::window {
     /// \returns whether the operation succeeded; on error, `x` and `y` are not modified.
     auto getFramebufferSize(WindowHandle window, int *outWidth, int *outHeight) noexcept -> bool;
 
+    /// Get the content scaling of the window.
+    /// \note Content scaling is based on the DPI settings for the display,
+    ///       and if it's set to 200%, the user expects everything to be twice as big
+    ///       e.g. on a 4k screen where it may otherwise be tiny.
+    /// \param[in]  window       window to check
+    /// \param[out] outScaleX    retrieves content scaling of screen width
+    /// \param[out] outScaleY    retrieves content scaling of screen height
+    /// \returns whether the retrieval was successful.
+    auto getContentScale(WindowHandle window, float *outScaleX, float *outScaleY) -> bool;
+
     /// Get whether window is fullscreen
     /// \param[in]  window        window to check
     /// \param[out] outFullscreen retrives whether the window is currently in fullscreen mode

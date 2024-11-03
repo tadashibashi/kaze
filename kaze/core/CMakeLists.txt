@@ -6,7 +6,22 @@ endif()
 
 include(kaze/deps/core)
 
-add_library(${PROJECT_NAME}
+add_library(kaze)
+kaze_target_plugin(kaze platform)
+
+target_include_directories(kaze SYSTEM PUBLIC ${KAZE_ROOT})
+
+target_link_libraries(kaze PUBLIC
+    gcem
+    glm
+    nlohmann_json
+    spdlog::spdlog
+    bgfx bx bimg bimg_decode
+)
+
+target_precompile_headers(kaze PUBLIC lib.pch)
+
+target_sources(kaze PRIVATE
         concepts.h
         debug.h
         debug.cpp
@@ -113,45 +128,33 @@ add_library(${PROJECT_NAME}
         video/private/texture.cpp
 )
 
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${KAZE_ROOT})
+# ===== Compile defines ================
+kaze_normalize_bool(KAZE_NO_NAMESPACE KAZE_NO_NAMESPACE)
+kaze_normalize_bool(KAZE_DEBUG KAZE_DEBUG)
+kaze_normalize_bool(KAZE_USE_WAYLAND KAZE_USE_WAYLAND)
 
-if (KAZE_NO_NAMESPACE)
-    set(KAZE_NO_NAMESPACE 1)
-else()
-    set(KAZE_NO_NAMESPACE 0)
-endif()
-
-if (KAZE_USE_WAYLAND)
-    set(KAZE_USE_WAYLAND 1)
-else()
-    set(KAZE_USE_WAYLAND 0)
-endif()
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC
+target_compile_definitions(kaze PUBLIC
     KAZE_NAMESPACE=${KAZE_NAMESPACE}
     KAZE_DEBUG=${KAZE_DEBUG}
     KAZE_USE_WAYLAND=${KAZE_USE_WAYLAND}
     KAZE_NO_NAMESPACE=${KAZE_NO_NAMESPACE}
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
-    gcem
-    glm
-    nlohmann_json
-    spdlog::spdlog
-    bgfx bx bimg bimg_decode
-)
-
-target_precompile_headers(${PROJECT_NAME} PUBLIC lib.pch)
-kaze_target_plugin(${PROJECT_NAME} platform)
+# ===== Compiler-specific settings =====
 
 # Emscripten flags
 if (KAZE_PLATFORM_EMSCRIPTEN)
-    target_link_options(${PROJECT_NAME} PUBLIC
+    target_link_options(kaze PUBLIC
         -s ALLOW_MEMORY_GROWTH=1)
 
     if (KAZE_DEBUG)
-        target_link_options(${PROJECT_NAME} PUBLIC
+        target_link_options(kaze PUBLIC
             -gsource-map)
     endif()
+endif()
+
+
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    # May potentially hide an important warning, but otherwise the console gets cluttered
+    target_compile_options(kaze PUBLIC "-Wno-psabi")
 endif()

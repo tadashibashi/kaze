@@ -157,8 +157,14 @@ namespace kz {
                     targetName = m_args.values()[2];
                 }
 
-                if ( !fs::exists(m_buildPath) )
+                if ( !fs::exists(m_buildPath / "CMakeCache.txt") )
                 {
+                    if (fs::exists(m_buildPath))
+                    {
+                        std::cout << "Cleaning existing build directory\n";
+                        fs::remove_all(m_buildPath);
+                    }
+
                     result = doConfig();
                     if ( !result )
                     {
@@ -189,8 +195,14 @@ namespace kz {
                     targetName = m_args.values()[2];
                 }
 
-                if ( !fs::exists(m_buildPath) )
+                if ( !fs::exists(m_buildPath / "CMakeCache.txt") )
                 {
+                    if (fs::exists(m_buildPath))
+                    {
+                        std::cout << "Cleaning existing build directory\n";
+                        fs::remove_all(m_buildPath);
+                    }
+
                     result = doConfig();
                     if ( !result )
                     {

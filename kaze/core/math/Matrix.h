@@ -131,7 +131,7 @@ struct alignas(16) Matrix {
 
     // ===== Transformation ===================================================
 
-    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 2> &v) const -> Matrix<T, Cols, Rows>
+    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 2> v) const -> Matrix<T, Cols, Rows>
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
@@ -143,7 +143,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 3> &v) const -> Matrix<T, Cols, Rows>
+    [[nodiscard]] constexpr auto toTranslated(const Vec<T, 3> v) const -> Matrix<T, Cols, Rows>
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
@@ -155,7 +155,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto translate(const Vec<T, 2> &v) -> Matrix<T, Cols, Rows> &
+    constexpr auto translate(const Vec<T, 2> v) -> Matrix<T, Cols, Rows> &
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::translate(m_mat, glm::vec<3, T>{
@@ -166,7 +166,7 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto translate(const Vec<T, 3> &v) -> Matrix<T, Cols, Rows> &
+    constexpr auto translate(const Vec<T, 3> v) -> Matrix<T, Cols, Rows> &
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::translate(m_mat, glm::vec<3, T>{
@@ -192,7 +192,7 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto toScaled(const Vec<T, 3> &v) const -> Matrix<T, Cols, Rows>
+    constexpr auto toScaled(const Vec<T, 3> v) const -> Matrix<T, Cols, Rows>
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
@@ -205,7 +205,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto scale(const Vec<T, 3> &v) -> Matrix<T, Cols, Rows> &
+    constexpr auto scale(const Vec<T, 3> v) -> Matrix<T, Cols, Rows> &
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::scale(m_mat, glm::vec<3, T>{
@@ -217,7 +217,7 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto toScaled(const Vec<T, 2> &v) const -> Matrix<T, Cols, Rows>
+    constexpr auto toScaled(const Vec<T, 2> v) const -> Matrix<T, Cols, Rows>
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
@@ -230,7 +230,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto scale(const Vec<T, 2> &v) -> Matrix<T, Cols, Rows> &
+    constexpr auto scale(const Vec<T, 2> v) -> Matrix<T, Cols, Rows> &
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::scale(m_mat, glm::vec<3, T>{
@@ -242,7 +242,7 @@ struct alignas(16) Matrix {
         return *this;
     }
 
-    constexpr auto toRotated(T angle, const Vec<T, 3> &axis) const -> Matrix<T, Cols, Rows>
+    constexpr auto toRotated(T angle, const Vec<T, 3> axis) const -> Matrix<T, Cols, Rows>
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         Matrix result;
@@ -255,7 +255,7 @@ struct alignas(16) Matrix {
         return result;
     }
 
-    constexpr auto rotate(T angle, const Vec<T, 3> &v) -> Matrix<T, Cols, Rows> &
+    constexpr auto rotate(T angle, const Vec<T, 3> v) -> Matrix<T, Cols, Rows> &
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
         m_mat = glm::rotate(m_mat, angle, glm::vec<3, T>{
@@ -309,7 +309,7 @@ struct alignas(16) Matrix {
     }
 
     template <Arithmetic U, Size UCols>
-    [[nodiscard]] constexpr auto operator *(const Matrix<U, UCols, Rows> &other) const -> Matrix<T, Rows, UCols>
+    [[nodiscard]] constexpr auto operator *(const Matrix<U, UCols, Rows> other) const -> Matrix<T, Rows, UCols>
     {
         Matrix<T, Rows, UCols> result;
         result.m_mat = m_mat * other.m_mat;
@@ -317,7 +317,7 @@ struct alignas(16) Matrix {
     }
 
     template <Arithmetic U>
-    [[nodiscard]] constexpr auto operator *(const Vec<U, Rows> &v) const -> Vec<U, Rows>
+    [[nodiscard]] constexpr auto operator *(const Vec<U, Rows> v) const -> Vec<U, Rows>
     {
         glm::vec<Rows, U> temp;
         for (int r = 0; r < Rows; ++r)

@@ -109,6 +109,18 @@ function(kaze_target_assets IN_TARGET)
         endif()
 endfunction()
 
+# Transform a truthy/falsy value to 1 and 0 respectively
+# Arguments:
+#   IN_VAR  the name of the variable to check
+#   OUT_VAR the variable to write to
+function(kaze_normalize_bool IN_VAR OUT_VAR)
+    if (${${IN_VAR}})
+        set(${OUT_VAR} 1 PARENT_SCOPE)
+    else()
+        set(${OUT_VAR} 0 PARENT_SCOPE)
+    endif()
+endfunction()
+
 # Transform a list of paths to become absolute
 # Arguments:
 #   PATHS    contains a list of paths that can either be absolute or relative
