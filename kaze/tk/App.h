@@ -3,6 +3,7 @@
 #pragma once
 #include <kaze/tk/lib.h>
 #include <kaze/tk/AppPlugin.h>
+
 #include <kaze/core/Action.h>
 #include <kaze/core/input/InputMgr.h>
 #include <kaze/core/math/Vec/Vec2.h>
@@ -38,6 +39,9 @@ public:
     /// Time since the last frame
     [[nodiscard]]
     auto deltaTime() const noexcept -> Double;
+
+    [[nodiscard]]
+    auto fps() const noexcept -> Double;
 
     /// Time since the application started
     /// \returns the time since the app started, in seconds, or a value < 0 of it failed.

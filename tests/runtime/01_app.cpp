@@ -171,6 +171,11 @@ private:
         }
 
         ImGui::ShowDemoWindow();
+        if (ImGui::Begin("Frame rate"))
+        {
+            ImGui::Text("Current fps: %f", fps());
+        }
+        ImGui::End();
     }
 
     auto render() -> void override {

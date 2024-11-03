@@ -5,6 +5,9 @@
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/BackendInitGuard.h>
 #include <kaze/core/platform/defines.h>
+
+#include <kaze/tk/FramerateCounter.h>
+
 #include <thread>
 
 #if KAZE_PLATFORM_EMSCRIPTEN
@@ -25,6 +28,8 @@ struct App::Impl
     GraphicsMgr graphics{};
     AppPluginMgr plugins{};
     CursorMgr cursors{};
+
+    FramerateCounter framerate{};
 
     AppInit config;
     Window window;
@@ -74,17 +79,22 @@ auto App::postClose() -> void
     m->window.close();
 }
 
-Double App::deltaTime() const noexcept
+auto App::deltaTime() const noexcept -> Double
 {
     return m->deltaTime;
 }
 
-Double App::time() const noexcept
+auto App::time() const noexcept -> Double
 {
     double time = -1.0;
     backend::getTime(&time);
 
     return static_cast<Double>(time);
+}
+
+auto App::fps() const noexcept -> Double
+{
+    return m->framerate.getAverageFps();
 }
 
 auto App::input() const noexcept -> const InputMgr &
@@ -291,6 +301,8 @@ auto App::oneTick() -> void
     backend::getTime(&startTickTime);
     m->deltaTime = startTickTime - m->lastTime;
 
+    m->framerate.frameBegin();
+
     pollEvents();
     frame();
 
@@ -305,6 +317,7 @@ auto App::oneTick() -> void
         }
     }
 
+    m->framerate.frameEnd();
     m->lastTime = startTickTime;
 }
 

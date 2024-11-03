@@ -28,16 +28,18 @@ function (kaze_copy_builtin_assets TARGET OUTPUT_DIR)
 endfunction()
 
 add_library(${PROJECT_NAME}
-        App.h
         App.cpp
+        App.h
         AppPlugin.h
         AppPluginMgr.cpp
         AppPluginMgr.h
-        Camera2D.h
         Camera2D.cpp
+        Camera2D.h
+        FramerateCounter.cpp
+        FramerateCounter.h
         lib.h
-        SpriteBatch.h
         SpriteBatch.cpp
+        SpriteBatch.h
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC kaze)
 
