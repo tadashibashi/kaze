@@ -8,32 +8,25 @@
 			],
 		}
 	],
-	"settings": {
-		
-		"LSP":
-		{
-			"clangd":
-			{
-				"enabled": true,
-			},
-		},
-	},
+
+	// Sublime Debugger Configurations
 	"debugger_configurations":
 	[
-		{
-			"type": "lldb",
-			"request": "launch",
-			"name": "kaze app RelWithDebInfo",
-			"program": "$project_path/../build/desktop/RelWithDebInfo/tests/runtime/bin/kaze_test_01_app",
-			"args": [],
-			"cwd": "$project_path/../build/desktop/RelWithDebInfo/tests/runtime/bin"
-		},
 		{
 			"name": "kaze app",
 			"request": "launch",
 			"type": "lldb",
 			"program": "$project_path/../build/desktop/Debug/tests/runtime/bin/kaze_test_01_app",
 			"cwd": "$project_path/../build/desktop/Debug/tests/runtime/bin",
+			"osx": {
+				"pre_debug_task": "build kaze app (Unix)"
+			},
+			"linux": {
+				"pre_debug_task": "build kaze app (Unix)"
+			},
+			"windows": {
+				"pre_debug_task": "build kaze app (Windows)"
+			}
 		},
 		{
 			"name": "kaze unit tests",
@@ -41,17 +34,38 @@
 			"type": "lldb",
 			"program": "$project_path/../build/desktop/Debug/tests/unit_tests/kaze_unit_tests",
 			"cwd": "$project_path/../build/desktop/Debug/tests/unit_tests",
+			"osx": {
+				"pre_debug_task": "build kaze tests (Unix)"
+			},
+			"linux": {
+				"pre_debug_task": "build kaze tests (Unix)"
+			},
+			"windows": {
+				"pre_debug_task": "build kaze tests (Windows)"
+			}
 		}
 	],
 	"debugger_tasks":
 	[
 		{
-			"name": "build kaze app",
-			"shell_cmd": "task build-01_app",
+			"name": "build kaze app (Unix)",
+			"shell_cmd": "trap 'exit 0' ERR && source $project_path/../tools/setup.sh && kz build kaze_test_01_app",
+			"cwd": "$project_path/..",
 		},
 		{
-			"name": "build kaze unit tests",
-			"shell_cmd": "task build-unittests",
-		}
-	],
+			"name": "build kaze app (Windows)",
+			"shell_cmd": "powershell tools\\setup.ps1 && kz build kaze_test_01_app",
+			"cwd": "$project_path\\..",
+		},
+		{
+			"name": "build kaze tests (Unix)",
+			"shell_cmd": "trap 'exit 0' ERR && source $project_path/../tools/setup.sh && kz build kaze_unit_tests",
+			"cwd": "$project_path/..",
+		},
+		{
+			"name": "build kaze tests (Windows)",
+			"shell_cmd": "powershell tools\\setup.ps1 && kz build kaze_unit_tests",
+			"cwd": "$project_path\\..",
+		},
+	]
 }

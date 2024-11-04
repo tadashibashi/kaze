@@ -90,18 +90,18 @@ function(kaze_target_assets IN_TARGET)
     )
 
     cmake_path(ABSOLUTE_PATH IN_OUTPUT_DIR
-        BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        BASE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
         NORMALIZE
         OUTPUT_VARIABLE OUTPUT_DIR
     )
 
         foreach(FILENAME ${IN_ASSETS})
-            add_custom_command(OUTPUT "${OUTPUT_DIR}/${IN_TARGET}"
+            add_custom_command(OUTPUT "${OUTPUT_DIR}/${FILENAME}"
                 DEPENDS "${ASSET_DIR}/${FILENAME}"
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ASSET_DIR}/${FILENAME}" "${OUTPUT_DIR}/${FILENAME}"
             )
 
-            target_sources(${IN_TARGET} PRIVATE "${OUTPUT_DIR}/${IN_TARGET}")
+            target_sources(${IN_TARGET} PRIVATE "${OUTPUT_DIR}/${FILENAME}")
         endforeach()
 
         if (KAZE_PLATFORM_EMSCRIPTEN)

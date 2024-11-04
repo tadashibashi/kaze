@@ -1,11 +1,13 @@
+#!/bin/bash
+
 # Set up kz
-if [[ -n "$BASH_SOURCE" ]]; then
+if [ -n "$BASH_SOURCE" ]; then
     SCRIPT_PATH="${BASH_SOURCE}"
 else
     SCRIPT_PATH="$0"
 fi
 
-if [ "$(expr substr "$SCRIPT_PATH" 1 1)" != "/" ]; then
+if [ "${SCRIPT_PATH:0:1}" != "/" ]; then
     SCRIPT_PATH="$(pwd)/$SCRIPT_PATH"
 fi
 
