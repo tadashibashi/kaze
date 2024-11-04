@@ -128,7 +128,7 @@ namespace backend {
         int w, h;
         glfwGetWindowSize(window, &w, &h);
 
-#if !KAZE_PLATFORM_MACOS
+#if KAZE_PLATFORM_LINUX
         float scaleX=1.f, scaleY=1.f;
         window::getContentScale(window, &scaleX, &scaleY);
 
@@ -453,7 +453,7 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
-#if !KAZE_PLATFORM_MACOS // Mac uses logical size values, it doesn't need scaling
+#if KAZE_PLATFORM_LINUX
         if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
         {
             if (xscale > 0)
@@ -476,7 +476,7 @@ namespace backend {
         glfwGetWindowSize(WIN_CAST(window), outWidth, outHeight);
         ERR_CHECK(Error::BE_RuntimeErr, "get logical window size");
 
-#if !KAZE_PLATFORM_MACOS // Mac uses logical sizes, doesn't need scaling (TODO: check this behavior for iOS also)
+#if KAZE_PLATFORM_LINUX
         if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
         {
             if (xscale > 0)
