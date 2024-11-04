@@ -304,29 +304,18 @@ auto App::doRender() -> void
 
 auto App::oneTick() -> void
 {
-    using Clock = std::chrono::high_resolution_clock;
-
-    const auto now = Clock::now();
+    m->framerate.frame();
 
     double startTickTime = 0;
     backend::getTime(&startTickTime);
     m->deltaTime = startTickTime - m->lastTime;
     m->lastTime = startTickTime;
-    m->framerate.frame();
+
 
     pollEvents();
     frame();
 
-    const auto end = Clock::now();
-    const std::chrono::duration<double> elapsed = end - now;
-    const auto targetSPF = m->targetSPF;
-    const auto endFrame = std::chrono::duration<double>(targetSPF) + now;
-    if (elapsed.count() < targetSPF && m->framerate.getAverageSpf() < targetSPF)
-    {
-        std::this_thread::sleep_until(endFrame);
-    }
-
-    while(Clock::now() < endFrame);
+    m->framerate.waitUntilFrameEnd();
 }
 
 auto App::doUpdate() -> void

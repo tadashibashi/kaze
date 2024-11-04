@@ -1,6 +1,7 @@
 #include "FramerateCounter.h"
 #include <kaze/core/math/mathf.h>
 #include <kaze/core/memory.h>
+#include <thread>
 
 KAZE_NS_BEGIN
 
@@ -11,6 +12,7 @@ FramerateCounter::FramerateCounter(const FramerateCounterInit &config) :
     KAZE_ASSERT(config.samples > 0);
 
     m_head = m_samples.data();
+    m_targetSPF = 1.0 / config.targetFPS;
 }
 
 auto FramerateCounter::frame() -> void
@@ -72,6 +74,20 @@ auto FramerateCounter::getAverageFps() const -> Double
 auto FramerateCounter::getDeltaTime() const -> Double
 {
     return *m_head;
+}
+
+auto FramerateCounter::waitUntilFrameEnd() const -> void
+{
+    const auto now = Clock::now();
+    const std::chrono::duration<Double> elapsed = now - m_lastFrameTime;
+
+    const auto endFrame = std::chrono::duration<Double>(m_targetSPF) + m_lastFrameTime;
+    if (elapsed.count() < m_targetSPF && getAverageSpf() < m_targetSPF)
+    {
+            std::this_thread::sleep_until(endFrame);
+    }
+
+    while (Clock::now() < endFrame);
 }
 
 KAZE_NS_END

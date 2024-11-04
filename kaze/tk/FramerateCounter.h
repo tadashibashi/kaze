@@ -8,6 +8,7 @@ KAZE_NS_BEGIN
 /// Initialization parameters for `FramerateCounter`
 struct FramerateCounterInit {
     Int samples = 100;
+    Double targetFPS = 60.0;
 };
 
 /// Utility class that tracks average frame rate
@@ -36,6 +37,8 @@ public:
     [[nodiscard]]
     auto getDeltaTime() const -> Double;
 
+    auto waitUntilFrameEnd() const -> void;
+
 private:
     using Clock = std::chrono::high_resolution_clock;
 
@@ -44,6 +47,7 @@ private:
     Double m_total;
     std::chrono::time_point<Clock> m_lastFrameTime;
     Uint64 m_framesCounted;
+    Double m_targetSPF;
 };
 
 KAZE_NS_END
