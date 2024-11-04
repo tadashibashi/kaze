@@ -1,6 +1,7 @@
 #include "App.h"
 #include "AppPluginMgr.h"
 
+#include <chrono>
 #include <kaze/core/input/CursorMgr.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/BackendInitGuard.h>
@@ -16,11 +17,12 @@
 
 KAZE_TK_NAMESPACE_BEGIN
 
-static constexpr Double targetFrameSec = 1.0 / 62.0;
-
 struct App::Impl
 {
-    explicit Impl(const AppInit &config, App *app) : config(config), app(app) { }
+    explicit Impl(const AppInit &config, App *app) : config(config), app(app)
+    {
+        targetSPF = 1.0 / config.targetFPS;
+    }
 
     Bool isRunning{};
     Double lastTime{}, deltaTime{};
@@ -29,7 +31,11 @@ struct App::Impl
     AppPluginMgr plugins{};
     CursorMgr cursors{};
 
-    FramerateCounter framerate{};
+    Double targetSPF{};
+
+    FramerateCounter framerate{{
+        .samples = 60
+    }};
 
     AppInit config;
     Window window;
@@ -298,25 +304,29 @@ auto App::doRender() -> void
 
 auto App::oneTick() -> void
 {
+    using Clock = std::chrono::high_resolution_clock;
+
+    const auto now = Clock::now();
+
     double startTickTime = 0;
     backend::getTime(&startTickTime);
     m->deltaTime = startTickTime - m->lastTime;
+    m->lastTime = startTickTime;
     m->framerate.frame();
 
     pollEvents();
     frame();
 
-    double endTickTime;
-    if (backend::getTime(&endTickTime))
+    const auto end = Clock::now();
+    const std::chrono::duration<double> elapsed = end - now;
+    const auto targetSPF = m->targetSPF;
+    const auto endFrame = std::chrono::duration<double>(targetSPF) + now;
+    if (elapsed.count() < targetSPF && m->framerate.getAverageSpf() < targetSPF)
     {
-        const auto elapsed = endTickTime - startTickTime;
-        if (m->framerate.getAverageSpf() < targetFrameSec - .01 && elapsed < targetFrameSec)
-        {
-            std::this_thread::sleep_for(std::chrono::duration<double>(targetFrameSec - elapsed));
-        }
+        std::this_thread::sleep_until(endFrame);
     }
 
-    m->lastTime = startTickTime;
+    while(Clock::now() < endFrame);
 }
 
 auto App::doUpdate() -> void
