@@ -128,7 +128,7 @@ namespace backend {
         int w, h;
         glfwGetWindowSize(window, &w, &h);
 
-#if KAZE_PLATFORM_LINUX
+#if KAZE_GLFW_SCALING
         float scaleX=1.f, scaleY=1.f;
         window::getContentScale(window, &scaleX, &scaleY);
 
@@ -453,7 +453,7 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
-#if KAZE_PLATFORM_LINUX
+#if KAZE_GLFW_SCALING
         if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
         {
             if (xscale > 0)
@@ -476,7 +476,7 @@ namespace backend {
         glfwGetWindowSize(WIN_CAST(window), outWidth, outHeight);
         ERR_CHECK(Error::BE_RuntimeErr, "get logical window size");
 
-#if KAZE_PLATFORM_LINUX
+#if KAZE_GLFW_SCALING
         if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
         {
             if (xscale > 0)
@@ -988,13 +988,23 @@ namespace backend {
         return true;
     }
 
-    auto window::setMinSize(const WindowHandle window, const int minWidth, const int minHeight) noexcept -> bool
+    auto window::setMinSize(const WindowHandle window, int minWidth, int minHeight) noexcept -> bool
     {
         RETURN_IF_NULL(window);
 
         WindowData *data;
         if ( !getWindowData(window, &data) )
             return false;
+
+#if KAZE_GLFW_SCALING
+        if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
+        {
+            if (xscale > 0)
+                minWidth *= xscale;
+            if (yscale > 0)
+                minHeight *= yscale;
+        }
+#endif
 
         glfwSetWindowSizeLimits(WIN_CAST(window),
             minWidth, minHeight, data->last.maxSize.x, data->last.maxSize.y);
@@ -1004,13 +1014,23 @@ namespace backend {
         return true;
     }
 
-    auto window::setMaxSize(const WindowHandle window, const int maxWidth, const int maxHeight) noexcept -> bool
+    auto window::setMaxSize(const WindowHandle window, int maxWidth, int maxHeight) noexcept -> bool
     {
         RETURN_IF_NULL(window);
 
         WindowData *data;
         if ( !getWindowData(window, &data) )
             return false;
+
+#if KAZE_GLFW_SCALING
+        if (float xscale, yscale; getContentScale(window, &xscale, &yscale))
+        {
+            if (xscale > 0)
+                maxWidth *= xscale;
+            if (yscale > 0)
+                maxHeight *= yscale;
+        }
+#endif
 
         glfwSetWindowSizeLimits(WIN_CAST(window),
             data->last.minSize.x, data->last.minSize.y, maxWidth, maxHeight);
@@ -1028,10 +1048,15 @@ namespace backend {
         if ( !getWindowData(window, &data) )
             return false;
 
+        float xscale = 1.f, yscale = 1.f;
+#if KAZE_GLFW_SCALING
+        getContentScale(window, &xscale, &yscale);
+#endif
         if (outMinWidth)
-            *outMinWidth = data->last.minSize.x;
+            *outMinWidth = data->last.minSize.x / xscale;
         if (outMinHeight)
-            *outMinHeight = data->last.minSize.y;
+            *outMinHeight = data->last.minSize.y / yscale;
+
         return true;
     }
 
@@ -1043,10 +1068,15 @@ namespace backend {
         if ( !getWindowData(window, &data) )
             return false;
 
+        float xscale = 1.f, yscale = 1.f;
+#if KAZE_GLFW_SCALING
+        getContentScale(window, &xscale, &yscale);
+#endif
+
         if (outMaxWidth)
-            *outMaxWidth = data->last.maxSize.x;
+            *outMaxWidth = data->last.maxSize.x / xscale;
         if (outMaxHeight)
-            *outMaxHeight = data->last.maxSize.y;
+            *outMaxHeight = data->last.maxSize.y / yscale;
         return true;
     }
 

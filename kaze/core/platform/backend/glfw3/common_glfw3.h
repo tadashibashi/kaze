@@ -10,8 +10,11 @@
 #include <kaze/core/input/KeyboardConstants.h>
 #include <kaze/core/memory.h>
 #include <kaze/core/platform/backend/helpers/WindowHandleContainer.h>
+#include <kaze/core/platform/defines.h>
 
 #include <GLFW/glfw3.h>
+
+#define KAZE_GLFW_SCALING KAZE_PLATFORM_WINDOWS || KAZE_PLATFORM_LINUX
 
 #define WIN_CAST(window) static_cast<GLFWwindow*>(window)
 

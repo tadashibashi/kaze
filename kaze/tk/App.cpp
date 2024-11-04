@@ -39,10 +39,6 @@ struct App::Impl
 
     AppInit config;
     Window window;
-
-    Bool wasResized{};
-    Vec2i newSize{};
-    float lastResizeTime{};
     App *app;
 };
 
@@ -275,7 +271,7 @@ auto App::processWindowEvent(const WindowEvent &e, const Double timestamp) -> vo
         {
             m->graphics.reset(e.data0, e.data1);
             frame();
-        #if KAZE_PLATFORM_APPLE
+        #if KAZE_PLATFORM_APPLE || KAZE_PLATFORM_WINDOWS
             m->graphics.renderFrame();
         #endif
         } break;
@@ -332,9 +328,6 @@ auto App::frame() -> void
     doRender();
     m->graphics.frame();
     m->plugins.postFrame.reverseInvoke(this);
-
-    if (m->wasResized)
-        m->graphics.reset(m->newSize.x, m->newSize.y);
 }
 
 KAZE_TK_NAMESPACE_END
