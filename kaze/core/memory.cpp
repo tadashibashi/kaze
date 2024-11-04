@@ -1,5 +1,6 @@
 #include "memory.h"
 #include <kaze/core/debug.h>
+#include <kaze/core/platform/defines.h>
 
 #include <cstdlib>
 #include <cstring>
@@ -37,7 +38,7 @@ auto allocAlign(Size bytes, Size alignment) noexcept -> void *
     KAZE_ASSERT(alignment > 0);
     KAZE_ASSERT(bytes % alignment == 0, "`bytes` must be a multiple of `alignment`");
 
-#if KAZE_COMPILER_MSVC
+#if KAZE_PLATFORM_WINDOWS
     return _aligned_malloc(bytes, alignment);
 #else
     return std::aligned_alloc(alignment, bytes);
@@ -51,7 +52,7 @@ auto free(void *memory) noexcept -> void
 
 auto freeAlign(void *alignedMemory) noexcept -> void
 {
-#if KAZE_COMPILER_MSVC
+#if KAZE_PLATFORM_WINDOWS
     _aligned_free(alignedMemory);
 #else
     std::free(alignedMemory);
