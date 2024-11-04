@@ -1,8 +1,6 @@
 #pragma once
 #include "defs/BuildType.h"
 #include "defs/Command.h"
-#include "defs/CpuArch.h"
-#include "defs/HostPlatform.h"
 #include "defs/Result.h"
 #include "defs/TargetPlatform.h"
 
