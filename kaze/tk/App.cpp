@@ -55,6 +55,7 @@ void App::run()
         return;
 
     m->plugins.init(this);
+    m->framerate.reset();
 
 #if KAZE_PLATFORM_EMSCRIPTEN
     emscripten_set_main_loop_arg([](void *userptr) {
@@ -300,12 +301,10 @@ auto App::oneTick() -> void
     double startTickTime = 0;
     backend::getTime(&startTickTime);
     m->deltaTime = startTickTime - m->lastTime;
-
-    m->framerate.frameBegin();
+    m->framerate.frame();
 
     pollEvents();
     frame();
-    m->framerate.frameEnd();
 
     double endTickTime;
     if (backend::getTime(&endTickTime))
