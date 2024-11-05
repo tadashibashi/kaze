@@ -99,10 +99,10 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
 #endif
     config.platformData.ndt = platformData.displayType;
     config.platformData.nwh = platformData.windowHandle;
-    config.platformData.type =  toBgfxNativeWindowType(platformData.type);
+    config.platformData.type = toBgfxNativeWindowType(platformData.type);
     config.resolution.width = viewWidth;
     config.resolution.height = viewHeight;
-    config.resolution.reset = BGFX_RESET_VSYNC;
+    config.resolution.reset = BGFX_RESET_VSYNC | BGFX_RESET_HIDPI;
     config.limits.transientIbSize = initConfig.maxTransientIBufferSize;
     config.limits.transientVbSize = initConfig.maxTransientVBufferSize;
 
@@ -145,7 +145,12 @@ auto GraphicsMgr::close() -> void
 
 auto GraphicsMgr::reset(Int width, Int height) -> void
 {
-    bgfx::reset(width, height, BGFX_RESET_VSYNC); // todo: expose flags?
+    bgfx::reset(width, height, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI); // todo: expose flags?
+}
+
+auto GraphicsMgr::touch(Int viewId) -> void
+{
+    bgfx::touch(viewId);
 }
 
 auto GraphicsMgr::frame() -> void

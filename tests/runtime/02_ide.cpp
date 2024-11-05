@@ -1,3 +1,4 @@
+#include <kaze/core/kmain.h>
 #include <kaze/core/platform/filesys/filesys.h>
 #include <kaze/tk/App.h>
 #include <kaze/tk/plugins/imgui/imgui_plugin.h>
@@ -57,7 +58,7 @@ private:
     }
 };
 
-auto main(int argc, char *argv[]) -> int
+auto kaze::kmain(int argc, char *argv[]) -> int
 {
     KazeIDE().run();
     return 0;

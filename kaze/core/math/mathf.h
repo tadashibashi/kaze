@@ -102,28 +102,32 @@ namespace mathf {
         b = temp;
     }
 
+    /// \returns the absolute value of a number
+    /// \param[in] n
     template<Arithmetic T>
-    constexpr auto abs(const T x) noexcept -> T
+    constexpr auto abs(const T n) noexcept -> T
     {
-        return (x < 0) ? -x : x;
+        return (n < 0) ? -n : n;
     }
 
+    /// \returns number rounded to nearest integral value
+    /// \param[in] n
     template <FloatingPoint T>
-    constexpr auto round(T x) noexcept -> T
+    constexpr auto round(T n) noexcept -> T
     {
-        return gcem::round(x);
+        return gcem::round(n);
     }
 
-    /// Get 1 if `x` is positive, or -1 if negative. 0 is returned if x is 0.
+    /// \returns `1` if `n` is positive, or `-1` if negative. `0` is returned if `n` is `0`.
     template<Arithmetic T>
-    constexpr T sign(const T x) noexcept
+    constexpr T sign(const T n) noexcept
     {
-        return (x > 0) ? T(1)
-            : (x < 0) ? T(-1)
+        return (n > 0) ? T(1)
+            : (n < 0) ? T(-1)
             : 0;
     }
 
-    /// Get the square root of a number
+    /// \returns the square root of a number
     /// \param[in] x the number to perform square root operation on
     template <Arithmetic T>
     constexpr auto sqrt(const T x) noexcept
@@ -131,24 +135,25 @@ namespace mathf {
         return gcem::sqrt(x);
     }
 
-    /// Get `x` to the p of `p`
-
-    /// \param[in] x the number to perform the operation on
-    /// \param[in] p the power to raise `x` to
-    /// \returns x to the power of p as an double if an integral, otherwise, type T.
+    /// Raise a number to an exponential power
+    /// \param[in] n the number to perform the operation on
+    /// \param[in] p the power to raise `n` to
+    /// \returns n to the power of p as an double if an integral, otherwise, type T.
     template <Arithmetic T, Arithmetic U>
-    constexpr auto pow(const T x, const U p) noexcept
+    constexpr auto pow(const T n, const U p) noexcept
     {
-        return gcem::pow(x, p);
+        return gcem::pow(n, p);
     }
 
     /// A true modulus function that wraps without reflective behavior over 0.
-    /// Positive values for `x` and `m` will behave exactly like `std::fmod` or `%`. A negative value for `x` and a
-    /// positive value for `m`, will behave as if in positive territory, continuing the pattern below 0.
-    /// Negative value for `m` results in inverted behavior, where positive `x` values do not reflect over 0. but
-    /// continue the same wrapping pattern.
-    ///
+    /// \note Positive values for `x` and `m` will behave exactly like `std::fmod` or `%`.
+    /// A negative value for `x` and a positive value for `m`, will behave as if in positive territory,
+    /// continuing the pattern below 0.
+    /// A negative value for `m` results in inverted behavior, where positive `x` values do not reflect over
+    /// 0. but continue the same wrapping pattern.
     /// If `m` is zero, the answer is undefined, but it looks like most compilers will result in 0
+    /// \param[in]  x   Number to wrap
+    /// \param[in]  m   Period or modulus
     template <Arithmetic T>
     constexpr auto mod(const T x, const T m) noexcept -> T
     {

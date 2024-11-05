@@ -8,28 +8,31 @@ KAZE_NS_BEGIN
 namespace filesys {
     auto getBaseDir() -> String
     {
-        String dir;
-        @autoreleasepool {
-            NSBundle *mainBundle = [NSBundle mainBundle];
-            NSString *resourcePath = [mainBundle resourcePath];
+        static String dir;
+        if (dir.empty())
+        {
+            @autoreleasepool {
+                NSBundle *mainBundle = [NSBundle mainBundle];
+                NSString *resourcePath = [mainBundle resourcePath];
 
-            if (resourcePath)
-            {
-                dir = String([resourcePath UTF8String], [resourcePath length]);
-            }
-            else
-            {
-                NSString *execPath = [[mainBundle executablePath] stringByDeletingLastPathComponent];
-                Bool isDirectory;
-                if ([[NSFileManager defaultManager]
-                        fileExistsAtPath: execPath
-                        isDirectory:      &isDirectory] && isDirectory)
+                if (resourcePath)
                 {
-                    dir = [execPath UTF8String];
+                    dir = String([resourcePath UTF8String], [resourcePath length]);
                 }
                 else
                 {
-                    KAZE_PUSH_ERR(Error::PlatformErr, "MacOS-specific error: failed to get executable path");
+                    NSString *execPath = [[mainBundle executablePath] stringByDeletingLastPathComponent];
+                    Bool isDirectory;
+                    if ([[NSFileManager defaultManager]
+                            fileExistsAtPath: execPath
+                            isDirectory:      &isDirectory] && isDirectory)
+                    {
+                        dir = [execPath UTF8String];
+                    }
+                    else
+                    {
+                        KAZE_PUSH_ERR(Error::PlatformErr, "MacOS-specific error: failed to get executable path");
+                    }
                 }
             }
         }

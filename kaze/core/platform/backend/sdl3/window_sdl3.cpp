@@ -5,11 +5,12 @@
 
 #include <kaze/core/errors.h>
 #include <kaze/core/debug.h>
+#include <kaze/core/platform/defines.h>
 
 #include <SDL3/SDL.h>
 
-#ifdef SDL_PLATFORM_IOS
-#include <SDL3/SDL_metal.h>
+#ifdef KAZE_PLATFORM_APPLE_DEVICE
+#include "private/uikit_window_sdl3.h"
 #endif
 
 KAZE_NS_BEGIN
@@ -52,31 +53,21 @@ namespace backend {
 
     #if defined(SDL_PLATFORM_MACOS)
 
-        result.windowHandle = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
+        result.windowHandle = SDL_GetPointerProperty(props,
+            SDL_PROP_WINDOW_COCOA_WINDOW_POINTER, nullptr);
         result.displayType = nullptr;
 
-    #elif defined(SDL_PLATFORM_IOS)
+    #elif defined(SDL_PLATFORM_IOS) || KAZE_PLATFORM_VISIONOS || KAZE_PLATFORM_TVOS
 
-        const auto metalView = SDL_Metal_CreateView(WIN_CAST(window));
-        if (!metalView)
-        {
-            KAZE_CORE_ERR("Failed to create metal view": {}, SDL_GetError());
-            return {};
-        }
-
-        auto metalLayer = SDL_Metal_GetLayer(metalView);
-        if (!metalLayer)
-        {
-            KAZE_CORE_ERR("Failed to get Metal layer from SDL_MetalView: {}", SDL_GetError());
-            return {};
-        }
-        result.windowHandle = metalLayer;
+        result.windowHandle = initMetalUIKitWindow(WIN_CAST(window));
         result.displayType = nullptr;
 
     #elif defined(SDL_PLATFORM_WIN32)
 
-        result.windowHandle = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
-        result.displayType = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_WIN32_HDC_POINTER, nullptr);
+        result.windowHandle = SDL_GetPointerProperty(props,
+            SDL_PROP_WINDOW_WIN32_HWND_POINTER, nullptr);
+        result.displayType = SDL_GetPointerProperty(props,
+            SDL_PROP_WINDOW_WIN32_HDC_POINTER, nullptr);
 
     #elif defined(SDL_PLATFORM_LINUX)
 
@@ -101,6 +92,7 @@ namespace backend {
         result.displayType = nullptr;
 
     #else
+        KAZE_CORE_WARN("window::getNativeInfo: platform not recognized, no window handle was returned");
         result.windowHandle = nullptr;
         result.displayType = nullptr;
 
@@ -134,8 +126,10 @@ namespace backend {
             KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create SDL3 Window: {}", SDL_GetError());
             return KAZE_FALSE;
         }
-        window::setSize(window, width, height);
 
+#if !KAZE_PLATFORM_APPLE_DEVICE && !KAZE_PLATFORM_MOBILE
+        window::setSize(window, width, height);
+#endif
         const auto props = SDL_GetWindowProperties(window);
         if ( !props )
         {

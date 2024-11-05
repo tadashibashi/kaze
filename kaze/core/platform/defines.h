@@ -65,6 +65,24 @@
 #   define KAZE_PLATFORM_EMSCRIPTEN 0
 #endif
 
+#if KAZE_PLATFORM_MACOS || KAZE_PLATFORM_WINDOWS || KAZE_PLATFORM_LINUX
+#   define KAZE_PLATFORM_DESKTOP 1
+#else
+#   define KAZE_PLATFORM_DESKTOP 0
+#endif
+
+#if KAZE_PLATFORM_IOS || KAZE_PLATFORM_VISIONOS || KAZE_PLATFORM_TVOS || KAZE_PLATFORM_WATCHOS
+#   define KAZE_PLATFORM_APPLE_DEVICE 1
+#else
+#   define KAZE_PLATFORM_APPLE_DEVICE 0
+#endif
+
+#if KAZE_PLATFORM_IOS || KAZE_PLATFORM_ANDROID
+#   define KAZE_PLATFORM_MOBILE 1
+#else
+#   define KAZE_PLATFORM_MOBILE 0
+#endif
+
 /// ===== Compiler definitions ================================================
 #if defined(__INTEL_COMPILER)           ///< Intel Compiler Classic (ICC)
 #   define KAZE_COMPILER_INTEL 1

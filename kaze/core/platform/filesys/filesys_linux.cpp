@@ -55,7 +55,7 @@ namespace filesys {
 
         auto exePath = (count != -1) ?
             std::filesystem::path(result).parent_path() :
-            std::filesystem::current_path();
+            std::filesystem::current_path(); // plausible fallback
 
         return exePath.string();
     }

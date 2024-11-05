@@ -18,6 +18,12 @@ endif()
 set(KAZE_BACKEND_LINK_LIBS_PRIVATE SDL3::SDL3)
 set(KAZE_BACKEND_SOURCES_PRIVATE
     common_sdl3.cpp
+    main_sdl3.cpp
     window_sdl3.cpp
     private/GamepadMgr.cpp
 )
+
+if (KAZE_PLATFORM_APPLE_DEVICE)
+    list(APPEND KAZE_BACKEND_SOURCES_PRIVATE
+        private/uikit_window_sdl3.mm)
+endif()

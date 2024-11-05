@@ -1,5 +1,6 @@
 
 #include <kaze/core/debug.h>
+#include <kaze/core/kmain.h>
 #include <kaze/core/input/Gamepad.h>
 #include <kaze/core/video/Window.h>
 
@@ -14,7 +15,7 @@ struct AppData
     Window window{};
 };
 
-int main(int argc, const char *argv[])
+auto kaze::kmain(int argc, char *argv[]) -> int
 {
     AppData app;
     if (!backend::init())

@@ -31,6 +31,8 @@ public:
     /// Reset graphics setting and backbuffer size
     auto reset(Int width, Int height) -> void;
 
+    auto touch(Int viewId) -> void;
+
     auto frame() -> void;
     auto renderFrame() -> void;
 

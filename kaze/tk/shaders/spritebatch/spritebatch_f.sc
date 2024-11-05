@@ -4,5 +4,5 @@ $input v_texcoord0, v_color0
 
 void main()
 {
-    gl_FragColor = texture2D(s_texture0, v_texcoord0) * v_color0;
+    gl_FragColor = vec4(texture2D(s_texture0, v_texcoord0)) * v_color0;
 }

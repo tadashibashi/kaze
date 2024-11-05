@@ -307,7 +307,6 @@ auto App::oneTick() -> void
     m->deltaTime = startTickTime - m->lastTime;
     m->lastTime = startTickTime;
 
-
     pollEvents();
     frame();
 
@@ -323,6 +322,7 @@ auto App::doUpdate() -> void
 
 auto App::frame() -> void
 {
+    m->graphics.touch(0);
     m->plugins.preFrame(this);
     doUpdate();
     doRender();

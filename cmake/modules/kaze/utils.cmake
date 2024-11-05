@@ -95,18 +95,23 @@ function(kaze_target_assets IN_TARGET)
         OUTPUT_VARIABLE OUTPUT_DIR
     )
 
-        foreach(FILENAME ${IN_ASSETS})
-            add_custom_command(OUTPUT "${OUTPUT_DIR}/${FILENAME}"
-                DEPENDS "${ASSET_DIR}/${FILENAME}"
-                COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ASSET_DIR}/${FILENAME}" "${OUTPUT_DIR}/${FILENAME}"
-            )
+    foreach(FILENAME ${IN_ASSETS})
+        add_custom_command(OUTPUT "${OUTPUT_DIR}/${FILENAME}"
+            DEPENDS "${ASSET_DIR}/${FILENAME}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${ASSET_DIR}/${FILENAME}" "${OUTPUT_DIR}/${FILENAME}"
+        )
 
-            target_sources(${IN_TARGET} PRIVATE "${OUTPUT_DIR}/${FILENAME}")
-        endforeach()
-
-        if (KAZE_PLATFORM_EMSCRIPTEN)
-            target_link_options("${IN_TARGET}" PUBLIC "SHELL:--preload-file ${ASSET_DIR}@${IN_ASSET_DIR}")
+        if (KAZE_PLATFORM_APPLE)
+            set_source_files_properties("${OUTPUT_DIR}/${FILENAME}" PROPERTIES
+                MACOSX_PACKAGE_LOCATION "Resources/${IN_ASSET_DIR}")
         endif()
+
+        target_sources(${IN_TARGET} PRIVATE "${OUTPUT_DIR}/${FILENAME}")
+    endforeach()
+
+    if (KAZE_PLATFORM_EMSCRIPTEN)
+        target_link_options("${IN_TARGET}" PUBLIC "SHELL:--preload-file ${ASSET_DIR}@${IN_ASSET_DIR}")
+    endif()
 endfunction()
 
 # Transform a truthy/falsy value to 1 and 0 respectively

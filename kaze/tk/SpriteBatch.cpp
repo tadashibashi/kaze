@@ -2,9 +2,11 @@
 
 #include <kaze/core/debug.h>
 #include <kaze/core/math/Vec/Vec3.h>
+#include <kaze/core/platform/filesys/filesys.h>
 #include <kaze/core/video/GraphicsMgr.h>
 #include <kaze/core/video/Renderable.h>
 #include <kaze/core/video/Window.h>
+#include <filesystem>
 
 KAZE_TK_NAMESPACE_BEGIN
 
@@ -61,18 +63,18 @@ struct SpriteBatch::Impl
         if ( !m_pixelTexture.loadPixels(makeRef(&Color::White, 1), {1, 1}) )
             return KAZE_FALSE;
 
+        const std::filesystem::path baseDir = filesys::getBaseDir();
+
         const auto result = m_renderable.init({
             .viewId = 0,
-            .vertShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_v.sc.bin"))),
-            .fragShader = std::move(Shader(Shader::makePath("kaze/shaders", "spritebatch_f.sc.bin"))),
+            .vertShader = std::move(Shader( (baseDir / Shader::makePath("kaze/shaders", "spritebatch_v.sc.bin")).string() )),
+            .fragShader = std::move(Shader( (baseDir / Shader::makePath("kaze/shaders", "spritebatch_f.sc.bin")).string() )),
             .layout = VertexLayout()
                 .begin()
                     .add(Attrib::Position, 3, AttribType::Float)
                     .add(Attrib::TexCoord0, 2, AttribType::Float)
                     .add(Attrib::Color0, 4, AttribType::Uint8, KAZE_TRUE)
                 .end(),
-            // .initialVertexCount = 40000,
-            // .initialIndexCount = 60000,
         });
 
         if ( !result )

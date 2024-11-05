@@ -1,11 +1,13 @@
+#include <kaze/core/platform/filesys/filesys.h>
 #include <kaze/tk/App.h>
 #include <kaze/tk/Camera2D.h>
 
 #include <kaze/core/AssetLoader.h>
 #include <kaze/core/debug.h>
+#include <kaze/core/kmain.h>
 
 #include <kaze/core/input/CursorConstants.h>
-
+#include <kaze/core/platform/filesys/filesys.h>
 #include <kaze/core/math/Vec/Vec3.h>
 #include <kaze/core/video/GraphicsMgr.h>
 #include <kaze/core/video/Renderable.h>
@@ -17,6 +19,8 @@
 #include <kaze/tk/plugins/imgui/imgui_plugin.h>
 
 #include <imgui/imgui.h>
+#include <filesystem>
+
 
 USING_KAZE_NS;
 USING_KAZE_TK_NS;
@@ -66,14 +70,14 @@ private:
         if ( !batch.init(graphics()) )
             return False;
 
+        const std::filesystem::path baseDir = filesys::getBaseDir();
+
         Image image;
-        if ( !image.load("assets/dungeon_tiles.png") )
+        if ( !image.load((baseDir / "assets/dungeon_tiles.png").string()) )
             return False;
 
         if ( !testTexture.loadImage(image) )
             return False;
-
-        cursors().set(CursorType::Pointer);
 
         images.reserve(1000);
         for (Int i = 0; i < 1000; ++i)
@@ -234,7 +238,7 @@ private:
     }
 };
 
-int main()
+auto kaze::kmain(Int argc, Char *argv[]) -> Int
 {
     Demo().run();
     return 0;

@@ -9,19 +9,22 @@ function (kaze_copy_builtin_assets TARGET OUTPUT_DIR)
 
     # Built-in Shaders
     set(KAZE_TK_SHADER_SOURCES
-            ${KAZE_TK_SHADER_ROOT}/spritebatch/spritebatch_v.sc
-            ${KAZE_TK_SHADER_ROOT}/spritebatch/spritebatch_f.sc
+        ${KAZE_TK_SHADER_ROOT}/spritebatch/spritebatch_v.sc
+        ${KAZE_TK_SHADER_ROOT}/spritebatch/spritebatch_f.sc
     )
 
-    kaze_compile_shaders(
-            SHADERS ${KAZE_TK_SHADER_SOURCES}
-            VARYING_DEF ${KAZE_TK_SHADER_ROOT}/varying.def.sc
-            OUTPUT_DIR ${OUTPUT_DIR}/kaze/shaders
-            INCLUDE_DIRS ${KAZE_TK_SHADER_ROOT}
+    kaze_target_shaders(${TARGET}
+        SHADERS ${KAZE_TK_SHADER_SOURCES}
+        VARYING_DEF ${KAZE_TK_SHADER_ROOT}/varying.def.sc
+        OUTDIR_NAME kaze/shaders
+        INCLUDE_DIRS ${KAZE_TK_SHADER_ROOT}
     )
 
-    if (KAZE_PLATFORM_EMSCRIPTEN) # Copy all default assets
+    if (KAZE_PLATFORM_EMSCRIPTEN) # Copy all default assets. TODO: move this into target_shaders
         target_link_options(${TARGET} PUBLIC "SHELL:--preload-file ${OUTPUT_DIR}/kaze@/kaze")
+    elseif(KAZE_PLATFORM_APPLE)
+        set_source_files_properties("${OUTPUT_DIR}/${FILENAME}" PROPERTIES
+            MACOSX_PACKAGE_LOCATION "Resources/${IN_ASSET_DIR}")
     endif()
 
     target_sources(${TARGET} PRIVATE ${KAZE_TK_SHADER_SOURCES})
