@@ -21,9 +21,7 @@
 #include <imgui/imgui.h>
 #include <filesystem>
 
-
 USING_KAZE_NS;
-USING_KAZE_TK_NS;
 
 class Demo final : public App {
 public:

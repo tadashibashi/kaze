@@ -1,6 +1,7 @@
 #include "AppPluginMgr.h"
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
+
 AppPluginMgr::~AppPluginMgr()
 {
     clear();
@@ -193,4 +194,4 @@ auto AppPluginMgr::addPluginCallbacks(const AppPlugin &plugin) -> void
         windowEvent.add(cb.windowEvent, cb.userptr);
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

@@ -1,16 +1,2 @@
 #pragma once
 #include <kaze/core/lib.h>
-
-#if KAZE_NO_NAMESPACE
-#define   KAZE_TK_NAMESPACE tk
-#else
-#define   KAZE_TK_NAMESPACE KAZE_NAMESPACE::tk
-#endif
-
-#define KAZE_TK_NAMESPACE_BEGIN namespace KAZE_TK_NAMESPACE {
-#define KAZE_TK_NAMESPACE_END }
-#define USING_KAZE_TK_NAMESPACE using namespace KAZE_TK_NAMESPACE
-
-#define USING_KAZE_TK_NS USING_KAZE_TK_NAMESPACE
-#define KAZE_TK_NS_BEGIN KAZE_TK_NAMESPACE_BEGIN
-#define KAZE_TK_NS_END KAZE_TK_NAMESPACE_END

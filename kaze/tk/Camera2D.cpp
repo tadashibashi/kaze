@@ -1,6 +1,6 @@
 #include "Camera2D.h"
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 auto Camera2D::setOrigin(const Vec2f origin) noexcept -> Camera2D &
 {
@@ -137,4 +137,4 @@ auto Camera2D::getScale() const noexcept -> Vec2f
     return m_scale;
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

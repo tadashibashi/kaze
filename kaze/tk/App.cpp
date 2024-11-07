@@ -15,7 +15,7 @@
 #   include <emscripten/emscripten.h>
 #endif
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 struct App::Impl
 {
@@ -330,4 +330,4 @@ auto App::frame() -> void
     m->plugins.postFrame.reverseInvoke(this);
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

@@ -1,12 +1,12 @@
 #include <kaze/core/kmain.h>
 #include <kaze/core/platform/filesys/filesys.h>
+
 #include <kaze/tk/App.h>
 #include <kaze/tk/plugins/imgui/imgui_plugin.h>
 
 #include <imgui/imgui.h>
 
-USING_KAZE_NAMESPACE;
-USING_KAZE_TK_NAMESPACE;
+USING_KAZE_NS;
 
 class KazeIDE : public App {
 public:

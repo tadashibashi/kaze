@@ -4,7 +4,7 @@
 
 #include <kaze/core/video/WindowConstants.h>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace plugins::imgui {
     struct InitConfig {
@@ -16,4 +16,4 @@ namespace plugins::imgui {
     auto create(const InitConfig &config) -> AppPlugin;
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

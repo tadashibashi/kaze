@@ -10,7 +10,7 @@
 #include <kaze/core/video/GraphicsMgr.h>
 #include <kaze/core/video/Window.h>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 /// Application init object
 struct AppInit {
@@ -110,4 +110,4 @@ private:
     Impl *m;
 };
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

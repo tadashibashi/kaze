@@ -3,7 +3,7 @@
 
 struct ImDrawData;
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace plugins::imgui {
     void ImGui_Implbgfx_Init(int view);
@@ -16,4 +16,4 @@ namespace plugins::imgui {
     bool ImGui_Implbgfx_CreateDeviceObjects();
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

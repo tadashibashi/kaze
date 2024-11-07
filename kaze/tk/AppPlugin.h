@@ -4,7 +4,7 @@
 
 #include <kaze/tk/lib.h>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class App;
 
@@ -65,5 +65,4 @@ private:
     String m_name;
 };
 
-
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

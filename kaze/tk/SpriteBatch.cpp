@@ -8,7 +8,7 @@
 #include <kaze/core/video/Window.h>
 #include <filesystem>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 auto SpriteBatch::SubShader::load(StringView fragmentPath) -> Bool
 {
@@ -352,4 +352,4 @@ auto SpriteBatch::end() -> void
     m->end();
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

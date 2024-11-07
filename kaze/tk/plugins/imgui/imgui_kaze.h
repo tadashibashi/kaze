@@ -5,7 +5,7 @@
 
 #include "imgui/imgui.h"
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace plugins::imgui {
 
@@ -29,4 +29,4 @@ auto ImGui_ImplKaze_SetViewportSize(WindowHandle window) -> void;
 
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

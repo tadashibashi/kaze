@@ -8,11 +8,9 @@
 #include <kaze/core/video/UniformMgr.h>
 
 KAZE_NS_BEGIN
+
 class GraphicsMgr;
 class Window;
-KAZE_NS_END
-
-KAZE_TK_NAMESPACE_BEGIN
 
 /// Common options for drawing textures and primitives with a SpriteBatch.
 struct SpriteDrawOpts {
@@ -95,4 +93,4 @@ private:
     Impl *m;
 };
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

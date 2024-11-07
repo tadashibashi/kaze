@@ -9,7 +9,7 @@
 #include <bx/math.h>
 #include <bx/timer.h>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace plugins::imgui {
 
@@ -193,4 +193,4 @@ void ImGui_Implbgfx_NewFrame()
 
 }
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

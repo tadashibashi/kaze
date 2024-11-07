@@ -6,7 +6,7 @@
 #include <kaze/core/math/Rect.h>
 #include <kaze/core/video/Window.h>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 class Camera2D {
 public:
@@ -106,4 +106,4 @@ private:
   mutable Bool m_wasChanged{true};
 };
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END

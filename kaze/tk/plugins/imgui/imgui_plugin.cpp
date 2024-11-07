@@ -7,7 +7,7 @@
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/video/Color.h>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 
 namespace plugins::imgui {
     static auto toImGuiColor(const Color &c) -> Uint
@@ -268,5 +268,5 @@ namespace plugins::imgui {
 
 }  // namespace imgui
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END
 

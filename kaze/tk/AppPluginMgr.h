@@ -4,7 +4,7 @@
 #include <kaze/tk/AppPlugin.h>
 #include <kaze/core/Action.h>
 
-KAZE_TK_NAMESPACE_BEGIN
+KAZE_NS_BEGIN
 class App;
 
 class AppPluginMgr {
@@ -68,4 +68,4 @@ private:
 };
 
 
-KAZE_TK_NAMESPACE_END
+KAZE_NS_END
