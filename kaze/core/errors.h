@@ -21,6 +21,7 @@ struct Error
         BE_InvalidWindowHandle, ///< Attempted to use invalid backend WindowHandle (improperly initialized, dangling, or invalid)
         BE_RuntimeErr,          ///< Error from backend library like glfw or SDL occurred
         BE_LogicError,          ///< Engine bug: problem with backend logic resulting in an unintended state
+        BE_Exception,           ///< Caught an exception that caused a backend task to fail
 
         // ----- Graphics Library Errors -----
         GR_InitErr,           ///< Error while setting up bgfx–the graphics library

@@ -1,6 +1,9 @@
 #include "filesys.h"
+#include <kaze/core/debug.h>
+
 #include <filesystem>
 #include <windows.h>
+#include <shlobj.h>
 
 KAZE_NS_BEGIN
 
@@ -19,7 +22,33 @@ namespace filesys {
 
     auto getUserDir() -> String
     {
-        return "";
+        std::filesystem::path fspath;
+
+        PWSTR path = nullptr;
+        if (SHGetKnownFolderPath(FOLDERID_RoamingAppData, 0, nullptr, &path) != S_OK)
+        {
+            return "";
+        }
+
+        try {
+            fspath = std::filesystem::path(path);
+            CoTaskMemFree(path);
+        }
+        catch(const std::exception &e)
+        {
+            KAZE_PUSH_ERR(Error::BE_Exception, "Exception caught while converting app data directory path: {}",
+                e.what());
+            CoTaskMemFree(path);
+            return "";
+        }
+        catch(...)
+        {
+            KAZE_PUSH_ERR(Error::BE_Exception, "Unknown exception while converting app data directory path");
+            CoTaskMemFree(path);
+            return "";
+        }
+
+        return fspath.string();
     }
 }
 
