@@ -19,7 +19,7 @@ namespace mathf::mat4f {
     }
 
     auto proj(
-        Float* result,
+        Float *result,
         Float ut,
         Float dt,
         Float lt,

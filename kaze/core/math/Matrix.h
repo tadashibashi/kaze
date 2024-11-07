@@ -11,6 +11,7 @@
 #include "private/mat4f.h"
 
 KAZE_NS_BEGIN
+
 template <FloatingPoint T, Size Cols, Size Rows>
 struct alignas(16) Matrix {
     static_assert(Cols > 0, "Matrix must have an X-axis length greater than 0");
@@ -58,10 +59,11 @@ struct alignas(16) Matrix {
         return mat;
     }
 
-    [[nodiscard]] static constexpr auto fromOrtho(T left, T right, T top, T bottom) -> Matrix<T, Cols, Rows>
+    [[nodiscard]]
+    static constexpr auto fromOrtho(T left, T right, T top, T bottom) -> Matrix
     {
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
-        Matrix<Float, 4, 4> result;
+        Matrix<Float, 4, 4> result{};
         mathf::mat4f::ortho(result.data(), left, right, bottom, top, 0, 100.f, 0);
 
         if constexpr (std::is_same_v<Float, T>)
@@ -70,11 +72,21 @@ struct alignas(16) Matrix {
             return (Matrix<T, 4, 4>)result;
     }
 
-    [[nodiscard]] static constexpr auto fromPerspective(T fovy, T aspect, T near, T far) -> Matrix<T, Cols, Rows>
+    [[nodiscard]]
+    static constexpr auto fromPerspective(T fovy_, T aspect_, T near_, T far_) -> Matrix
     {
+         /// \note On MSVC, the param names without the underscores causes compilation issues for some reason. 
+         ///       It may be a macro interference or some other Windows weirdness.
+ 
         static_assert(Cols == 4 && Rows == 4, "This function is only available in a 4x4 Matrix");
-        Matrix<Float, 4, 4> result;
-        mathf::mat4f::proj(result.data(), fovy, aspect, near, far);
+        Matrix<Float, 4, 4> result{};
+        mathf::mat4f::proj(
+            result.data(),
+            fovy_,
+            aspect_,
+            near_,
+            far_
+        );
 
         if constexpr (std::is_same_v<Float, T>)
             return result;
