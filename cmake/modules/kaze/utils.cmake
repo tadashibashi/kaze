@@ -304,12 +304,14 @@ function(add_kaze_executable TARGET)
                 set(CONTENT_BIN_ROOT "")
             endif()
 
-            add_custom_command(TARGET ${TARGET} POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E rm -rf "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
-                COMMAND ${CMAKE_COMMAND} -E rename
-                    "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${APP_NAME}"
-                    "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
-            )
+            if (NOT "${TARGET}" STREQUAL "${APP_NAME}")
+                add_custom_command(TARGET ${TARGET} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E rm -rf "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
+                    COMMAND ${CMAKE_COMMAND} -E rename
+                        "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${APP_NAME}"
+                        "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
+                )
+            endif()
         endif()
     endif()
 
