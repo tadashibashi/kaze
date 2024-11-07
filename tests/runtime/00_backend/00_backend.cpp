@@ -6,7 +6,7 @@
 
 #include <kaze/core/platform/backend/backend.h>
 
-USING_KAZE_NAMESPACE;
+USING_KAZE_NS;
 
 struct AppData
 {

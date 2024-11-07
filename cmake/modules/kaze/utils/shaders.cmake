@@ -496,10 +496,10 @@ function(kaze_target_shaders TARGET)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     get_target_property(TARGET_BINARY_DIR ${TARGET} BINARY_DIR)
-    set(OUTDIR_FULL ${TARGET_BINARY_DIR}/${IN_OUTDIR_NAME})
+    set(OUTDIR_FULL "${TARGET_BINARY_DIR}/${IN_OUTDIR_NAME}")
 
     if (NOT EXISTS ${IN_OUTDIR_NAME})
-        file(MAKE_DIRECTORY ${IN_OUTDIR_NAME})
+        file(MAKE_DIRECTORY "${OUTDIR_FULL}")
     endif()
 
     foreach(SHADER_FILE ${IN_SHADERS})

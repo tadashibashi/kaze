@@ -76,7 +76,7 @@ namespace kz::run {
         auto targetPath = fs::path("build") / platformName / buildTypeName / targetPathFromBuildDir;
         auto parentPath = targetPath.parent_path();
 
-        auto command = std::format( "cd {} && ./{}", parentPath.string(), target);
+        auto command = std::format( "cd \"{}\" && \"./{}\"", parentPath.string(), target);
 
         if (std::system(command.c_str()) != 0)
             return Result::RuntimeError;
@@ -104,7 +104,7 @@ namespace kz::run {
         auto targetPath = fs::path("build") / platformName / buildTypeName / targetPathFromBuildDir;
         auto parentPath = targetPath.parent_path();
 
-        auto command = std::format( "cd {} && .\\{}", parentPath.string(), target);
+        auto command = std::format( "cd \"{}\" && \".\\{}\"", parentPath.string(), target);
         if (std::system(command.c_str()) != 0)
             return Result::RuntimeError;
         return Result::Ok;
