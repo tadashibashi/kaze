@@ -11,6 +11,7 @@
 
 #if   KAZE_PLATFORM_WINDOWS
 #   define GLFW_EXPOSE_NATIVE_WIN32
+#   include <windows.h>
 #elif KAZE_PLATFORM_MACOS
 #   define GLFW_EXPOSE_NATIVE_COCOA
 #elif KAZE_PLATFORM_LINUX
@@ -32,6 +33,37 @@
 KAZE_NS_BEGIN
 
 namespace backend {
+#if KAZE_PLATFORM_WINDOWS
+    static auto setWindowIconFromRc(GLFWwindow *window, uint32_t id)
+    {
+        const auto hwnd = glfwGetWin32Window(window);
+        if ( !hwnd )
+        {
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr,
+                "Failed to get win32 window: {}", getGlfwErrorStr());
+            glfwDestroyWindow(window);
+            return false;
+        }
+
+        HINSTANCE hInstance = (HINSTANCE)GetWindowLongPtr(hwnd, GWLP_HINSTANCE);
+        if ( !hInstance)
+        {
+            KAZE_PUSH_ERR(Error::BE_RuntimeErr,
+                "Failed to get HINSTANCE from window: {}", getGlfwErrorStr());
+            glfwDestroyWindow(window);
+            return false;
+        }
+
+        const auto hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(id));
+        if (hIcon) // don't fail here, it's okay if user does not provide icon
+        {
+            SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        }
+
+        return true;
+    }
+#endif
     window::NativePlatformData window::getNativeInfo(const WindowHandle window) noexcept
     {
     #if   KAZE_PLATFORM_WINDOWS
@@ -332,6 +364,10 @@ namespace backend {
         glfwSetWindowIconifyCallback  ( window, glfwWindowIconifyCallback ); WARN_CHECK("set window iconify/minimize callback");
         glfwSetDropCallback           ( window, glfwDropCallback );        WARN_CHECK("set window drop callback");
         glfwSetCharCallback           ( window, glfwTextInputCallback );   WARN_CHECK("set window char callback");
+
+        #if KAZE_PLATFORM_WINDOWS
+            setWindowIconFromRc(window, 101); // 101 is the default Win32 icon resource id for kaze
+        #endif
 
         if (flags & WindowInit::Fullscreen)
         {

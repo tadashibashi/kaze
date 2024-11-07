@@ -106,6 +106,7 @@ function(add_kaze_executable TARGET)
         COPYRIGHT
         HTML_SHELL
         ICON_FILE
+        ICON_FILE_ICO
         INFO_PLIST
         INFO_PLIST_IOS
         INFO_PLIST_MACOS
@@ -124,13 +125,35 @@ function(add_kaze_executable TARGET)
     add_executable(${TARGET} ${EXE_TYPE})
     set(BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
+    # Normalize the output directories in case of multi-config.
+    # Kaze's workflow prefers to use one folder per configuration for the sake
+    # of directory simplicity.
+    set_target_properties(${TARGET}
+        PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY                "${BINARY_DIR}/bin"
+            RUNTIME_OUTPUT_DIRECTORY_DEBUG          "${BINARY_DIR}/bin"
+            RUNTIME_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/bin"
+            RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/bin"
+            RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/bin"
+            LIBRARY_OUTPUT_DIRECTORY                "${BINARY_DIR}/lib"
+            LIBRARY_OUTPUT_DIRECTORY_DEBUG          "${BINARY_DIR}/lib"
+            LIBRARY_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/lib"
+            LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/lib"
+            LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/lib"
+            ARCHIVE_OUTPUT_DIRECTORY                "${BINARY_DIR}/lib"
+            ARCHIVE_OUTPUT_DIRECTORY_DEBUG          "${BINARY_DIR}/lib"
+            ARCHIVE_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/lib"
+            ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/lib"
+            ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/lib"
+    )
+
     if (IN_SOURCES)
         target_sources(${TARGET} PRIVATE ${IN_SOURCES})
     endif()
 
     if (IN_KAZE_TK)
         target_link_libraries(${TARGET} PRIVATE kaze_tk)
-        kaze_copy_builtin_assets(${TARGET} "${BINARY_DIR}/bin")
+        kaze_copy_builtin_assets(${TARGET} "")
     else()
         target_link_libraries(${TARGET} PRIVATE kaze)
     endif()
@@ -156,28 +179,6 @@ function(add_kaze_executable TARGET)
         set(ICON_FILE "")
     endif()
 
-    # Normalize the output directories in case of multi-config.
-    # Kaze's workflow prefers to use one folder per configuration for the sake
-    # of directory simplicity.
-    set_target_properties(${TARGET}
-        PROPERTIES
-            RUNTIME_OUTPUT_DIRECTORY                "${BINARY_DIR}/bin"
-            RUNTIME_OUTPUT_DIRECTORY_DEBUG          "${BINARY_DIR}/bin"
-            RUNTIME_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/bin"
-            RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/bin"
-            RUNTIME_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/bin"
-            LIBRARY_OUTPUT_DIRECTORY                "${BINARY_DIR}/lib"
-            LIBRARY_OUTPUT_DIRECTORY_DEBUG          "${BINARY_DIR}/lib"
-            LIBRARY_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/lib"
-            LIBRARY_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/lib"
-            LIBRARY_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/lib"
-            ARCHIVE_OUTPUT_DIRECTORY                "${BINARY_DIR}/lib"
-            ARCHIVE_OUTPUT_DIRECTORY_DEBUG          "${BINARY_DIR}/lib"
-            ARCHIVE_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/lib"
-            ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/lib"
-            ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/lib"
-    )
-
     # ===== Platform-specific bundling =====
     if (KAZE_PLATFORM_EMSCRIPTEN)
         if (IN_HTML_SHELL)
@@ -192,16 +193,20 @@ function(add_kaze_executable TARGET)
     endif()
 
     if (KAZE_PLATFORM_WINDOWS)
-        if (IN_ICON_FILE) # Add icon file
-            set(TEMP_ICON_FILE "${CMAKE_BINARY_DIR}/temp/${TARGET}/icon.rc")
+        if (IN_ICON_FILE_ICO) # Add icon file
+            set(TEMP_DIR "${CMAKE_BINARY_DIR}/temp/${TARGET}")
+            set(TEMP_ICON_FILE "${TEMP_DIR}/Icon.rc")
 
-            cmake_path(RELATIVE_PATH IN_ICON_FILE
-                BASE_DIRECTORY "${TEMP_ICON_FILE}"
-                OUTPUT_VARIABLE WINDOWS_ICON_FILE
+            cmake_path(ABSOLUTE_PATH IN_ICON_FILE_ICO
+                BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+                OUTPUT_VARIABLE ICON_FILE_ICO)
+            cmake_path(RELATIVE_PATH ICON_FILE_ICO
+                BASE_DIRECTORY "${TEMP_DIR}"
+                OUTPUT_VARIABLE WINDOWS_ICON_PATH
             )
 
             configure_file("${KAZE_ROOT}/cmake/config/Icon.rc.in" "${TEMP_ICON_FILE}")
-            target_sources(${TARGET} PRIVATE "${TEMP_ICON_FILE")
+            target_sources(${TARGET} PRIVATE "${TEMP_ICON_FILE}")
         endif()
     endif()
 
@@ -291,22 +296,23 @@ function(add_kaze_executable TARGET)
             XCODE_ATTRIBUTE_EXECUTABLE_NAME             "${TARGET}"
         )
         set(CMAKE_XCODE_ATTRIBUTE_IPHONEOS_DEPLOYMENT_TARGET  ${MACOSX_DEPLOYMENT_TARGET})
-    endif()
 
-    if (NOT CMAKE_GENERATOR STREQUAL "Xcode")
-        if (KAZE_PLATFORM_MACOS)
-            set (CONTENT_BIN_ROOT Contents/MacOS/)
-        else()
-            set(CONTENT_BIN_ROOT "")
+        if (NOT CMAKE_GENERATOR STREQUAL "Xcode")
+            if (KAZE_PLATFORM_MACOS)
+                set (CONTENT_BIN_ROOT Contents/MacOS/)
+            else()
+                set(CONTENT_BIN_ROOT "")
+            endif()
+
+            add_custom_command(TARGET ${TARGET} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E rm -rf "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
+                COMMAND ${CMAKE_COMMAND} -E rename
+                    "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${APP_NAME}"
+                    "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
+            )
         endif()
-
-        add_custom_command(TARGET ${TARGET} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E rm -rf "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
-            COMMAND ${CMAKE_COMMAND} -E rename
-                "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${APP_NAME}"
-                "${BINARY_DIR}/bin/${APP_NAME}.app/${CONTENT_BIN_ROOT}${TARGET}"
-        )
     endif()
+
 endfunction()
 
 # Copy assets into the final bundle or executable path of a target

@@ -313,7 +313,7 @@ function(_kaze_target_shaders_impl TARGET)
     set(options AS_HEADERS)
     set(oneValueArgs TYPE VARYING_DEF OUTPUT_DIR SHADERC)
     set(multiValueArgs SHADERS INCLUDE_DIRS)
-    cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
+    cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if (NOT EXISTS "${IN_SHADERC}")
         set(IN_SHADERC bgfx::shaderc)
@@ -347,7 +347,7 @@ function(_kaze_target_shaders_impl TARGET)
         message(error "shaderc: Unsupported platform")
     endif()
 
-    get_target_property(BINARY_DIR ${TARGET} BINARY_DIR)
+    get_target_property(BINARY_DIR ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
 
     if (KAZE_PLATFORM_APPLE)
         set(OUTPUT_DIR "${CMAKE_BINARY_DIR}/temp/${TARGET}/${IN_OUTPUT_DIR}") # Temp dir for APPLE
@@ -359,7 +359,11 @@ function(_kaze_target_shaders_impl TARGET)
         source_group("Shaders" FILES "${SHADER}")
         get_filename_component(SHADER_FILE_BASENAME ${SHADER_FILE} NAME)
         get_filename_component(SHADER_FILE_NAME_WE ${SHADER_FILE} NAME_WE)
-        get_filename_component(SHADER_FILE_ABSOLUTE ${SHADER_FILE} ABSOLUTE)
+
+        cmake_path(ABSOLUTE_PATH SHADER_FILE
+            BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+            NORMALIZE
+            OUTPUT_VARIABLE SHADER_FILE_ABSOLUTE)
 
         # Build output targets and their commands
         set(OUTPUTS "")
@@ -371,14 +375,14 @@ function(_kaze_target_shaders_impl TARGET)
             if(IN_AS_HEADERS)
                 set(HEADER_PREFIX .h)
             endif()
-            set(OUTPUT ${OUTPUT_DIR}/${PROFILE_EXT}/${SHADER_FILE_BASENAME}.bin${HEADER_PREFIX})
+            set(OUTPUT "${OUTPUT_DIR}/${PROFILE_EXT}/${SHADER_FILE_BASENAME}.bin${HEADER_PREFIX}")
             set(PLATFORM_I ${PLATFORM})
             if(PROFILE STREQUAL "spirv")
                 set(PLATFORM_I LINUX)
             endif()
             set(BIN2C_PART "")
             if(IN_AS_HEADERS)
-                set(BIN2C_PART BIN2C ${SHADER_FILE_NAME_WE}_${PROFILE_EXT})
+                set(BIN2C_PART BIN2C "${SHADER_FILE_NAME_WE}_${PROFILE_EXT}")
             endif()
             _kaze_bgfx_shaderc_parse(
                 CLI #
@@ -425,9 +429,9 @@ function(_kaze_target_shaders_impl TARGET)
                     PROPERTIES
                         MACOSX_PACKAGE_LOCATION "${PACKAGE_LOCATION}")
                 math(EXPR COUNTER "${COUNTER} + 1")
-                target_sources(${TARGET} PRIVATE ${OUTPUT})
             endforeach()
         endif()
+        target_sources(${TARGET} PRIVATE ${OUTPUTS})
     endforeach()
 endfunction()
 
@@ -495,7 +499,7 @@ function(kaze_target_shaders TARGET)
     set(multiValueArgs SHADERS INCLUDE_DIRS)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    get_target_property(TARGET_BINARY_DIR ${TARGET} BINARY_DIR)
+    get_target_property(TARGET_BINARY_DIR ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
     set(OUTDIR_FULL "${TARGET_BINARY_DIR}/${IN_OUTDIR_NAME}")
 
     if (NOT EXISTS ${IN_OUTDIR_NAME})
@@ -521,10 +525,10 @@ function(kaze_target_shaders TARGET)
         _kaze_target_shaders_impl("${TARGET}"
             SHADERC "${KAZE_ROOT}/build/tools/bin/shaderc" # if this wasn't built by tools/setup it will attempt to build it with this configuration
             TYPE "${SHADER_TYPE}"
-            SHADERS "${SHADER_DIR_ABSOLUTE}/${SHADER_FILE}"
+            SHADERS "${SHADER_FILE_ABSOLUTE}"
             VARYING_DEF "${IN_VARYING_DEF}"
             OUTPUT_DIR "${IN_OUTDIR_NAME}"
-            INCLUDE_DIRS ${BGFX_DIR}/src ${IN_INCLUDE_DIRS}
+            INCLUDE_DIRS "${BGFX_DIR}/src" "${IN_INCLUDE_DIRS}"
         )
     endforeach()
 endfunction()

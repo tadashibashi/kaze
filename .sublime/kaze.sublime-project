@@ -16,7 +16,7 @@
 			"name": "kaze app",
 			"request": "launch",
 			"type": "lldb",
-			"program": "$project_path/../build/desktop/Debug/tests/runtime/bin/kaze_test_01_app",
+			"program": "$project_path/../build/desktop/Debug/tests/runtime/bin/01_app/ktest_01_app",
 			"cwd": "$project_path/../build/desktop/Debug/tests/runtime/bin",
 			"osx": {
 				"pre_debug_task": "build kaze app (Unix)"
@@ -49,12 +49,12 @@
 	[
 		{
 			"name": "build kaze app (Unix)",
-			"shell_cmd": "trap 'exit 0' ERR && source $project_path/../tools/setup.sh && kz build kaze_test_01_app",
+			"shell_cmd": "trap 'exit 0' ERR && source $project_path/../tools/setup.sh && kz build ktest_01_app",
 			"cwd": "$project_path/..",
 		},
 		{
 			"name": "build kaze app (Windows)",
-			"shell_cmd": "powershell tools\\setup.ps1 && kz build kaze_test_01_app",
+			"shell_cmd": "powershell tools\\setup.ps1 && kz build ktest_01_app",
 			"cwd": "$project_path\\..",
 		},
 		{

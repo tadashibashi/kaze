@@ -1,6 +1,13 @@
 #pragma once
 
 #include <kaze/core/lib.h>
+#include <kaze/core/platform/defines.h>
+
+#if KAZE_PLATFORM_WINDOWS
+#include <windows.h>
+
+extern int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
+#endif
 
 KAZE_NS_BEGIN
 

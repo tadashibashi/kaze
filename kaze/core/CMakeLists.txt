@@ -153,7 +153,6 @@ if (KAZE_PLATFORM_EMSCRIPTEN)
     endif()
 endif()
 
-
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # May potentially hide an important warning, but otherwise the console gets cluttered
     target_compile_options(kaze PUBLIC "-Wno-psabi")

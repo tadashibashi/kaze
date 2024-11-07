@@ -7,12 +7,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES OFF) # No C++20 Modules in this project
 
 # ===== Directory Variables ===================================================
-set(KAZE_ROOT ${CMAKE_CURRENT_SOURCE_DIR} CACHE STRING "Path to the entire project's root" FORCE)
-set(KAZE_SOURCE_ROOT ${KAZE_ROOT}/kaze    CACHE STRING "Path to the Kaze engine source code directory" FORCE)
-set(KAZE_BACKEND_ROOT ${KAZE_SOURCE_ROOT}/core/platform/backend CACHE STRING "Path to the Kaze engine backends" FORCE)
-set(KAZE_TESTS_ROOT ${KAZE_ROOT}/tests)
+set(KAZE_ROOT "${CMAKE_CURRENT_SOURCE_DIR}" CACHE STRING "Path to the entire project's root" FORCE)
+set(KAZE_SOURCE_ROOT "${KAZE_ROOT}/kaze"    CACHE STRING "Path to the Kaze engine source code directory" FORCE)
+set(KAZE_BACKEND_ROOT "${KAZE_SOURCE_ROOT}/core/platform/backend" CACHE STRING "Path to the Kaze engine backends" FORCE)
+set(KAZE_TESTS_ROOT "${KAZE_ROOT}/tests")
 
-list(APPEND CMAKE_MODULE_PATH ${KAZE_ROOT}/cmake/modules)
+list(APPEND CMAKE_MODULE_PATH "${KAZE_ROOT}/cmake/modules")
 
 if (KAZE_ROOT STREQUAL CMAKE_SOURCE_DIR)
     set(KAZE_IS_ROOT ON CACHE BOOL "" FORCE)

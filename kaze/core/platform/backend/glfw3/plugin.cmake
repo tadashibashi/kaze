@@ -28,9 +28,10 @@ endif()
 set(KAZE_BACKEND_SOURCES_PRIVATE
     common_glfw3.cpp
     window_glfw3.cpp
+)
+set(KAZE_BACKEND_SOURCES_PUBLIC
     main_glfw.cpp
 )
-
 if (APPLE)
     list(APPEND KAZE_BACKEND_SOURCES_PRIVATE
         window_glfw3.mm)
