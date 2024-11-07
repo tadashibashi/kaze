@@ -1,4 +1,3 @@
-#include <kaze/core/platform/filesys/filesys.h>
 #include <kaze/tk/App.h>
 #include <kaze/tk/Camera2D.h>
 

@@ -2,8 +2,13 @@
 #include <kaze/core/debug.h>
 
 #include <filesystem>
+#include <exception>
+
 #include <windows.h>
-#include <shlobj.h>
+#include <combaseapi.h>
+#include <KnownFolders.h>
+#include <ShlObj_core.h>
+
 
 KAZE_NS_BEGIN
 
@@ -20,7 +25,7 @@ namespace filesys {
             return fspath.root_directory().string();
     }
 
-    auto getUserDir() -> String
+    auto getUserDir(StringView companyName, StringView appName) -> String
     {
         std::filesystem::path fspath;
 
@@ -48,7 +53,7 @@ namespace filesys {
             return "";
         }
 
-        return fspath.string();
+        return (fspath / companyName / appName).string();
     }
 }
 
