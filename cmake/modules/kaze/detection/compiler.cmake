@@ -126,6 +126,7 @@ else()
 endif()
 
 if (EMSCRIPTEN)
+    set(CMAKE_REQURIED_FLAGS "-msimd128")
     check_cxx_source_compiles("
         #include <wasm_simd128.h>
         int main() {
@@ -133,6 +134,7 @@ if (EMSCRIPTEN)
             return 0;
         }
     " KAZE_COMPILER_SUPPORTS_WASM_SIMD)
+    unset(CMAKE_REQUIRED_FLAGS)
 else()
     set(KAZE_COMPILER_SUPPORTS_WASM_SIMD 0)
 endif()

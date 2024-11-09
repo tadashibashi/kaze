@@ -310,7 +310,9 @@ auto App::oneTick() -> void
     pollEvents();
     frame();
 
+#if !KAZE_PLATFORM_EMSCRIPTEN
     m->framerate.waitUntilFrameEnd();
+#endif
 }
 
 auto App::doUpdate() -> void

@@ -409,9 +409,15 @@ function(_kaze_target_shaders_impl TARGET)
             list(APPEND COMMANDS COMMAND ${IN_SHADERC} ${CLI})
 
             if (KAZE_PLATFORM_APPLE)
-                list(APPEND MACOSX_PACKAGE_LOCATIONS "Resources/${IN_OUTPUT_DIR}/${PROFILE_EXT}")
+                set_source_files_properties("${OUTPUT}"
+                    PROPERTIES
+                        MACOSX_PACKAGE_LOCATION "Resources/${IN_OUTPUT_DIR}/${PROFILE_EXT}")
             endif()
 
+            if (KAZE_PLATFORM_EMSCRIPTEN) # Copy all default assets. TODO: move this into target_shaders
+                target_link_options(${TARGET} PUBLIC
+                    "SHELL:--preload-file ${OUTPUT}@/${IN_OUTPUT_DIR}/${PROFILE_EXT}/${SHADER_FILE_BASENAME}.bin${HEADER_PREFIX}")
+            endif()
         endforeach()
 
         add_custom_command(
@@ -421,16 +427,6 @@ function(_kaze_target_shaders_impl TARGET)
             DEPENDS ${IN_VARYING_DEF}
         )
 
-        if (KAZE_PLATFORM_APPLE)
-            set(COUNTER 0)
-            foreach(OUTPUT ${OUTPUTS})
-                list(GET MACOSX_PACKAGE_LOCATIONS "${COUNTER}" PACKAGE_LOCATION)
-                set_source_files_properties("${OUTPUT}"
-                    PROPERTIES
-                        MACOSX_PACKAGE_LOCATION "${PACKAGE_LOCATION}")
-                math(EXPR COUNTER "${COUNTER} + 1")
-            endforeach()
-        endif()
         target_sources(${TARGET} PRIVATE ${OUTPUTS})
     endforeach()
 endfunction()

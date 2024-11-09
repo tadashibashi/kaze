@@ -148,7 +148,10 @@ target_compile_definitions(kaze PUBLIC
 # Emscripten flags
 if (KAZE_PLATFORM_EMSCRIPTEN)
     target_link_options(kaze PUBLIC
-        -s ALLOW_MEMORY_GROWTH=1)
+        -s ALLOW_MEMORY_GROWTH=1
+        -msimd128)
+    target_compile_options(kaze PUBLIC
+        -msimd128)
 
     if (KAZE_DEBUG)
         target_link_options(kaze PUBLIC

@@ -102,6 +102,8 @@ Size byteOffsetOf(T Class::*member)
 constexpr Bool True = static_cast<Bool>(1);
 constexpr Bool False = static_cast<Bool>(0);
 
+using fmt_lib::format;
+
 KAZE_NS_END
 
 #if KAZE_COMPILER_CLANG || KAZE_COMPILER_GCC

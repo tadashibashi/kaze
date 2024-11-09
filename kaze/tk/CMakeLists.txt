@@ -24,10 +24,6 @@ function (kaze_copy_builtin_assets TARGET OUTPUT_DIR)
         BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
         OUTPUT_VARIABLE OUTPUT_DIR_ABSOLUTE
     )
-
-    if (KAZE_PLATFORM_EMSCRIPTEN) # Copy all default assets. TODO: move this into target_shaders
-        target_link_options(${TARGET} PUBLIC "SHELL:--preload-file ${OUTPUT_DIR_ABSOLUTE}/kaze@/kaze")
-    endif()
 endfunction()
 
 add_library(${PROJECT_NAME}

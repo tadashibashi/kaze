@@ -61,7 +61,7 @@ namespace kz {
     {
         Args args(argc, argv);
         Env env;
-        env.load(args.getOpt("env", ".build")); // should silently fail
+        env.load(args.getOpt("env", ".env")); // should silently fail
 
         if (args.values().size() < 2)
         {
