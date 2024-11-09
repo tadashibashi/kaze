@@ -1,6 +1,8 @@
 /// \file Window_sdl3.h
 /// SDL3 implementation for functions in the backend::window namespace
 #include "window_sdl3.h"
+#include "SDL3/SDL_hints.h"
+#include "SDL3/SDL_keyboard.h"
 #include "common_sdl3.h"
 
 #include <kaze/core/errors.h>
@@ -9,7 +11,7 @@
 
 #include <SDL3/SDL.h>
 
-#ifdef KAZE_PLATFORM_APPLE_DEVICE
+#if KAZE_PLATFORM_IOS
 #include "private/uikit_window_sdl3.h"
 #endif
 
@@ -59,7 +61,7 @@ namespace backend {
 
     #elif defined(SDL_PLATFORM_IOS) || KAZE_PLATFORM_VISIONOS || KAZE_PLATFORM_TVOS
 
-        result.windowHandle = initMetalUIKitWindow(WIN_CAST(window));
+        uiKitWindowGetMetalLayer(WIN_CAST(window), &result.windowHandle);
         result.displayType = nullptr;
 
     #elif defined(SDL_PLATFORM_WIN32)
@@ -85,7 +87,7 @@ namespace backend {
 
     #elif defined(SDL_PLATFORM_ANDROID)
         result.windowHandle = SDL_GetPointerProperty(props, SDL_PROP_WINDOW_ANDROID_WINDOW_POINTER, nullptr);
-        result.displayType = result.windowHandle;
+        result.displayType = nullptr;
 
     #elif defined(SDL_PLATFORM_EMSCRIPTEN)
         result.windowHandle = (void *)"#canvas";
@@ -106,6 +108,11 @@ namespace backend {
         auto sdl3Flags = SDL_WINDOW_HIDDEN | SDL_WINDOW_HIGH_PIXEL_DENSITY;
     #if KAZE_PLATFORM_APPLE
         sdl3Flags |= SDL_WINDOW_METAL;
+
+    #elif KAZE_PLATFORM_ANDROID
+         // We're not actually using Vulkan for Android, but default window creation inits an EGL context that
+         // interferes with BGFX's init.
+        sdl3Flags |= SDL_WINDOW_VULKAN;
     #endif
         if (flags & WindowInit::Resizable)
             sdl3Flags |= SDL_WINDOW_RESIZABLE;
@@ -120,35 +127,54 @@ namespace backend {
         if (flags & WindowInit::Transparent)
             sdl3Flags |= SDL_WINDOW_TRANSPARENT;
 
+        const auto textInputProps = SDL_CreateProperties();
+        if (textInputProps == 0)
+        {
+            SDL_SetBooleanProperty(textInputProps, SDL_PROP_TEXTINPUT_MULTILINE_BOOLEAN, false);
+            return False;
+        }
+
         const auto window = SDL_CreateWindow(title, width, height, sdl3Flags);
         if ( !window )
         {
             KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create SDL3 Window: {}", SDL_GetError());
-            return KAZE_FALSE;
+            return False;
         }
 
 #if !KAZE_PLATFORM_APPLE_DEVICE && !KAZE_PLATFORM_MOBILE
         window::setSize(window, width, height);
+#endif
+#if KAZE_PLATFORM_IOS
+        if ( !uiKitWindowInitMetal(window) )
+        {
+            return False;
+        }
+
+        // For some reason, the iOS IME return key doesn't pass as a
+        // text/keyboard event – close IME on return
+        SDL_SetHint(SDL_HINT_RETURN_KEY_HIDES_IME, "1");
 #endif
         const auto props = SDL_GetWindowProperties(window);
         if ( !props )
         {
             KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to get window properties: {}", SDL_GetError());
             SDL_DestroyWindow(window);
-            return KAZE_FALSE;
+            return False;
         }
 
         // Set up associated window metadata
         const auto windowData = new WindowData();
         if ( !SDL_SetPointerPropertyWithCleanup(props, "WindowData", windowData,
             [](void *userptr, void *value) noexcept {
-                delete static_cast<WindowData *>(value);
+                auto data = static_cast<WindowData *>(value);
+                SDL_DestroyProperties(data->textInputPropsId);
+                delete data;
             }, nullptr) )
         {
             KAZE_CORE_ERR("Failed to set WindowData to SDL_Window properties: {}", SDL_GetError());
             SDL_DestroyWindow(window);
             delete windowData; // data ptr failed to hand over to prop API, clean up manually
-            return KAZE_FALSE;
+            return False;
         }
 
         // Check if mouse is inside the window to set initial hover state
@@ -184,6 +210,7 @@ namespace backend {
         }
 
         *outWindow = window;
+        windowData->textInputPropsId = static_cast<Uint>(textInputProps);
         return KAZE_TRUE;
     }
 
@@ -195,12 +222,25 @@ namespace backend {
         auto windows = SDL_GetWindows(&windowCount);
         if ( !windows )
         {
-
             return false;
         }
 
-        SDL_DestroyWindow(static_cast<SDL_Window *>(window));
-        return true;
+        bool containsWindow = false;
+        for (int i = 0; i < windowCount; ++i)
+        {
+            if (windows[i] == window)
+            {
+                containsWindow = true;
+                break;
+            }
+        }
+
+        if (containsWindow)
+        {
+            SDL_DestroyWindow(static_cast<SDL_Window *>(window));
+        }
+
+        return containsWindow;
     }
 
     auto window::isOpen(const WindowHandle window, bool *outOpen) noexcept -> bool
@@ -850,9 +890,19 @@ namespace backend {
     {
         RETURN_IF_NULL(window);
 
-        return (yes) ?
-            SDL_StartTextInput(WIN_CAST(window)) :
+        WindowData *data;
+        if ( !getWindowData(window, &data) )
+            return false;
+        bool result = (yes) ?
+            SDL_StartTextInputWithProperties(WIN_CAST(window),
+                                             data->textInputPropsId) :
             SDL_StopTextInput(WIN_CAST(window));
+
+#if KAZE_PLATFORM_IOS
+        if (result)
+            uiKitWindowSetTextInput(WIN_CAST(window), yes);
+#endif
+        return result;
     }
 
     auto window::isTextInputActive(WindowHandle window, bool *outValue) noexcept -> bool
@@ -860,6 +910,39 @@ namespace backend {
         RETURN_IF_NULL(window);
         RETURN_IF_NULL(outValue);
         *outValue = SDL_TextInputActive(WIN_CAST(window));
+        return true;
+    }
+
+    auto window::setTextInputArea(WindowHandle window, Int x, Int y, Int w, Int h, Int offsetX) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        SDL_Rect r {
+            .x = x,
+            .y = y,
+            .w = w,
+            .h = h,
+        };
+
+        return SDL_SetTextInputArea(WIN_CAST(window), &r, 0);
+    }
+
+    auto window::getTextInputArea(WindowHandle window, Int *outX, Int *outY, Int *outW, Int *outH, Int *outOffsetX) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        SDL_Rect r;
+        if ( !SDL_GetTextInputArea(WIN_CAST(window), &r, outOffsetX) )
+            return false;
+
+        if (outX)
+            *outX = r.x;
+        if (outY)
+            *outY = r.y;
+        if (outW)
+            *outW = r.w;
+        if (outH)
+            *outH = r.h;
         return true;
     }
 

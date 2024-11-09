@@ -32,7 +32,7 @@ namespace filesys {
             }
             else if (const auto homeDir = getHomeDir())
             {
-                appDir = std::format("{}/.local/share", homeDir);
+                appDir = fmt_lib::format("{}/.local/share", homeDir);
             }
             else
             {
@@ -62,7 +62,7 @@ namespace filesys {
 
     auto getUserDir(StringView companyName, StringView appName) -> String
     {
-        return std::format("{}/{}/{}", getAppDataDir(), companyName, appName);
+        return fmt_lib::format("{}/{}/{}", getAppDataDir(), companyName, appName);
     }
 }
 

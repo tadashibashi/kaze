@@ -7,6 +7,7 @@ constexpr int GamepadMaxSlots = 16;
 
 /// Clickable button on a game controller
 enum class GamepadBtn {
+    Unknown = -1,
     A = 0,       ///< Bottom of ABXY buttons
     B,           ///< Right of ABXY buttons
     X,           ///< Left of ABXY buttons
@@ -28,6 +29,7 @@ enum class GamepadBtn {
 
 /// Gradual axis inputs on a game controller
 enum class GamepadAxis {
+    Unknown = -1,
     LeftX = 0,     ///< Left stick X horizontal axis
     LeftY,         ///< Left stick Y vertical axis
     RightX,        ///< Right stick X horizontal axis

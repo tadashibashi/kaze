@@ -96,6 +96,8 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
     bgfx::Init config{};
 #if KAZE_PLATFORM_LINUX  // Vulkan crashes when resizing window, it may be a vulkan consideration and not just linux...
     config.type = bgfx::RendererType::OpenGL;
+#elif KAZE_PLATFORM_ANDROID
+    config.type = bgfx::RendererType::OpenGLES;
 #endif
     config.platformData.ndt = platformData.displayType;
     config.platformData.nwh = platformData.windowHandle;

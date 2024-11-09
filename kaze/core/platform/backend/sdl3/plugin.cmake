@@ -15,15 +15,22 @@ if (NOT TARGET SDL3::SDL3)
     FetchContent_MakeAvailable(SDL3)
 endif()
 
-set(KAZE_BACKEND_LINK_LIBS_PRIVATE SDL3::SDL3)
+set(KAZE_BACKEND_LINK_LIBS_PUBLIC SDL3::SDL3)
 set(KAZE_BACKEND_SOURCES_PRIVATE
     common_sdl3.cpp
+    common_sdl3.h
     main_sdl3.cpp
     window_sdl3.cpp
+    window_sdl3.h
     private/GamepadMgr.cpp
+    private/GamepadMgr.h
 )
 
 if (KAZE_PLATFORM_APPLE_DEVICE)
     list(APPEND KAZE_BACKEND_SOURCES_PRIVATE
-        private/uikit_window_sdl3.mm)
+        private/uikit_window_sdl3.h
+        private/uikit_window_sdl3.mm
+        private/uikit_InputHandler.h
+        private/uikit_InputHandler.mm
+    )
 endif()

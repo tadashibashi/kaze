@@ -48,7 +48,7 @@ namespace filesys {
             homeDir = String([tempHomeDir UTF8String], [tempHomeDir length]);
         }
 
-        const auto fullPath = std::format("{}/Library/Application Support/{}/{}", homeDir, companyName, appName);
+        const auto fullPath = fmt_lib::format("{}/Library/Application Support/{}/{}", homeDir, companyName, appName);
         if ( !std::filesystem::exists(fullPath) )
         {
             std::filesystem::create_directories(fullPath);

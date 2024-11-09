@@ -1,4 +1,4 @@
-if (APPLE)
+if (KAZE_PLATFORM_APPLE)
     project(kaze LANGUAGES C CXX OBJC OBJCXX)
 else()
     project(kaze LANGUAGES C CXX)
@@ -19,7 +19,9 @@ target_link_libraries(kaze PUBLIC
     bgfx bx bimg bimg_decode
 )
 
-target_precompile_headers(kaze PUBLIC lib.pch)
+if (NOT KAZE_PLATFORM_ANDROID)
+    target_precompile_headers(kaze PUBLIC lib.pch)
+endif()
 
 target_sources(kaze PRIVATE
         concepts.h
@@ -132,12 +134,13 @@ target_sources(kaze PRIVATE
 kaze_normalize_bool(KAZE_NO_NAMESPACE KAZE_NO_NAMESPACE)
 kaze_normalize_bool(KAZE_DEBUG KAZE_DEBUG)
 kaze_normalize_bool(KAZE_USE_WAYLAND KAZE_USE_WAYLAND)
-
+kaze_normalize_bool(KAZE_USE_FMT_LIB KAZE_USE_FMT_LIB)
 target_compile_definitions(kaze PUBLIC
     KAZE_NAMESPACE=${KAZE_NAMESPACE}
     KAZE_DEBUG=${KAZE_DEBUG}
     KAZE_USE_WAYLAND=${KAZE_USE_WAYLAND}
     KAZE_NO_NAMESPACE=${KAZE_NO_NAMESPACE}
+    KAZE_USE_FMT_LIB=${KAZE_USE_FMT_LIB}
 )
 
 # ===== Compiler-specific settings =====

@@ -180,7 +180,6 @@ namespace plugins::imgui {
                 // {
                     io.AddKeyEvent(s_keyToImGuiKey[static_cast<Int>(e.key)], e.isDown);
                 // }
-
                 return !io.WantCaptureKeyboard;
             },
             .mbuttonFilter = [](const MouseButtonEvent &e, Double timestamp, App *app, void *userdata) -> Bool
@@ -203,7 +202,11 @@ namespace plugins::imgui {
                     return True;
                 }
 
-                io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+                #if KAZE_PLATFORM_IOS || KAZE_PLATFORM_ANDROID
+                    io.AddMouseSourceEvent(ImGuiMouseSource_TouchScreen);
+                #else
+                    io.AddMouseSourceEvent(ImGuiMouseSource_Mouse);
+                #endif
                 io.AddMouseButtonEvent(mouseButton, e.isDown);
 
                 return !io.WantCaptureMouse;
@@ -214,7 +217,7 @@ namespace plugins::imgui {
                 if (ctx->window != e.window)
                     return True;
                 ImGui::GetIO().AddMousePosEvent(e.position.x, e.position.y);
-                return !ImGui::GetIO().WantCaptureMouse;
+                return true;
             },
             .mscrollFilter = [](const MouseScrollEvent &e, Double timestamp, App *app, void *userdata)
             {
@@ -230,6 +233,7 @@ namespace plugins::imgui {
                 if (ctx->window != e.window)
                     return True;
                 ImGui::GetIO().AddInputCharacter(e.codepoint);
+
                 return !ImGui::GetIO().WantTextInput;
             },
             .windowFilter = [](const WindowEvent &e, Double timestamp, App *app, void *userdata)

@@ -1,0 +1,6 @@
+.cxx/
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+local.properties

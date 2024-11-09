@@ -171,12 +171,26 @@ private:
             images[i].rotation = mathf::fmod(images[i].rotation + 4.f, 360.f);
         }
 
+
+        static char text[1024];
+        if (ImGui::Begin("Multi-line Test"))
+        {
+            if (ImGui::InputTextMultiline("Multi-line Text", text, 1024, {480, 1024}))
+            {
+
+            }
+        }
+        ImGui::End();
+
+
         ImGui::ShowDemoWindow();
         if (ImGui::Begin("Frame rate"))
         {
             ImGui::Text("Current fps: %f", fps());
         }
         ImGui::End();
+
+
     }
 
     auto render() -> void override {

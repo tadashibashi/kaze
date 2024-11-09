@@ -1,0 +1,6 @@
+set (KAZE_PLUGIN_NAME KAZE_PLATFORM_ANDROID)
+
+set(KAZE_PLATFORM_ANDROID_SOURCES_PUBLIC
+    AndroidNative.cpp
+    AndroidNative.h
+)

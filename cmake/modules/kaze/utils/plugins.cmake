@@ -47,7 +47,7 @@ function(kaze_target_plugin TARGET PATH)
                 PATHS ${${NAME}_SOURCES_PUBLIC}
                 ROOT_DIR ${PLUGIN_ROOT}
                 OUT_VAR SOURCES_ABS)
-        target_sources(${TARGET} PRIVATE ${SOURCES_ABS})
+        target_sources(${TARGET} PUBLIC ${SOURCES_ABS})
     endif()
     if (DEFINED ${NAME}_SOURCES_PRIVATE)
         kaze_make_paths_absolute(
@@ -149,7 +149,7 @@ function(kaze_add_subplugin SUBPATH)
                 PATHS ${${NAME}_SOURCES_PUBLIC}
                 ROOT_DIR ${SUBPLUGIN_ROOT}
                 OUT_VAR SOURCES_ABS)
-        target_sources(${TARGET} PRIVATE ${SOURCES_ABS})
+        target_sources(${TARGET} PUBLIC ${SOURCES_ABS})
     endif()
     if (DEFINED ${NAME}_SOURCES_PRIVATE)
         kaze_make_paths_absolute(

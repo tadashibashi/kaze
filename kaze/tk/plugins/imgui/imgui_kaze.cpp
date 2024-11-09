@@ -30,16 +30,39 @@ auto ImGui_ImplKaze_SetViewportSize(const WindowHandle window) -> void
     }
 }
 
-static auto ImGui_ImplKaze_GetClipboardText(void *) -> const char *
+static auto ImGui_ImplKaze_GetClipboardText(ImGuiContext *) -> const char *
 {
     auto text = "";
     backend::getClipboard(&text);
     return text;
 }
 
-static auto ImGui_ImplKaze_SetClipboardText(void *, const char *text) -> void
+static auto ImGui_ImplKaze_SetClipboardText(ImGuiContext *, const char *text) -> void
 {
     backend::setClipboard(text);
+}
+
+static auto ImGui_ImplKaze_PlatformSetImeData(ImGuiContext *imContext,
+    ImGuiViewport *viewport, ImGuiPlatformImeData *data) -> void
+{
+    const auto context = CONTEXT_CAST(ImGui::GetIO().UserData);
+    const auto window = static_cast<WindowHandle>(viewport->PlatformHandle);
+    if (( !data->WantVisible || window != context->imeWindow) && context->imeWindow != nullptr)
+    {
+        backend::window::setTextInputMode(window, false);
+        context->imeWindow = nullptr;
+    }
+    if (data->WantVisible)
+    {
+        backend::window::setTextInputArea(window,
+            static_cast<Int>(data->InputPos.x),
+            static_cast<Int>(data->InputPos.y),
+            1,
+            static_cast<Int>(data->InputLineHeight),
+            0);
+        backend::window::setTextInputMode(window, true);
+        context->imeWindow = window;
+    }
 }
 
 static auto toCursorType(const ImGuiMouseCursor cursor) -> CursorType
@@ -63,11 +86,13 @@ static auto toCursorType(const ImGuiMouseCursor cursor) -> CursorType
 
 static auto ImGui_ImplKaze_UpdateMouseCursor(ImGuiKazeContext *context)
 {
+    #if !KAZE_TARGET_MOBILE
     const auto &io = ImGui::GetIO();
     if (io.ConfigFlags & ImGuiConfigFlags_NoMouseCursorChange)
         return;
 
     const auto ctx = CONTEXT_CAST(context);
+
 
     if (const auto curCursor = ImGui::GetMouseCursor();
         io.MouseDrawCursor || curCursor == ImGuiMouseCursor_None)
@@ -85,6 +110,7 @@ static auto ImGui_ImplKaze_UpdateMouseCursor(ImGuiKazeContext *context)
 
         backend::window::setCursorMode(ctx->window, CursorMode::Visible);
     }
+    #endif
 }
 
 auto ImGui_ImplKaze_Init(ImGuiKazeContext *context) -> Bool
@@ -95,14 +121,16 @@ auto ImGui_ImplKaze_Init(ImGuiKazeContext *context) -> Bool
     auto &io = ImGui::GetIO();
 
     io.BackendPlatformName = "Kaze";
-    io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
-    io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
-
-    io.SetClipboardTextFn = ImGui_ImplKaze_SetClipboardText;
-    io.GetClipboardTextFn = ImGui_ImplKaze_GetClipboardText;
-    io.ClipboardUserData = nullptr;
-
+    #if !KAZE_PLATFORM_IOS && !KAZE_PLATFORM_ANDROID
+        io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
+        io.BackendFlags |= ImGuiBackendFlags_HasSetMousePos;
+    #endif
     io.UserData = context;
+
+    auto &platformIO = ImGui::GetPlatformIO();
+    platformIO.Platform_GetClipboardTextFn = ImGui_ImplKaze_GetClipboardText;
+    platformIO.Platform_SetClipboardTextFn = ImGui_ImplKaze_SetClipboardText;
+    platformIO.Platform_SetImeDataFn = ImGui_ImplKaze_PlatformSetImeData;
 
     // Set platform dependent data
     const auto viewport = ImGui::GetMainViewport();
@@ -126,12 +154,6 @@ auto ImGui_ImplKaze_NewFrame(ImGuiKazeContext *context) -> void
 
     io.DeltaTime = static_cast<float>(deltaTime);
     context->lastTime = time;
-
-    if (io.WantCaptureKeyboard != context->keyboardRequested)
-    {
-        backend::window::setTextInputMode(context->window, io.WantCaptureKeyboard);
-        context->keyboardRequested = io.WantCaptureKeyboard;
-    }
 
     ImGui_ImplKaze_UpdateMouseCursor(context);
 }

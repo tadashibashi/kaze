@@ -130,6 +130,6 @@ static constexpr Array<Uint16, static_cast<Size>(Key::Count)> s_keyToSdlKey = {
     SDL_SCANCODE_Z,
 };
 
-static Array<Uint16, SDL_SCANCODE_COUNT> s_sdlKeyToKey = {0};
+static Array<Int16, SDL_SCANCODE_COUNT> s_sdlKeyToKey = {-1};
 
 KAZE_NS_END

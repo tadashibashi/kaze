@@ -166,33 +166,30 @@ namespace backend {
         GLFW_GAMEPAD_AXIS_RIGHT_TRIGGER,
     };
 
-    static Array<Uint8, GLFW_GAMEPAD_AXIS_LAST + 1> s_glfwToGamepadAxis{0};
+    static Array<int, GLFW_GAMEPAD_AXIS_LAST + 1> s_glfwToGamepadAxis{0};
 
     void initGlobals() noexcept
     {
         // set up input query arrays
-        if (s_glfwKeyToKey[GLFW_KEY_Z] == 0)
+        for (int i = 0; i < s_glfwKeyToKey.size(); ++i)
+            s_glfwKeyToKey[i] = -1;
+        for (auto i = 0; const auto key : s_keyToGlfwKey)
         {
-            for (auto i = 0; const auto key : s_keyToGlfwKey)
-            {
-                s_glfwKeyToKey[key] = i++;
-            }
+            s_glfwKeyToKey[key] = i++;
         }
 
-        if (s_glfwToGamepadButton[GLFW_GAMEPAD_BUTTON_LAST] == 0)
+        for (int i = 0; i < s_glfwToGamepadButton.size(); ++i)
+            s_glfwToGamepadButton[i] = -1;
+        for (auto i = 0; const auto btn : s_gamepadButtonToGlfw)
         {
-            for (auto i = 0; const auto btn : s_gamepadButtonToGlfw)
-            {
-                s_glfwToGamepadButton[btn] = i++;
-            }
+            s_glfwToGamepadButton[btn] = i++;
         }
 
-        if (s_glfwToGamepadAxis[GLFW_GAMEPAD_AXIS_LAST] == 0)
+        for (int i = 0; i < s_glfwToGamepadAxis.size(); ++i)
+            s_glfwToGamepadAxis[i] = -1;
+        for (auto i = 0; const auto axis : s_gamepadAxisToGlfw)
         {
-            for (auto i = 0; const auto axis : s_gamepadAxisToGlfw)
-            {
-                s_glfwToGamepadAxis[axis] = i++;
-            }
+            s_glfwToGamepadAxis[axis] = i++;
         }
 
         // Check if any gamepads are present on initialization

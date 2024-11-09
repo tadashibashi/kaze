@@ -11,3 +11,7 @@ endif()
 
 kaze_add_subplugin(backend/${KAZE_BACKEND})
 kaze_add_subplugin(filesys)
+
+if (KAZE_PLATFORM_ANDROID)
+    kaze_add_subplugin(android)
+endif()

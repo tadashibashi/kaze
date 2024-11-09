@@ -23,3 +23,9 @@ else()               # Default to at least build for Desktop
     set(KAZE_BACKEND_DEFAULT "glfw3")
     set(KAZE_BACKEND_SHARED_DEFAULT OFF)
 endif()
+
+if (ANDROID)
+    set(KAZE_USE_FMT_LIB_DEFAULT ON)
+else()
+    set(KAZE_USE_FMT_LIB_DEFAULT OFF)
+endif()

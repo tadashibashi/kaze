@@ -1190,6 +1190,22 @@ namespace backend {
         return true;
     }
 
+    auto window::setTextInputArea(WindowHandle window, Int x, Int y, Int w, Int h, Int offsetX) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        // no glfw3 implementation available
+        return true;
+    }
+
+    auto window::getTextInputArea(WindowHandle window, Int *outX, Int *outY, Int *outW, Int *outH, Int *outOffsetX) noexcept -> bool
+    {
+        RETURN_IF_NULL(window);
+
+        // no glfw3 implementation available
+        return true;
+    }
+
 } // namespace backend
 
 KAZE_NS_END

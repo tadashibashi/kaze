@@ -60,10 +60,10 @@ function (string_ends_with STR SUFFIX RESULT_VAR)
 endfunction()
 
 function(kaze_slugify STR OUT_VAR)
-    string(REGEX REPLACE "[_\\s]+" "-" STR "${STR}")
-    string(TOLOWER "${STR}" STR)
+    string(REGEX REPLACE "[_ \t\r\n]+" "-" SLUGIFIED_STR "${STR}")
+    string(TOLOWER "${SLUGIFIED_STR}" LOWER_STR)
 
-    set(${OUT_VAR} "${STR}" PARENT_SCOPE)
+    set(${OUT_VAR} "${LOWER_STR}" PARENT_SCOPE)
 endfunction()
 
 function(kaze_get_or_default VAR_NAME DEFAULT_VALUE OUT_VAR)
@@ -114,15 +114,20 @@ function(add_kaze_executable TARGET)
     set(multiValueArgs SOURCES)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    if (KAZE_PLATFORM_WINDOWS)
-        set(EXE_TYPE WIN32)
-    elseif(KAZE_PLATFORM_APPLE)
-        set(EXE_TYPE MACOSX_BUNDLE)
+    if (KAZE_PLATFORM_ANDROID)
+        add_library(${TARGET} STATIC) # To link to Android Ndk so library
     else()
-        set(EXE_TYPE "")
+        if (KAZE_PLATFORM_WINDOWS)
+            set(EXE_TYPE WIN32)
+        elseif(KAZE_PLATFORM_APPLE)
+            set(EXE_TYPE MACOSX_BUNDLE)
+        else()
+            set(EXE_TYPE "")
+        endif()
+
+        add_executable(${TARGET} ${EXE_TYPE})
     endif()
 
-    add_executable(${TARGET} ${EXE_TYPE})
     set(BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
     # Normalize the output directories in case of multi-config.
@@ -152,10 +157,10 @@ function(add_kaze_executable TARGET)
     endif()
 
     if (IN_KAZE_TK)
-        target_link_libraries(${TARGET} PRIVATE kaze_tk)
+        target_link_libraries(${TARGET} PUBLIC kaze_tk)
         kaze_copy_builtin_assets(${TARGET} "")
     else()
-        target_link_libraries(${TARGET} PRIVATE kaze)
+        target_link_libraries(${TARGET} PUBLIC kaze)
     endif()
 
     # Get app name and slug
@@ -289,7 +294,7 @@ function(add_kaze_executable TARGET)
             XCODE_EMBED_FRAMEWORKS_CODE_SIGN_ON_COPY    YES
             XCODE_EMBED_RESOURCES_CODE_SIGN_ON_COPY     YES
             XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY          "${CODE_SIGN_ID}"
-            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER   "io.kaze.example.gui"
+            XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER   "${BUNDLE_ID}"
             XCODE_ATTRIBUTE_GENERATE_INFOPLIST_FILE     NO
             ${XCODE_DEPLOYMENT_TARGET_VARNAME}          ${MACOSX_DEPLOYMENT_TARGET}
             OUTPUT_NAME                                 "${APP_NAME}"

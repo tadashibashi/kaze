@@ -7,7 +7,6 @@
 #include <array>
 #include <cassert>
 #include <cstdint>
-#include <format>
 #include <map>
 #include <string>
 #include <string_view>
@@ -15,6 +14,15 @@
 #include <unordered_set>
 #include <vector>
 #include <variant>
+
+// Format lib
+#if KAZE_USE_FMT_LIB
+#include <spdlog/fmt/fmt.h>
+namespace fmt_lib = fmt;
+#else
+#include <format>
+namespace fmt_lib = std;
+#endif
 
 #ifndef KAZE_NAMESPACE
 #define KAZE_NAMESPACE kaze
@@ -83,9 +91,6 @@ using Array = std::array<T, Size>;
 
 using String = std::string;
 using StringView = std::string_view;
-
-using std::format;
-using std::formatter;
 
 template <typename Class, typename T>
 Size byteOffsetOf(T Class::*member)

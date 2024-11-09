@@ -14,11 +14,11 @@ KAZE_NS_BEGIN
 
 /// Application init object
 struct AppInit {
-    String title           {String("")}; ///< App title bar text
-    Vec2i size             {640, 480};   ///< Initial window size
-    Color clearColor       {100, 154, 206, 235}; ///< Default background clear color
-    Double targetFPS = 60.0;
-    WindowInit::Flags flags{};           ///< Initial window attribute flags, can be or'd together
+    String title                 {String("")}; ///< App title bar text
+    Vec2i size                   {640, 480};   ///< Initial window size
+    Color clearColor             {100, 154, 206, 235}; ///< Default background clear color
+    Double targetFPS             {60.0};
+    WindowInit::Flags flags      {};           ///< Initial window attribute flags, can be or'd together
     Size maxTransientVBufferSize {4000 * 1024};
     Size maxTransientIBufferSize {6000 * 1024};
 };

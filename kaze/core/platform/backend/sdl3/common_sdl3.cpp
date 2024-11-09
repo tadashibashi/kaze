@@ -1,6 +1,7 @@
 /// \file PlatformBackend_globals.cpp
 /// Implementation for constant conversions and global variables
 #include "common_sdl3.h"
+#include "SDL3/SDL_events.h"
 #include "window_sdl3.h"
 #include "private/GamepadConstants.inl"
 #include "private/KeyboardConstants.inl"
@@ -62,39 +63,36 @@ namespace backend {
     auto initGlobals() noexcept -> void
     {
         // Initialize SDL key to kaze::Key array
-        if (s_sdlKeyToKey[SDL_SCANCODE_Z] == 0)
+        for (int i = 0; i < s_sdlKeyToKey.size(); ++i)
+            s_sdlKeyToKey[i] = -1;
+
+        for (Uint16 i = 0; const auto key : s_keyToSdlKey)
         {
-            for (Uint16 i = 0; const auto key : s_keyToSdlKey)
-            {
-                s_sdlKeyToKey[key] = i++;
-            }
+            s_sdlKeyToKey[key] = i++;
         }
 
         // Initialize SDL gamepad buttons to kaze::GamepadBtn array
-        if (s_sdlToGamepadButton[SDL_GAMEPAD_BUTTON_COUNT-1] == 0)
+        for (int i = 0; i < s_sdlToGamepadButton.size(); ++i)
+            s_sdlToGamepadButton[i] = -1;
+        for (Uint8 i = 0; const auto btn : s_gamepadButtonToSDL)
         {
-            for (Uint8 i = 0; const auto btn : s_gamepadButtonToSDL)
-            {
-                s_sdlToGamepadButton[btn] = i++;
-            }
+            s_sdlToGamepadButton[btn] = i++;
         }
 
         // Initialize SDL gamepad axis to kaze::GamepadAxis array
-        if (s_sdlToGamepadAxis[SDL_GAMEPAD_AXIS_COUNT-1] == 0)
+        for (int i = 0; i < s_sdlToGamepadAxis.size(); ++i)
+            s_sdlToGamepadAxis[i] = -1;
+        for (Uint8 i = 0; const auto axis : s_gamepadAxisToSDL)
         {
-            for (Uint8 i = 0; const auto axis : s_gamepadAxisToSDL)
-            {
-                s_sdlToGamepadAxis[axis] = i++;
-            }
+            s_sdlToGamepadAxis[axis] = i++;
         }
 
         // Initialize SDL mouse buttons
-        if (s_toMouseButton[SDL_BUTTON_X2] == (MouseBtn)0)
+        for (int i = 0; i < s_toMouseButton.size(); ++i)
+            s_toMouseButton[i] = (MouseBtn)-1;
+        for (Uint8 i = 0; const auto button : s_toSDLMouseButton)
         {
-            for (Uint8 i = 0; const auto button : s_toSDLMouseButton)
-            {
-                s_toMouseButton[button] = (MouseBtn)i++;
-            }
+            s_toMouseButton[button] = (MouseBtn)i++;
         }
     }
 
@@ -245,13 +243,18 @@ namespace backend {
             case SDL_EVENT_KEY_UP:
             case SDL_EVENT_KEY_DOWN:
                 {
-                    const auto window = SDL_GetWindowFromID(e.wheel.windowID);
-                    events.emit(KeyboardEvent {
-                        .key      = backend::toKey(e.key.scancode),
-                        .isDown     = e.key.down,
-                        .isRepeat = e.key.repeat,
-                        .window = window,
-                    });
+                    const auto key = backend::toKey(e.key.scancode);
+                    if (key != Key::Unknown)
+                    {
+                        const auto window = SDL_GetWindowFromID(e.wheel.windowID);
+                        events.emit(KeyboardEvent {
+                            .key      = key,
+                            .isDown   = e.key.down,
+                            .isRepeat = e.key.repeat,
+                            .window = window,
+                        });
+                    }
+
                 } break;
 
             case SDL_EVENT_MOUSE_WHEEL:
@@ -275,12 +278,16 @@ namespace backend {
             case SDL_EVENT_MOUSE_BUTTON_UP:
             case SDL_EVENT_MOUSE_BUTTON_DOWN:
                 {
-                    const auto window = SDL_GetWindowFromID(e.button.windowID);
-                    events.emit(MouseButtonEvent {
-                        .button = toMouseBtn(e.button.button),
-                        .isDown = e.button.down,
-                        .window = window
-                    });
+                    const auto button = backend::toMouseBtn(e.button.button);
+                    if (button != MouseBtn::Unknown)
+                    {
+                        const auto window = SDL_GetWindowFromID(e.button.windowID);
+                        events.emit(MouseButtonEvent {
+                            .button = button,
+                            .isDown = e.button.down,
+                            .window = window
+                        });
+                    }
                 } break;
 
             case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
@@ -406,59 +413,58 @@ namespace backend {
                         });
                     }
                 } break;
-
             case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
             case SDL_EVENT_GAMEPAD_BUTTON_UP:
                 {
-                    auto gamepad = SDL_GetGamepadFromID(e.gbutton.which);
-                    if (gamepad)
+                    const auto button = backend::toGamepadBtn(static_cast<SDL_GamepadButton>(e.gbutton.button));
+                    if (button == GamepadBtn::Unknown) break;
+
+                    const auto gamepad = SDL_GetGamepadFromID(e.gbutton.which);
+                    if ( !gamepad ) break;
+
+                    auto props = SDL_GetGamepadProperties(gamepad);
+                    if ( !props ) break;
+
+                    auto data = static_cast<GamepadData *>(SDL_GetPointerProperty(props, GamepadMgr::DataKey, nullptr));
+                    if ( !data ) break;
+
+                    if (data->controllerIndex >= 0)
                     {
-                        auto props = SDL_GetGamepadProperties(gamepad);
-                        if (props)
-                        {
-                            auto data = static_cast<GamepadData *>(SDL_GetPointerProperty(props, GamepadMgr::DataKey, nullptr));
-                            if (data)
-                            {
-                                if (data->controllerIndex >= 0)
-                                {
-                                    const auto event = GamepadButtonEvent {
-                                        .controllerIndex = data->controllerIndex,
-                                        .type = e.gbutton.down ? GamepadButtonEvent::Down : GamepadButtonEvent::Up,
-                                        .button = backend::toGamepadBtn(static_cast<SDL_GamepadButton>(e.gbutton.button)),
-                                    };
-                                    backend::gamepads.processEvent(event);
-                                    backend::events.emit(event);
-                                }
-                            }
-                        }
+                        const auto event = GamepadButtonEvent {
+                            .controllerIndex = data->controllerIndex,
+                            .type = e.gbutton.down ? GamepadButtonEvent::Down : GamepadButtonEvent::Up,
+                            .button = button,
+                        };
+                        backend::gamepads.processEvent(event);
+                        backend::events.emit(event);
                     }
                 } break;
 
             case SDL_EVENT_GAMEPAD_AXIS_MOTION:
                 {
+                    const auto axis = backend::toGamepadAxis( static_cast<SDL_GamepadAxis>(e.gaxis.axis) );
+                    if (axis == GamepadAxis::Unknown) break;
+
                     auto gamepad = SDL_GetGamepadFromID(e.gaxis.which);
-                    if (gamepad)
+                    if ( !gamepad ) break;
+
+                    auto props = SDL_GetGamepadProperties(gamepad);
+                    if ( !props ) break;
+
+                    auto data = static_cast<GamepadData *>(SDL_GetPointerProperty(props, GamepadMgr::DataKey, nullptr));
+                    if ( !data ) break;
+
+                    if (data->controllerIndex >= 0)
                     {
-                        auto props = SDL_GetGamepadProperties(gamepad);
-                        if (props)
-                        {
-                            auto data = static_cast<GamepadData *>(SDL_GetPointerProperty(props, GamepadMgr::DataKey, nullptr));
-                            if (data)
-                            {
-                                if (data->controllerIndex >= 0)
-                                {
-                                    const auto event = GamepadAxisEvent {
-                                        .controllerIndex = data->controllerIndex,
-                                        .axis = backend::toGamepadAxis( static_cast<SDL_GamepadAxis>(e.gaxis.axis) ),
-                                        .value = e.gaxis.value > 0 ?
-                                            (float)e.gaxis.value / (float)std::numeric_limits<decltype(e.gaxis.value)>::max() :
-                                            (float)e.gaxis.value / -(float)std::numeric_limits<decltype(e.gaxis.value)>::min(),
-                                    };
-                                    gamepads.processEvent(event);
-                                    events.emit(event);
-                                }
-                            }
-                        }
+                        const auto event = GamepadAxisEvent {
+                            .controllerIndex = data->controllerIndex,
+                            .axis = axis,
+                            .value = e.gaxis.value > 0 ?
+                                (float)e.gaxis.value / (float)std::numeric_limits<decltype(e.gaxis.value)>::max() :
+                                (float)e.gaxis.value / -(float)std::numeric_limits<decltype(e.gaxis.value)>::min(),
+                        };
+                        gamepads.processEvent(event);
+                        events.emit(event);
                     }
                 } break;
 

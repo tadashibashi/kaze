@@ -5,12 +5,59 @@
 #include <filesystem>
 #include <fstream>
 
-KAZE_NS_BEGIN
-
 /// Number of bytes read in iterations, as opposed to all at once
-constexpr int BytesPerRead = 1024;
+static constexpr int BytesPerRead = 1024;
 /// Number of bytes written in iterations, as opposed to all at once
-constexpr int BytesPerWrite = 1024;
+static constexpr int BytesPerWrite = 1024;
+
+#if KAZE_PLATFORM_ANDROID
+#include <kaze/core/platform/android/AndroidNative.h>
+#include <android/asset_manager.h>
+static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, KAZE_NS::Size *outSize) -> KAZE_NS::Bool
+{
+    USING_KAZE_NS;
+
+    if (path.size() <= 9) // "bundle://" is the prefix
+    {
+        KAZE_PUSH_ERR(Error::InvalidArgErr, "path was not a valid apk path");
+        return False;
+    }
+
+    const auto actualPath = path.substr(9);
+    const auto actualPathStr = String(actualPath.data(), actualPath.size()); // ensure it's null-terminated properly
+
+    auto asset = android::openAssetStream(actualPathStr.c_str());
+    if ( !asset )
+    {
+        KAZE_PUSH_ERR(Error::RuntimeErr, "failed to open file from apk at: {}", actualPathStr);
+        return False;
+    }
+
+    // Get the size
+    const auto size = AAsset_getLength64(asset);
+    if (size == 0)
+    {
+        KAZE_PUSH_ERR(Error::RuntimeErr, "file had zero bytes");
+        return false;
+    }
+
+    const auto buf = (Ubyte *)memory::alloc(size);
+    for  (Int64 i = 0; i < size;)
+    {
+        const auto bytesRead = AAsset_read(asset, buf + i, BytesPerRead);
+        if (bytesRead < BytesPerRead)
+            break;
+        i += bytesRead;
+    }
+
+    *outData = buf;
+    *outSize = size;
+    return true;
+}
+
+#endif
+
+KAZE_NS_BEGIN
 
 static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
 {
@@ -33,8 +80,8 @@ static auto loadFile(std::ifstream &file, Ubyte *data, Size size) -> Bool
     }
 
     Int64 b = 0;
-    for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerRead); 
-        b <= limit; 
+    for (const Int64 limit = static_cast<Int64>(size) - static_cast<Int64>(BytesPerRead);
+        b <= limit;
         b += BytesPerRead)
     {
         if ( !file.read((char *)data + b, BytesPerRead) )
@@ -66,6 +113,13 @@ auto file::load(StringView path, Ubyte **outData, Size *outSize) -> Bool
         KAZE_PUSH_ERR(Error::NullArgErr, "Required param `path.data()` was null");
         return KAZE_FALSE;
     }
+
+#if KAZE_PLATFORM_ANDROID
+    if (path.starts_with("bundle://"))
+    {
+        return loadFileFromApk(path, outData, outSize);
+    }
+#endif
 
     std::ifstream file(path.data(), std::ios::in | std::ios::binary);
     if ( !file.is_open() )

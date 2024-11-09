@@ -6,6 +6,7 @@ KAZE_NS_BEGIN
 
 enum class MouseAxis
 {
+    Unknown = -1,
     ScrollX,
     ScrollY,
     Count
@@ -13,6 +14,7 @@ enum class MouseAxis
 
 enum class MouseBtn
 {
+    Unknown = -1,
     Left,
     Right,
     Middle,

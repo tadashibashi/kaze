@@ -37,7 +37,7 @@ struct Vec
     constexpr auto at(Size i) -> T &
     {
         if (i >= S)
-            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
+            throw std::out_of_range(fmt_lib::format("index must be less than {}, but got {}", S, i));
         return data[i];
     }
 
@@ -45,7 +45,7 @@ struct Vec
     constexpr auto at(Size i) const -> const T &
     {
         if (i >= S)
-            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
+            throw std::out_of_range(fmt_lib::format("index must be less than {}, but got {}", S, i));
         return data[i];
     }
 
@@ -114,7 +114,7 @@ public:
     constexpr auto at(const Size i) -> T &
     {
         if (i >= S)
-            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
+            throw std::out_of_range(fmt_lib::format("index must be less than {}, but got {}", S, i));
         return derived()[i];
     }
 
@@ -125,7 +125,7 @@ public:
     constexpr auto at(const Size i) const -> const T &
     {
         if (i >= S)
-            throw std::out_of_range(format("index must be less than {}, but got {}", S, i));
+            throw std::out_of_range(fmt_lib::format("index must be less than {}, but got {}", S, i));
         return derived()[i];
     }
 
@@ -332,7 +332,7 @@ public:
     {
         Vec<diff_t, S> diff;
         if constexpr (std::is_signed_v<T>)
-            diff = target - *this;
+            diff = target - (Vec<T, S>)*this;
         else
             diff = static_cast<Vec<diff_t, S>>(target) - static_cast<Vec<diff_t, S>>(*this);
 

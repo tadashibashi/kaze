@@ -1,9 +1,7 @@
 #include "common.h"
-
 #include <string>
 #include <string_view>
 #include <fstream>
-#include <format>
 
 struct Brackets
 {
@@ -86,8 +84,7 @@ struct InAttributeType
                 int index = name[5] - '0';
                 if (index < 0 || index > 3)
                 {
-                    throw std::out_of_range(
-                        std::format("Color index {} is out of range: make sure to limit 4 Color attributes", index));
+                    throw std::out_of_range("Color index is out of range: make sure to limit 4 Color attributes");
                 }
 
                 return static_cast<Enum>(Color0 + index);
@@ -117,8 +114,7 @@ struct InAttributeType
                 int index = name[8] - '0';
                 if (index < 0 || index > 7)
                 {
-                    throw std::out_of_range(
-                        std::format("TexCoord index {} is out of range: make sure to limit 8 TexCoord attributes", index));
+                    throw std::out_of_range("TexCoord index is out of range: make sure to limit 8 TexCoord attributes");
                 }
 
                 return static_cast<Enum>(TexCoord0 + index);

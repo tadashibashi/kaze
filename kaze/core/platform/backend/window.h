@@ -8,8 +8,8 @@ KAZE_NS_BEGIN
 namespace backend::window {
     /// Window native platform pointers
     struct NativePlatformData {
-        void *windowHandle;
-        void *displayType;
+        void *windowHandle = {};
+        void *displayType = {};
 
         enum class WindowType {
             Default = 0,
@@ -307,6 +307,10 @@ namespace backend::window {
     /// \param[out]  outValue  retrieves whether text input events are enabled
     /// \returns whether the retrieval succeeded
     auto isTextInputActive(WindowHandle window, bool *outValue) noexcept -> bool;
+
+    auto setTextInputArea(WindowHandle window, Int x, Int y, Int w, Int h, Int offsetX) noexcept -> bool;
+
+    auto getTextInputArea(WindowHandle window, Int *outX, Int *outY, Int *outW, Int *outH, Int *outOffsetX) noexcept -> bool;
 }
 
 KAZE_NS_END

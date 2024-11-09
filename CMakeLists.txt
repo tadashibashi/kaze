@@ -44,6 +44,7 @@ set(KAZE_BUILD_TESTS   ${KAZE_IS_ROOT}       CACHE BOOL   "Make kaze unit tests 
 # This is buggy with BGFX so turned off for now
 set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland support on Linux" FORCE)
 
+set(KAZE_USE_FMT_LIB   ${KAZE_USE_FMT_LIB_DEFAULT}      CACHE BOOL   "Use fmt internal library instead of C++20 std::format")
 
 # ----- Kaze Toolkit Options -----
 set(KAZE_TK_IMGUI_PLUGIN  ON CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")

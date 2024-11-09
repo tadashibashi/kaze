@@ -1,7 +1,7 @@
 #include <kaze/core/kmain.h>
 #include <kaze/core/platform/defines.h>
 
-#if defined(KAZE_PLATFORM_WINDOWS)
+#if KAZE_PLATFORM_WINDOWS
 #include <windows.h>
 
 static PCHAR* CommandLineToArgvA(

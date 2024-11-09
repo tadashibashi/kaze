@@ -12,6 +12,7 @@ namespace plugins::imgui {
 struct ImGuiKazeContext {
     ImGuiContext *context;
     WindowHandle window;
+    WindowHandle imeWindow{};
     Int viewId;
     Float fontSize;
     Double lastTime = 0;

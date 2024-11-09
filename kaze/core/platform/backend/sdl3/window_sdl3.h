@@ -4,6 +4,7 @@
 
 #include <kaze/core/lib.h>
 #include <kaze/core/platform/backend/backend.h>
+#include <kaze/core/platform/defines.h>
 
 KAZE_NS_BEGIN
 namespace backend {
@@ -14,6 +15,7 @@ namespace backend {
         bool isHovered{false};
         bool cursorVisibleMode{true};
         CursorHandle cursor{};
+        Uint textInputPropsId{};
     };
 
     /// Get window data associated with the window handle, if any

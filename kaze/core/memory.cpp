@@ -93,7 +93,7 @@ auto realloc(void *memory, Size size) noexcept -> void *
 auto reallocAlign(void *alignedMem, Size oldSize, Size newSize, Size alignment) noexcept -> void *
 {
     KAZE_ASSERT((uintptr_t)alignedMem % alignment == 0,
-        format("memory passed to `reallocAlign` must have an `alignment` of: {}", alignment));
+        fmt_lib::format("memory passed to `reallocAlign` must have an `alignment` of: {}", alignment));
 
     if ( !alignedMem )
     {
