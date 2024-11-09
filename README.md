@@ -30,12 +30,14 @@ Tested Compilers
 - Emscripten 20
 - GCC 13
 - MSVC 17 (Visual Studio 2022)
+- Android NDK 28
 
 Tested Target Platforms
 - MacOS Sonoma 14.6.1 - M1
 - Linux Ubuntu 24.04 LTS - Arm64
 - Windows 11 - Arm64
 - iOS 16.3+ (to_chars floating point overload implemented in 16.3)
+- Android 15
 - Chrome, Safari
 
 *Linux Requirements*
@@ -68,3 +70,41 @@ Powershell
 scripts\setup.ps1
 kz run kaze_test_01_app
 ```
+
+### Other Platform Builds
+
+#### iOS
+```sh
+cmake -B build/ios -S . -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_BUILD_TYPE=Debug
+```
+
+##### Emulator build
+Open the generated Xcode project in Xcode. It should run in an emulator out of the box.
+
+##### Hardware build
+To test on hardware, you'll need an Apple Developer account.
+Make sure your device is registered with your Apple Account, and recognized by and connected to your Mac.
+
+Then, in the Xcode, under the executable project's "Signing & Capabilities", make sure to tick
+"Automatically manage signing". Then select your account under "Team" dropdown menu.
+(The UI for these settings may vary by Xcode version. I'm currently on Xcode 16.1)
+
+Now the project should run on your connected device.
+
+#### Android
+Currently, only test/01_app has a working Android project.
+Open the "android" folder in Android Studio, and with the latest Android SDK and NDK installed
+(SDK v35, NDK v28, as of writing these instructions) it should build and run.
+
+#### WebGL
+You'll need Emsdk installed on your system.
+Place a `.env` file in your project's root directory with an EMSDK variable with an absolute path to the root
+of the installation. Make sure the latest version of Emscripten has been installed and activated (v20 as of
+writing these instructions).
+
+Make sure to source the proper tools/setup file on your OS as shown above.
+```bash
+kz run ktest_01_app -p emscripten
+```
+
+A default browser should open with the project running in it
