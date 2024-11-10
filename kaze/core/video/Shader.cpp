@@ -62,8 +62,8 @@ String Shader::makePath(const StringView folder, const StringView shaderName)
     {
     case bgfx::RendererType::OpenGLES:   subFolder = "essl"; break;
     case bgfx::RendererType::OpenGL:     subFolder = "glsl"; break;
-    case bgfx::RendererType::Vulkan:     subFolder = "spv"; break;
-    case bgfx::RendererType::Metal:      subFolder = "mtl"; break;
+    case bgfx::RendererType::Vulkan:     subFolder = "spirv"; break;
+    case bgfx::RendererType::Metal:      subFolder = "metal"; break;
     case bgfx::RendererType::Direct3D11: subFolder = "dx11"; break;
     case bgfx::RendererType::Direct3D12: subFolder = "dx12"; break;
     default:

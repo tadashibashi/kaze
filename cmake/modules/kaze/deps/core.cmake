@@ -100,7 +100,7 @@ FetchContent_MakeAvailable(spdlog)
 # Copyright (c) 2010-2024 - Branimir Karadzic
 FetchContent_Declare(bgfx-cmake
     GIT_REPOSITORY https://github.com/bkaradzic/bgfx.cmake
-    GIT_TAG        v1.128.8808-482
+    GIT_TAG        v1.128.8832-486
 )
 set(BX_AMALGAMATED             OFF CACHE BOOL "")
 set(BGFX_AMALGAMATED           OFF CACHE BOOL "")
