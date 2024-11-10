@@ -30,7 +30,15 @@ auto RstreamableAAsset::cleanupAsset() -> void
 
 auto RstreamableAAsset::openFile(const String &path) -> Bool
 {
-    const auto asset = android::openAssetStream(path.c_str());
+    return openFile(path, false);
+}
+
+auto RstreamableAAsset::openFile(const String &path, bool inMemory) -> Bool
+{
+    AAsset *asset = inMemory ?
+        android::openAsset(path.c_str()) :
+        android::openAssetStream(path.c_str());
+
     if ( !asset )
     {
         return False;
@@ -43,6 +51,7 @@ auto RstreamableAAsset::openFile(const String &path) -> Bool
     m_eof = False;
     m_pos = 0;
     m_size = static_cast<Int64>(length);
+
     return True;
 }
 

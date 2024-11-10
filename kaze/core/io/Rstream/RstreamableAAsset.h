@@ -13,6 +13,7 @@ public:
     ~RstreamableAAsset() override;
 
     auto openFile(const String &path) -> Bool override;
+    auto openFile(const String &path, bool inMemory) -> Bool;
 
     auto close() -> void override;
 

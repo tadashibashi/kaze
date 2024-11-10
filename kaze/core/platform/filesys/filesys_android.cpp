@@ -6,7 +6,7 @@ KAZE_NS_BEGIN
 namespace filesys {
     auto getBaseDir() -> String
     {
-        return "bundle://";
+        return "apk://";
     }
 
     auto getUserDir(StringView companyName, StringView appName) -> String

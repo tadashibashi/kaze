@@ -1,14 +1,9 @@
 #pragma once
-
 #include <kaze/core/lib.h>
 
-KAZE_NS_BEGIN
+#include "StreamBase.h"
 
-enum class SeekBase {
-    Begin,
-    Current,
-    End
-};
+KAZE_NS_BEGIN
 
 class Rstreamable {
 public:

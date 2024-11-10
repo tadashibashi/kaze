@@ -13,6 +13,8 @@ set(KAZE_IO_SOURCES_PRIVATE
     io.h
     StructLayout.h
 
+    Rstream/Rstream.cpp
+    Rstream/Rstream.h
     Rstream/Rstreamable.h
     Rstream/RstreamableFile.cpp
     Rstream/RstreamableFile.h

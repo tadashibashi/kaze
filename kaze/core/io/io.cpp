@@ -17,7 +17,7 @@ static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, 
 {
     USING_KAZE_NS;
 
-    if (path.size() <= 9) // "bundle://" is the prefix
+    if (path.size() <= 6) // "apk://" is the prefix
     {
         KAZE_PUSH_ERR(Error::InvalidArgErr, "path was not a valid apk path");
         return False;
@@ -38,6 +38,7 @@ static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, 
     if (size == 0)
     {
         KAZE_PUSH_ERR(Error::RuntimeErr, "file had zero bytes");
+        AAsset_close(asset);
         return false;
     }
 
@@ -45,6 +46,13 @@ static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, 
     for  (Int64 i = 0; i < size;)
     {
         const auto bytesRead = AAsset_read(asset, buf + i, BytesPerRead);
+        if (bytesRead < 0)
+        {
+            memory::free(buf);
+            AAsset_close(asset);
+            KAZE_PUSH_ERR(Error::RuntimeErr, "Error during AAsset_read");
+            return false;
+        }
         if (bytesRead < BytesPerRead)
             break;
         i += bytesRead;
@@ -52,6 +60,7 @@ static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, 
 
     *outData = buf;
     *outSize = size;
+    AAsset_close(asset);
     return true;
 }
 
@@ -115,7 +124,7 @@ auto file::load(StringView path, Ubyte **outData, Size *outSize) -> Bool
     }
 
 #if KAZE_PLATFORM_ANDROID
-    if (path.starts_with("bundle://"))
+    if (path.starts_with("apk://"))
     {
         return loadFileFromApk(path, outData, outSize);
     }

@@ -74,7 +74,7 @@ namespace android {
         return openAssetImpl(filename, AASSET_MODE_STREAMING);
     }
 
-    auto closeAsset(AAsset *asset)
+    auto closeAsset(AAsset *asset) -> void
     {
         AAsset_close(asset);
     }
