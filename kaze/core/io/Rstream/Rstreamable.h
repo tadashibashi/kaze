@@ -1,7 +1,7 @@
 #pragma once
 #include <kaze/core/lib.h>
 
-#include "StreamBase.h"
+#include "SeekBase.h"
 
 KAZE_NS_BEGIN
 

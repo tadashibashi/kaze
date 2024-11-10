@@ -2,7 +2,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/MemView.h>
 
-#include "StreamBase.h"
+#include "SeekBase.h"
 
 KAZE_NS_BEGIN
 
