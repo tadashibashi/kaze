@@ -43,5 +43,5 @@ add_library(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME} PUBLIC kaze)
 
 if (KAZE_TK_IMGUI_PLUGIN)
-    kaze_target_plugin(kaze_tk plugins/imgui)
+    kaze_target_module(kaze_tk plugins/imgui)
 endif()

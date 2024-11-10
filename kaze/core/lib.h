@@ -69,7 +69,7 @@ using Double = double;
 
 using Bool = bool;
 
-auto Null = nullptr;
+constexpr auto Null = nullptr;
 
 template <typename ...Types>
 using Variant = std::variant<Types...>;

@@ -9,6 +9,7 @@ KAZE_NS_BEGIN
 namespace android {
     auto openAsset(const char *filename) -> AAsset *; ///< Intended for single read into a buffer
     auto openAssetStream(const char *filename) -> AAsset *; ///< Intended for streaming multiple reads
+    auto closeAsset(AAsset *asset);
     auto getDefaultSampleRate() -> int;
     auto getDefaultFramesPerBuffer() -> int;
     auto getDataDirectory() -> const String &;

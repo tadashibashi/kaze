@@ -74,6 +74,11 @@ namespace android {
         return openAssetImpl(filename, AASSET_MODE_STREAMING);
     }
 
+    auto closeAsset(AAsset *asset)
+    {
+        AAsset_close(asset);
+    }
+
     auto getDefaultSampleRate() -> int
     {
         return defaultSampleRate;

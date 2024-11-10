@@ -7,8 +7,7 @@ endif()
 include(kaze/deps/core)
 
 add_library(kaze)
-kaze_target_plugin(kaze platform)
-
+kaze_target_modules(kaze platform io)
 target_include_directories(kaze SYSTEM PUBLIC ${KAZE_ROOT})
 
 target_link_libraries(kaze PUBLIC
@@ -57,18 +56,6 @@ target_sources(kaze PRIVATE
         input/Mouse.cpp
         input/MouseConstants.h
 
-        io/BufferIO.h
-        io/BufferIO.cpp
-        io/BufferView.h
-        io/BufferView.cpp
-        io/BufferWriter.h
-        io/BufferWriter.cpp
-        io/FileBuffer.h
-        io/FileBuffer.cpp
-        io/io.h
-        io/io.cpp
-        io/StructLayout.h
-
         macros/enum.h
         macros/map.h
 
@@ -87,12 +74,6 @@ target_sources(kaze PRIVATE
         math/Vec.hpp
         math/private/mat4f.h
         math/private/mat4f.cpp
-
-        platform/backend/backend.h
-        platform/backend/backend.cpp
-        platform/BackendInitGuard.h
-        platform/BackendInitGuard.cpp
-        platform/defines.h
 
         video/Color.h
         video/Color.cpp

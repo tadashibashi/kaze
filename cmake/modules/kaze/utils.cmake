@@ -1,5 +1,5 @@
 include(kaze/utils/shaders)
-include(kaze/utils/plugins)
+include(kaze/utils/modules)
 
 # Behaves like `option` but for string values
 # Arguments:

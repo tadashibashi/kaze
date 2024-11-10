@@ -1,5 +1,5 @@
 # GLFW3 Backend Plugin
-set (KAZE_PLUGIN_NAME KAZE_BACKEND)
+set (KAZE_MODULE_NAME KAZE_BACKEND)
 
 if (EMSCRIPTEN)
     set(KAZE_BACKEND_LINK_OPTS_PUBLIC --use-port=contrib.glfw3)

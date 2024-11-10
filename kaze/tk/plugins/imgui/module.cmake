@@ -1,4 +1,4 @@
-set(KAZE_PLUGIN_NAME IMGUI)
+set(KAZE_MODULE_NAME IMGUI)
 
 set(IMGUI_SOURCES_PRIVATE
     imgui_plugin.cpp
