@@ -108,8 +108,10 @@ private:
         }) )
             return False;
 
-        computerScoreSnd = audio.createSound( (baseDir / "assets/computer_score.wav").string(), Sound::InMemory);
-        playerScoreSnd = audio.createSound( (baseDir / "assets/player_score.wav").string(), Sound::InMemory);
+        computerScoreSnd = audio.createSound( (baseDir / "assets/computer_score.wav").string(),
+            Sound::InMemory | Sound::OneShot);
+        playerScoreSnd = audio.createSound( (baseDir / "assets/player_score.wav").string(),
+            Sound::InMemory | Sound::OneShot);
         if ( !computerScoreSnd || !playerScoreSnd )
             return False;
 

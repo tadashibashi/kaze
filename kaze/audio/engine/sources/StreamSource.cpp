@@ -46,7 +46,7 @@ StreamSource::~StreamSource()
 
 auto StreamSource::isOpen() const -> Bool
 {
-    return m != nullptr && m->decoder.isOpen();
+    return m != Null && m->decoder.isOpen();
 }
 
 auto StreamSource::openConstMem(const MemView<void> mem) -> Bool

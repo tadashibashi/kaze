@@ -2,6 +2,7 @@
 #include <kaze/audio/engine/AudioContext.h>
 
 #include <kaze/audio/conv/extern/miniaudio/miniaudio_ext.h>
+#include <kaze/core/io/io.h>
 #include <kaze/core/platform/defines.h>
 
 #include "sources/AudioBus.h"
@@ -129,8 +130,22 @@ auto Sound::openFile(const String &filename, InitFlags flags, const AudioSpec &t
     // force in-memory streams in Emscripten builds, since it does not support streaming via the virtual FS.
     flags |= Sound::InMemory;
 #endif
+    if (flags & InMemory)
+    {
+        Ubyte *fileData;
+        Size fileSize;
+        if ( !file::load(filename, &fileData, &fileSize) )
+        {
+            return False;
+        }
 
-    m->data = filename;
+        m->data = ManagedMem(fileData, fileSize);
+    }
+    else
+    {
+        m->data = filename;
+    }
+
     m->targetSpec = targetSpec;
     m->flags = flags;
     m->markers.swap(markers);
@@ -297,10 +312,21 @@ auto Sound::instantiate(AudioContext *context, Bool paused, Handle<AudioBus> bus
     const Bool oneShot = m->flags & Sound::OneShot;
     const Bool inMemory = m->flags & Sound::InMemory;
 
+    Variant< ManagedMem, MemView<void>, String > data;
+    if (m->data.index() == 0)
+    {
+        const auto mem = std::get<ManagedMem>(m->data);
+        data = MemView<void>(mem.data(), mem.size());
+    }
+    else
+    {
+        data = m->data;
+    }
+
     const Handle<AudioSource> source = context->createObject<StreamSource>(
         StreamSourceInit {
             .context = context,
-            .pathOrMemory = m->data,
+            .pathOrMemory = data,
             .parentClock = parentClock,
             .paused = paused,
             .isLooping = looping,
