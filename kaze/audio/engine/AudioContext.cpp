@@ -15,27 +15,6 @@ auto AudioContext::getSpec() const -> const AudioSpec &
     return m_device->getSpec();
 }
 
-auto AudioContext::audioCallback(void *userptr, AlignedList<Ubyte, 16> *outBuffer) -> void
-{
-    const auto context = static_cast<AudioContext *>(userptr);
-    if ( !context->isOpen() )
-        return;
-
-    const auto lockGuard = std::lock_guard(context->m_mixMutex);
-    // Process commands that require sample-accurate immediacy
-    // TODO: not sure why, but deferred command lock guard was set here in original repo.
-    //       This may need to be added for some reason...
-    //       Also processImmediateCommands was unlocked.
-    context->m_immediateCmds.processCommandsLocked();
-
-    const auto bufSize = outBuffer->size();
-    context->m_masterBus->read(Null, static_cast<Int64>(bufSize));
-    context->m_clock += bufSize / (2 * sizeof(Float)); // we currently only support stereo float output
-    context->m_masterBus->updateParentClock(context->m_clock);
-
-    context->m_masterBus->swapBuffers(outBuffer);
-}
-
 auto AudioContext::open(const AudioContextOpen &config) -> Bool
 {
     if (m_device->isOpen()) // Currently only allows one open
@@ -63,7 +42,6 @@ auto AudioContext::open(const AudioContextOpen &config) -> Bool
     }
 
     m_masterBus = bus;
-    //m_masterBus->setPaused(False);
     m_device->resume();
     return True;
 }
@@ -81,7 +59,7 @@ auto AudioContext::close() -> void
             m_deferredCmds.processCommandsLocked();
 
             m_masterBus->processRemovals();
-            releaseObject(m_masterBus);
+            releaseObjectImpl(m_masterBus);
             m_masterBus = {};
         }
 
@@ -103,8 +81,35 @@ AudioContext::~AudioContext()
 
 auto AudioContext::flagRemoveSource() -> void
 {
-    const auto lockGuard = std::lock_guard(m_mixMutex);
+    //const auto lockGuard = std::lock_guard(m_mixMutex);
     m_removeSourceFlag = True;
+}
+
+auto AudioContext::audioCallback(void *userptr, AlignedList<Ubyte, 16> *outBuffer) -> void
+{
+    const auto context = static_cast<AudioContext *>(userptr);
+    if ( !context->isOpen() )
+        return;
+
+    const auto lockGuard = std::lock_guard(context->m_mixMutex);
+    // Process commands that require sample-accurate immediacy
+    // TODO: not sure why, but deferred command lock guard was set here in original repo.
+    //       This may need to be added for some reason...
+    //       Also processImmediateCommands was unlocked.
+    context->m_immediateCmds.processCommandsLocked();
+
+    if (context->m_removeSourceFlag)
+    {
+        context->m_masterBus->processRemovals();
+        context->m_removeSourceFlag = False;
+    }
+
+    const auto bufSize = outBuffer->size();
+    context->m_masterBus->read(Null, static_cast<Int64>(bufSize));
+    context->m_clock += bufSize / (2 * sizeof(Float)); // we currently only support stereo float output
+    context->m_masterBus->updateParentClock(context->m_clock);
+
+    context->m_masterBus->swapBuffers(outBuffer);
 }
 
 auto AudioContext::update() -> void
@@ -118,14 +123,8 @@ auto AudioContext::update() -> void
 
     m_device->update();
 
+    const auto lockGuard = std::lock_guard(m_mixMutex);
     m_deferredCmds.processCommandsLocked();
-
-    const auto mixLockGuard = std::lock_guard(m_mixMutex);
-    if (m_removeSourceFlag)
-    {
-        m_masterBus->processRemovals();
-        m_removeSourceFlag = False;
-    }
 }
 
 KAUDIO_NS_END

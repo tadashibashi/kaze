@@ -10,19 +10,23 @@
 // Contains the functions for each command
 
 KAUDIO_NS_BEGIN
+auto commands::ContextFlagRemovals::operator()() -> void
+{
+    context->m_removeSourceFlag = True;
+}
 
-auto commands::SetEffectParameter::operator()() -> void
+auto commands::EffectSetParameter::operator()() -> void
 {
     using Param = AudioEffect::Param;
     effect->receiveParam(paramIndex, Param(value));
 }
 
-auto commands::SetSourcePause::operator()() -> void
+auto commands::SourceSetPause::operator()() -> void
 {
     source->setPauseImpl(True, clock, releaseOnPause);
 }
 
-auto commands::SetSourceUnpause::operator()() -> void
+auto commands::SourceSetUnpause::operator()() -> void
 {
     source->setPauseImpl(False, clock, False);
 }

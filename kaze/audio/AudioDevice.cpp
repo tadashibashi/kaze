@@ -5,11 +5,11 @@
 #if KAZE_PLATFORM_DESKTOP
 #include <kaze/audio/backend/portaudio/PortAudioDevice.h>
 #elif KAZE_PLATFORM_IOS
-
+#include <kaze/audio/backend/ios/iOSAudioDevice.h>
 #elif KAZE_PLATFORM_ANDROID
-
+#include <kaze/audio/backend/android/AAudioDevice.h>
 #elif KAZE_PLATFORM_EMSCRIPTEN
-
+#include <kaze/audio/backend/emscripten/EmAudioDevice.h>
 #endif
 
 KAUDIO_NS_BEGIN
@@ -19,14 +19,11 @@ auto AudioDevice::create() -> AudioDevice *
 #if KAZE_PLATFORM_DESKTOP
     return new PortAudioDevice();
 #elif KAZE_PLATFORM_IOS
-    KAZE_PUSH_ERR(Error::NotImplemented, "AudioDevice platform is not implemented");
-    return nullptr;
+    return new iOSAudioDevice();
 #elif KAZE_PLATFORM_ANDROID
-    KAZE_PUSH_ERR(Error::NotImplemented, "AudioDevice platform is not implemented");
-    return nullptr;
+    return new AAudioDevice();
 #elif KAZE_PLATFORM_EMSCRIPTEN
-    KAZE_PUSH_ERR(Error::NotImplemented, "AudioDevice platform is not implemented");
-    return nullptr;
+    return new EmAudioDevice();
 #else
     KAZE_PUSH_ERR(Error::NotImplemented, "AudioDevice platform is not implemented");
     return nullptr;

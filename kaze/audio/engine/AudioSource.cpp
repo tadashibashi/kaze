@@ -19,7 +19,7 @@ KAUDIO_NS_BEGIN
 
 AudioSource::AudioSource(AudioSource &&other) noexcept :
     m_context(other.m_context),
-    //m_volume(other.m_volume), m_panner(other.m_panner),
+    m_volume(other.m_volume), m_panner(other.m_panner),
     m_effects(other.m_effects),
     m_outBuffer(std::move(other.m_outBuffer)), m_inBuffer(std::move(other.m_inBuffer)),
     m_fadePoints(std::move(other.m_fadePoints)), m_fadeValue(other.m_fadeValue),
@@ -30,7 +30,7 @@ AudioSource::AudioSource(AudioSource &&other) noexcept :
 
 }
 
-auto AudioSource::init_(AudioContext *context, Uint64 parentClock, Bool paused) -> Bool
+auto AudioSource::init_(AudioContext *context, const Uint64 parentClock, const Bool paused) -> Bool
 {
     m_context = context;
     m_clock = 0;
@@ -43,11 +43,11 @@ auto AudioSource::init_(AudioContext *context, Uint64 parentClock, Bool paused) 
     m_shouldDiscard = False;
     m_fadeValue = 1.f;
 
-    //m_panner = engine->getObjectPool().allocate<PanEffect>();
-    //m_volume = engine->getObjectPool().allocate<VolumeEffect>();
+    m_panner = m_context->createObjectImpl<PanEffect>();
+    m_volume = m_context->createObjectImpl<VolumeEffect>();
 
-    //addEffectImpl(0, m_panner.cast<Effect>());
-    //addEffectImpl(1, m_volume.cast<Effect>());
+    addEffectImpl(0, m_panner.cast<AudioEffect>());
+    addEffectImpl(1, m_volume.cast<AudioEffect>());
     return True;
 }
 
@@ -55,7 +55,7 @@ auto AudioSource::release_() -> void // callback on destruct
 {
     for (auto &effect : m_effects)
     {
-        m_context->releaseObject(effect);
+        m_context->releaseObjectImpl(effect);
     }
     m_effects.clear();
 }
@@ -64,7 +64,9 @@ auto AudioSource::release() -> void
 {
     HANDLE_GUARD();
     m_shouldDiscard = True;
-    m_context->flagRemoveSource();
+    m_context->pushCommand(commands::ContextFlagRemovals {
+        .context = m_context,
+    });
 }
 
 /// Find starting fade point index, if there is no fade, e.g. < 2 points available, or the last fadepoint clock time
@@ -78,7 +80,7 @@ auto AudioSource::release() -> void
 static auto findFadePointIndex(const List<FadePoint> &points, const Uint64 clock, Int *outIndex) -> Bool
 {
     Int res = -1;
-    Size size = points.size();
+    const Size size = points.size();
     for (Size i = 0; i < size; ++i)
     {
         if (points[i].clock > clock)
@@ -396,7 +398,7 @@ auto AudioSource::pauseAt(Uint64 clock, Bool releaseOnPause) -> Bool
 {
     HANDLE_GUARD_RET(False);
     m_context->pushImmediateCommand(
-        commands::SetSourcePause{
+        commands::SourceSetPause{
             .source = this,
             .releaseOnPause = releaseOnPause,
             .clock = clock
@@ -410,7 +412,7 @@ auto AudioSource::unpauseAt(Uint64 clock) -> Bool
 {
     HANDLE_GUARD_RET(False);
     m_context->pushImmediateCommand(
-        commands::SetSourceUnpause {
+        commands::SourceSetUnpause {
             .source = this,
             .clock = clock
         }

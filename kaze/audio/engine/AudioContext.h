@@ -44,6 +44,13 @@ public:
     auto createObject(TArgs &&...args) -> Handle<T>
     {
         const auto lockGuard = std::lock_guard(m_mixMutex);
+        return createObjectImpl<T>(std::forward<TArgs>(args)...);
+    }
+
+    template <Poolable T, typename... TArgs>
+    [[nodiscard]]
+    auto createObjectImpl(TArgs &&...args) -> Handle<T>
+    {
         return m_pool.allocate<T>(std::forward<TArgs>(args)...);
     }
 
@@ -52,6 +59,12 @@ public:
     auto releaseObject(Handle<T> handle) -> Bool
     {
         const auto lockGuard = std::lock_guard(m_mixMutex);
+        return releaseObjectImpl(handle);
+    }
+
+    template <typename T>
+    auto releaseObjectImpl(Handle<T> handle) -> Bool
+    {
         return m_pool.deallocate(handle);
     }
 
@@ -114,7 +127,8 @@ public:
     [[nodiscard]]
     auto getDeviceId() const -> Uint { return m_device->getId(); }
 private:
-    friend AudioEngine; // TODO: put other "driver" classes here that needs to access driving features
+    friend class AudioEngine; // TODO: put other "driver" classes here that needs to access driving features
+    friend class commands::ContextFlagRemovals;
 
     static auto audioCallback(void *userptr, AlignedList<Ubyte, 16> *outBuffer) -> void;
 
@@ -131,7 +145,7 @@ private:
     CommandQueue<AudioCommand> m_deferredCmds{}, m_immediateCmds{};
     Handle<AudioBus> m_masterBus{};
 
-    std::recursive_mutex m_mixMutex{};
+    std::mutex m_mixMutex{};
 
     Uint64 m_clock{};
     AudioDevice *m_device{};

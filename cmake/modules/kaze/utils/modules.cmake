@@ -145,8 +145,11 @@ function(kaze_add_submodule SUBPATH)
         cmake_path(GET PATH PARENT_PATH SUBMODULE_ROOT)
     endif()
 
+    set(MODULE_ROOT "${SUBMODULE_ROOT}")
     unset(KAZE_MODULE)
+
     include(${SUBPATH})
+
     if (NOT DEFINED KAZE_MODULE)
         message(FATAL_ERROR "Failed to define KAZE_MODULE in plugin located at ${PATH}")
     endif()

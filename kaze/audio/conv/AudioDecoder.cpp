@@ -1,16 +1,17 @@
 #include "AudioDecoder.h"
 #include <kaze/core/io/stream/Rstreamable.h>
 #include <kaze/core/math/mathf.h>
+
 #include "extern/miniaudio/miniaudio_decoder_backends.h"
 
 KAUDIO_NS_BEGIN
 
 /// miniaudio decoder read callback
-static ma_result ma_decoder_on_read_rstream(
+static auto ma_decoder_on_read_rstream(
     ma_decoder *decoder,
     void *bufferOut,
     const size_t bytesToRead,
-    size_t *outBytesRead)
+    size_t *outBytesRead) -> ma_result
 {
     // Read from the stream
     const auto stream = static_cast<Rstreamable *>(decoder->pUserData);
@@ -26,10 +27,10 @@ static ma_result ma_decoder_on_read_rstream(
 }
 
 /// miniaudio decoder seek callback
-static ma_result ma_decoder_on_seek_rstream(
+static auto ma_decoder_on_seek_rstream(
     ma_decoder *decoder,
     const int64_t offset,
-    const ma_seek_origin origin)
+    const ma_seek_origin origin) -> ma_result
 {
     const auto stream = static_cast<Rstreamable *>(decoder->pUserData);
 
@@ -154,7 +155,7 @@ auto AudioDecoder::postOpen(const AudioSpec &targetSpec) -> Bool
     // Init the decoder
     if (const auto result = ma_decoder_init(
             ma_decoder_on_read_rstream,
-            ma_decoder_on_seek_rstream,
+            reinterpret_cast<ma_decoder_seek_proc>(ma_decoder_on_seek_rstream),
             m_stream.stream(),
             &config,
             decoder);

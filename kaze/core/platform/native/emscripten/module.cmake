@@ -11,12 +11,22 @@ set(KAZE_EMSCRIPTEN_LINK_OPTS_PUBLIC
 
     # We'll expose native functions for accessing URLs via fetch
     -sFETCH
+
+    -sWASM=1
+)
+
+set(KAZE_EMSCRIPTEN_COMPILE_OPTS_PUBLIC
+    -pthread
 )
 
 if (KAZE_DEBUG)
     list(APPEND KAZE_EMSCRIPTEN_LINK_OPTS_PUBLIC
         # Provide source maps to the browser on debug builds
         -gsource-map
+
+        # 1+ optimization level is necessary due to a mysterious stack overflow
+        # which doesn't appear on other platforms
+        -O1
     )
 endif()
 
@@ -43,6 +53,7 @@ if (${KAZE_EMSCRIPTEN_PTHREAD_POOL_SIZE} GREATER 0)
         -sPTHREAD_POOL_SIZE=${KAZE_EMSCRIPTEN_PTHREAD_POOL_SIZE}
         -sALLOW_BLOCKING_ON_MAIN_THREAD=1
     )
+
     list(APPEND KAZE_EMSCRIPTEN_COMPILE_OPTS_PUBLIC -pthread)
 endif()
 

@@ -2,7 +2,7 @@
 
 static thread_local kaze::String s_curError{};
 
-#if KAZE_DEBUG
+#if KAZE_DEBUG && !KAZE_PLATFORM_ANDROID
 #include <spdlog/sinks/stdout_color_sinks.h>
 
 KAZE_NS_BEGIN

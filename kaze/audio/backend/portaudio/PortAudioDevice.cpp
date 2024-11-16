@@ -82,7 +82,7 @@ struct PortAudioDevice::Impl {
     void *userdata{};
     AlignedList<Uint8, 16> buffer{};
     AudioSpec spec{};
-    std::recursive_mutex mutex{};
+    std::mutex mutex{};
     Uint requestedBufferFrames{};
 
     Impl()
@@ -338,7 +338,7 @@ auto PortAudioDevice::getDefaultSampleRate() const -> Int
 
 auto PortAudioDevice::update() -> void
 {
-    auto lockGuard = std::lock_guard(m->mutex);
+    //auto lockGuard = std::lock_guard(m->mutex);
     if (m->id != Pa_GetDefaultOutputDevice())
     {
         m->refreshDefaultDevice();

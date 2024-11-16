@@ -323,7 +323,7 @@ auto Sound::instantiate(AudioContext *context, Bool paused, Handle<AudioBus> bus
         data = m->data;
     }
 
-    const Handle<AudioSource> source = context->createObject<StreamSource>(
+    const Handle<AudioSource> source = context->createObjectImpl<StreamSource>(
         StreamSourceInit {
             .context = context,
             .pathOrMemory = data,

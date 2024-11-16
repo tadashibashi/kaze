@@ -33,7 +33,7 @@ public:
 
     virtual auto resume() -> void = 0;
 
-    virtual auto update() -> void = 0;
+    virtual auto update() -> void {};
 
     [[nodiscard]]
     virtual auto getDefaultSampleRate() const -> Int = 0;

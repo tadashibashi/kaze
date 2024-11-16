@@ -12,7 +12,7 @@ auto AudioEffect::sendParam(const Int index, const Param::Type value) -> Bool
 {
     KAZE_HANDLE_GUARD_RET(False);
 
-    m_context->pushCommand(commands::SetEffectParameter {
+    m_context->pushCommand(commands::EffectSetParameter {
         .effect = this,
         .paramIndex = index,
         .value = value,

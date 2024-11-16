@@ -1,11 +1,12 @@
 #include <doctest/doctest.h>
 
-#include <kaze/core/audio/SampleFormat.h>
-#include <kaze/core/io/audio/extern/miniaudio/miniaudio.h>
+#include <kaze/audio/SampleFormat.h>
+#include <kaze/audio/conv/extern/miniaudio/miniaudio.h>
 
 #include <kaze/core/endian.h>
 
-USING_KAZE_NS;
+using namespace KAZE_NS;
+using namespace KAUDIO_NS;
 
 TEST_SUITE("io/audio/SampleFormat")
 {

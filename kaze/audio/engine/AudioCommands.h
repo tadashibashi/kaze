@@ -13,7 +13,20 @@ class AudioEngine;
 class AudioSource;
 
 namespace commands {
-    struct SetEffectParameter {
+
+    // ===== Audio Context ====================================================
+
+    struct ContextFlagRemovals
+    {
+        AudioContext *context;
+
+        auto operator()() -> void;
+    };
+
+
+    // ===== Audio Effect =====================================================
+
+    struct EffectSetParameter {
         /// Effect to set parameter on
         AudioEffect *effect;
 
@@ -33,8 +46,11 @@ namespace commands {
         auto operator()() -> void;
     };
 
+
+    // ===== Audio Source =====================================================
+
     /// Set pause on AudioSource
-    struct SetSourcePause
+    struct SourceSetPause
     {
         /// Source to set pause on
         AudioSource *source;
@@ -49,7 +65,7 @@ namespace commands {
     };
 
     /// Set unpause on AudioSource
-    struct SetSourceUnpause
+    struct SourceSetUnpause
     {
         /// Source to unpause
         AudioSource *source;
@@ -126,6 +142,9 @@ namespace commands {
         auto operator()() -> void;
     };
 
+
+    // ===== Audio Bus ========================================================
+
     /// Append an AudioSource to an AudioBus
     struct BusConnectSource {
         Handle<AudioBus> bus;
@@ -142,23 +161,11 @@ namespace commands {
         auto operator()() -> void;
     };
 
-    enum class Type {
-        SetEffectParameter,
-        SetSourcePause,
-        SetSourceUnpause,
-        SourceAddEffect,
-        SourceRemoveEffect,
-        SourceAddFadePoint,
-        SourceRemoveFadePoint,
-        SourceFadeTo,
-        BusConnectSource,
-        BusDisconnectSource
-    };
-
     using AudioCommand = Variant<
-        SetEffectParameter,
-        SetSourcePause,
-        SetSourceUnpause,
+        ContextFlagRemovals,
+        EffectSetParameter,
+        SourceSetPause,
+        SourceSetUnpause,
         SourceAddEffect,
         SourceRemoveEffect,
         SourceAddFadePoint,

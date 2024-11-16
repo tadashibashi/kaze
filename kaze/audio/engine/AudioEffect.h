@@ -64,7 +64,7 @@ protected:
 private:
     friend class AudioEngine;
     friend class AudioSource;
-    friend class commands::SetEffectParameter;
+    friend class commands::EffectSetParameter;
 
     /// VIRTUAL: Optional
     /// Override this if you need to process parameter sets.

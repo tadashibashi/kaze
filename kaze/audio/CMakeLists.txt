@@ -9,7 +9,7 @@ target_sources(kaze_audio PRIVATE
         AudioDevice.h
         AudioSpec.h
         AudioTime.cpp
-        AudioTime.h
+        Audiotime.h
         FadePoint.h
         lib.h
         SampleFormat.cpp
@@ -29,7 +29,6 @@ target_sources(kaze_audio PRIVATE
         engine/AudioSource.h
         engine/Sound.cpp
         engine/Sound.h
-
         engine/effects/DelayEffect.cpp
         engine/effects/DelayEffect.h
         engine/effects/PanEffect.cpp

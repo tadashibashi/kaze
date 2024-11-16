@@ -327,7 +327,7 @@ auto AudioBus::processRemovals() -> void
 
         if (source->shouldDiscard())
         {
-            ctx->releaseObject(handle);
+            ctx->releaseObjectImpl(handle);
             return True;
         }
 

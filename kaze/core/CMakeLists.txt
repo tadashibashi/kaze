@@ -8,7 +8,6 @@ include(kaze/deps/core)
 
 add_library(kaze_core)
 kaze_target_modules(kaze_core platform io)
-
 target_include_directories(kaze_core SYSTEM PUBLIC ${KAZE_ROOT})
 
 target_link_libraries(kaze_core PUBLIC

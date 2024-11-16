@@ -1,7 +1,8 @@
 /// \file lib.h
 /// Contains type aliases for primitives and common utility types, and basic engine defines
 #pragma once
-
+#ifndef kaze_core_lib_h_
+#define kaze_core_lib_h_
 #include <kaze/core/platform/defines.h>
 
 #include <array>
@@ -169,3 +170,5 @@ KAZE_NS_END
 
 #include "concepts.h"
 #include "traits.h"
+
+#endif

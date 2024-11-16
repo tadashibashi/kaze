@@ -12,6 +12,11 @@ if (NOT TARGET SDL3::SDL3)
         set(SDL_SHARED OFF  CACHE BOOL "" FORCE)
         set(SDL_STATIC ON   CACHE BOOL "" FORCE)
     endif()
+
+    if (KAZE_PLATFORM_EMSCRIPTEN)
+        set(SDL_PTHREADS ON CACHE BOOL "" FORCE)
+    endif()
+
     FetchContent_MakeAvailable(SDL3)
 endif()
 

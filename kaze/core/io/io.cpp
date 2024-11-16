@@ -23,7 +23,7 @@ static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, 
         return False;
     }
 
-    const auto actualPath = path.substr(9);
+    const auto actualPath = path.substr(6);
     const auto actualPathStr = String(actualPath.data(), actualPath.size()); // ensure it's null-terminated properly
 
     auto asset = android::openAssetStream(actualPathStr.c_str());

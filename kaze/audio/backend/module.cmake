@@ -3,7 +3,8 @@ set(KAZE_MODULE KAUDIO_BACKEND)
 if (KAZE_PLATFORM_IOS) # ===== iOS ============================================
 
     list(APPEND KAUDIO_BACKEND_SOURCES_PRIVATE
-        # TODO: create and add iOSAudioDevice sources here
+        ios/iOSAudioDevice.h
+        ios/iOSAudioDevice.mm
     )
 
     list(APPEND KAUDIO_BACKEND_LINK_LIBS_PRIVATE
@@ -13,18 +14,20 @@ if (KAZE_PLATFORM_IOS) # ===== iOS ============================================
 elseif(KAZE_PLATFORM_ANDROID) # ===== Android =================================
 
     list(APPEND KAUDIO_BACKEND_SOURCES_PRIVATE
-        # TODO: create and add EmAudioDevice sources here
+        android/AAudioDevice.cpp
+        android/AAudioDevice.h
     )
+
     list(APPEND KAUDIO_BACKEND_LINK_LIBS_PRIVATE aaudio)
 
 elseif(KAZE_PLATFORM_EMSCRIPTEN) # ===== Emscripten ===========================
 
     list(APPEND KAUDIO_BACKEND_SOURCES_PRIVATE
-        # TODO: create and add EmAudioDevice sources here
+        emscripten/EmAudioDevice.cpp
+        emscripten/EmAudioDevice.h
     )
 
     # Link opts are set under kaze/core/platform/native/emscripten/module.cmake
-
 
 elseif(KAZE_PLATFORM_DESKTOP) # ===== Desktop =================================
 

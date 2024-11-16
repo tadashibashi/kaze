@@ -183,8 +183,8 @@ private:
     auto swapBuffers(AlignedList<Ubyte , 16> *buffer) -> void;
 
     // ----- Commands ---------------------------------------------------------
-    friend struct commands::SetSourcePause;
-    friend struct commands::SetSourceUnpause;
+    friend struct commands::SourceSetPause;
+    friend struct commands::SourceSetUnpause;
     auto setPauseImpl(Bool pause, Uint64 clock, Bool releaseOnPause) -> void;
 
     friend struct commands::SourceAddEffect;

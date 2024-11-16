@@ -20,7 +20,11 @@ elseif (EXISTS SDL2::SDL2)
     set(KAZE_BACKEND_DEFAULT "sdl2")
     set(KAZE_BACKEND_SHARED_DEFAULT ON)
 else()               # Default to at least build for Desktop
-    set(KAZE_BACKEND_DEFAULT "glfw3")
+    if (EMSCRIPTEN) # the glfw3 emscripten port causes a linkage issue atm
+        set(KAZE_BACKEND_DEFAULT "sdl3")
+    else()
+        set(KAZE_BACKEND_DEFAULT "glfw3")
+    endif()
     set(KAZE_BACKEND_SHARED_DEFAULT OFF)
 endif()
 
