@@ -11,6 +11,7 @@ namespace plugins::imgui {
         WindowHandle window;
         Int viewId = 1;
         Float fontSize = 18.f;
+        Bool enableDocking = True;
     };
 
     auto create(const InitConfig &config) -> AppPlugin;

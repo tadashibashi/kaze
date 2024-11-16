@@ -16,8 +16,9 @@ struct ImGuiKazeContext {
     Int viewId;
     Float fontSize;
     Double lastTime = 0;
-    bool keyboardRequested = false; ///< last state keyboard requested
+    Bool keyboardRequested = False; ///< last state keyboard requested
     CursorType lastCursor = CursorType::Arrow;
+    Bool enableDocking = True;
 };
 
 #define CONTEXT_CAST(userptr) static_cast<ImGuiKazeContext *>(userptr)

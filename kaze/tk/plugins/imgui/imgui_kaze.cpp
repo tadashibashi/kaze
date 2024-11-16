@@ -120,6 +120,9 @@ auto ImGui_ImplKaze_Init(ImGuiKazeContext *context) -> Bool
     ImGui::SetCurrentContext(context->context);
     auto &io = ImGui::GetIO();
 
+    if (context->enableDocking)
+        io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
     io.BackendPlatformName = "Kaze";
     #if !KAZE_PLATFORM_IOS && !KAZE_PLATFORM_ANDROID
         io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;
