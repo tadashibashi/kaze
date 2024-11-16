@@ -108,6 +108,16 @@ using fmt_lib::format;
 
 KAZE_NS_END
 
+#if   defined(__PRETTY_FUNCTION__)
+#   define KAZE_FUNCTION __PRETTY_FUNCTION__
+#elif defined(__FUNCTION__)
+#   define KAZE_FUNCTION __FUNCTION__
+#elif defined(__func__)
+#   define KAZE_FUNCTION __func__
+#else
+#   define KAZE_FUNCTION "" // not supported
+#endif
+
 #if KAZE_COMPILER_CLANG || KAZE_COMPILER_GCC
 #   define KAZE_PACKED __attribute__((packed))
 #elif KAZE_COMPILER_MSVC

@@ -1,4 +1,5 @@
 #pragma once
+#if !KAZE_NO_MAIN
 
 #include <kaze/core/lib.h>
 #include <kaze/core/platform/defines.h>
@@ -16,3 +17,6 @@ KAZE_NS_BEGIN
 auto kmain(Int argc, Char *argv[]) -> Int;
 
 KAZE_NS_END
+
+#endif
+

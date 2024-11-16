@@ -5,7 +5,7 @@
 
 KAZE_NS_BEGIN
 
-static auto defaultDealloc(void *mem)
+static auto defaultDealloc(void *mem, void *userptr)
 {
     memory::free(mem);
 }
@@ -15,7 +15,7 @@ auto RstreamableMemory::cleanupData() -> void
    if (m_data && m_deallocator)
     {
         try {
-            m_deallocator(m_data);
+            m_deallocator(m_data, m_userptr);
         }
         catch(const std::exception &e)
         {
@@ -46,10 +46,11 @@ auto RstreamableMemory::openFile(const String &path) -> Bool
     m_head = data;
     m_eof = False;
     m_deallocator = defaultDealloc;
+    m_userptr = Null;
     return True;
 }
 
-auto RstreamableMemory::openMem(MemView<void> mem, funcptr_t<void(void *mem)> deallocator) -> Bool
+auto RstreamableMemory::openMem(ManagedMem mem) -> Bool
 {
     if ( !mem.data() )
     {
@@ -63,11 +64,12 @@ auto RstreamableMemory::openMem(MemView<void> mem, funcptr_t<void(void *mem)> de
     m_end = m_data + mem.size();
     m_head = m_data;
     m_eof = False;
-    m_deallocator = deallocator ? deallocator : defaultDealloc;
+    m_deallocator = mem.deallocator();
+    m_userptr = mem.userptr();
     return True;
 }
 
-auto RstreamableMemory::openConstMem(MemView<const void> mem) -> Bool
+auto RstreamableMemory::openConstMem(MemView<void> mem) -> Bool
 {
     if ( !mem.data() )
     {
@@ -82,6 +84,7 @@ auto RstreamableMemory::openConstMem(MemView<const void> mem) -> Bool
     m_head = m_data;
     m_eof = False;
     m_deallocator = Null;
+    m_userptr = Null;
     return True;
 }
 

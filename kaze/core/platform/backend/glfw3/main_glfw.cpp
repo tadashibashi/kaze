@@ -1,3 +1,4 @@
+#if !KAZE_NO_MAIN
 #include <kaze/core/kmain.h>
 #include <kaze/core/platform/defines.h>
 
@@ -115,4 +116,6 @@ auto main(int argc, char *argv[]) -> int
 {
     return KAZE_NS::kmain(argc, argv);
 }
+#endif
+
 #endif

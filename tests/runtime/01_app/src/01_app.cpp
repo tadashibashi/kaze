@@ -17,10 +17,14 @@
 #include <kaze/tk/SpriteBatch.h>
 #include <kaze/tk/plugins/imgui/imgui_plugin.h>
 
+#include <kaze/audio/engine/AudioEngine.h>
+#include <kaze/audio/engine/AudioSource.h>
+
 #include <imgui/imgui.h>
 #include <filesystem>
 
 USING_KAZE_NS;
+using namespace KAUDIO_NS;
 
 class Demo final : public App {
 public:
@@ -36,6 +40,8 @@ private:
     //AssetLoader<String, Texture2D> textures;
     Texture2D testTexture{};
     SpriteBatch batch{};
+    AudioEngine audio{};
+    Handle<Sound> computerScoreSnd{}, playerScoreSnd{};
 
     struct TestImage
     {
@@ -96,6 +102,17 @@ private:
             .viewId=1,
         }));
 
+        if ( !audio.open({
+            .samplerate = 0,
+            .bufferFrameSize = 1024
+        }) )
+            return False;
+
+        computerScoreSnd = audio.createSound( (baseDir / "assets/computer_score.wav").string(), Sound::InMemory);
+        playerScoreSnd = audio.createSound( (baseDir / "assets/player_score.wav").string(), Sound::InMemory);
+        if ( !computerScoreSnd || !playerScoreSnd )
+            return False;
+
         return True;
     }
 
@@ -153,6 +170,16 @@ private:
             camera.setRotationDegrees(camera.getRotationDegrees() - 4);
         }
 
+        if (input().isJustDown(Key::P))
+        {
+            audio.playSound(playerScoreSnd, False);
+        }
+
+        if (input().isJustDown(Key::C))
+        {
+            audio.playSound(computerScoreSnd, False);
+        }
+
         for (auto &image : images)
         {
             image.rotation = mathf::fmod(image.rotation + 4.f, 360.f);
@@ -190,7 +217,7 @@ private:
         }
         ImGui::End();
 
-
+        audio.update();
     }
 
     auto render() -> void override {
@@ -246,6 +273,7 @@ private:
     auto close() -> void override {
         testTexture.release();
         batch.release();
+        audio.close();
     }
 };
 

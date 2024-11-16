@@ -11,7 +11,7 @@ static constexpr int BytesPerRead = 1024;
 static constexpr int BytesPerWrite = 1024;
 
 #if KAZE_PLATFORM_ANDROID
-#include <kaze/core/platform/android/AndroidNative.h>
+#include <kaze/core/platform/native/android/AndroidNative.h>
 #include <android/asset_manager.h>
 static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, KAZE_NS::Size *outSize) -> KAZE_NS::Bool
 {

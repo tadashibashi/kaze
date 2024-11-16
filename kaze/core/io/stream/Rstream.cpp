@@ -15,12 +15,12 @@ Rstream::~Rstream()
     delete m_stream;
 }
 
-Rstream::Rstream(Rstream &&other) : m_stream(other.m_stream)
+Rstream::Rstream(Rstream &&other) noexcept : m_stream(other.m_stream)
 {
     other.m_stream = Null;
 }
 
-auto Rstream::operator= (Rstream &&other) -> Rstream &
+auto Rstream::operator= (Rstream &&other) noexcept -> Rstream &
 {
     if (this == &other) return *this;
 
@@ -78,10 +78,10 @@ auto Rstream::openFile(const String &path, Bool inMemory) -> Bool
     }
 }
 
-auto Rstream::openMem(MemView<void> mem, funcptr_t<void(void *mem)> deallocator) -> Bool
+auto Rstream::openMem(const ManagedMem mem) -> Bool
 {
     const auto stream = new RstreamableMemory();
-    if ( !stream->openMem(mem, deallocator))
+    if ( !stream->openMem(mem))
     {
         delete stream;
         return False;
@@ -91,7 +91,7 @@ auto Rstream::openMem(MemView<void> mem, funcptr_t<void(void *mem)> deallocator)
     return True;
 }
 
-auto Rstream::openConstMem(MemView<const void> mem) -> Bool
+auto Rstream::openConstMem(MemView<void> mem) -> Bool
 {
     const auto stream = new RstreamableMemory();
     if ( !stream->openConstMem(mem) )

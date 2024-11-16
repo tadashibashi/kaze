@@ -5,7 +5,7 @@
 #   error RstreamableAAsset is only available on Android
 #endif
 
-#include <kaze/core/platform/android/AndroidNative.h>
+#include <kaze/core/platform/native/android/AndroidNative.h>
 #include <android/asset_manager.h>
 
 KAZE_NS_BEGIN

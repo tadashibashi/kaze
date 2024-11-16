@@ -1,4 +1,4 @@
-set (KAZE_MODULE_NAME KAZE_BACKEND)
+set (KAZE_MODULE KAZE_BACKEND)
 
 if (NOT TARGET SDL3::SDL3)
     FetchContent_Declare(SDL3
@@ -19,12 +19,17 @@ set(KAZE_BACKEND_LINK_LIBS_PUBLIC SDL3::SDL3)
 set(KAZE_BACKEND_SOURCES_PRIVATE
     common_sdl3.cpp
     common_sdl3.h
-    main_sdl3.cpp
     window_sdl3.cpp
     window_sdl3.h
     private/GamepadMgr.cpp
     private/GamepadMgr.h
 )
+
+if (NOT KAZE_NO_MAIN)
+    list(APPEND KAZE_BACKEND_SOURCES_PRIVATE
+        main_sdl3.cpp
+    )
+endif()
 
 if (KAZE_PLATFORM_APPLE_DEVICE)
     list(APPEND KAZE_BACKEND_SOURCES_PRIVATE

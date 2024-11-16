@@ -1,4 +1,4 @@
-set(KAZE_MODULE_NAME KAZE_IO)
+set(KAZE_MODULE KAZE_IO)
 
 set(KAZE_IO_SOURCES_PRIVATE
     BufferIO.cpp
@@ -13,18 +13,18 @@ set(KAZE_IO_SOURCES_PRIVATE
     io.h
     StructLayout.h
 
-    Rstream/Rstream.cpp
-    Rstream/Rstream.h
-    Rstream/Rstreamable.h
-    Rstream/RstreamableFile.cpp
-    Rstream/RstreamableFile.h
-    Rstream/RstreamableMemory.cpp
-    Rstream/RstreamableMemory.h
+    stream/Rstream.cpp
+    stream/Rstream.h
+    stream/Rstreamable.h
+    stream/RstreamableFile.cpp
+    stream/RstreamableFile.h
+    stream/RstreamableMemory.cpp
+    stream/RstreamableMemory.h
 )
 
 if (KAZE_PLATFORM_ANDROID)
     list(APPEND KAZE_IO_SOURCES_PRIVATE
-        Rstream/RstreamableAAsset.cpp
-        Rstream/RstreamableAAsset.h
+        stream/RstreamableAAsset.cpp
+        stream/RstreamableAAsset.h
     )
 endif()

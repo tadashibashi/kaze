@@ -38,18 +38,35 @@ set(KAZE_BACKEND_SHARED ${KAZE_BACKEND_SHARED_DEFAULT}  CACHE BOOL   "Whether to
 set(KAZE_NO_NAMESPACE   OFF                             CACHE BOOL   "Unwrap all kaze engine types and functions into the global namespace")
 set(KAZE_NAMESPACE      "kaze"                          CACHE STRING "Set the namespace name, KAZE_NO_NAMESPACE overrides this option")
 
-set(KAZE_DEBUG         ${KAZE_DEBUG_DEFAULT} CACHE BOOL   "Build with debug mode: logging and asserts")
-set(KAZE_BUILD_TESTS   ${KAZE_IS_ROOT}       CACHE BOOL   "Make kaze unit tests available for compilation")
+set(KAZE_DEBUG          ${KAZE_DEBUG_DEFAULT} CACHE BOOL   "Build with debug mode: logging and asserts")
+set(KAZE_BUILD_TESTS    ${KAZE_IS_ROOT}       CACHE BOOL   "Make kaze unit tests available for compilation")
+
+set(KAZE_CPU_INTRINSICS ON                    CACHE BOOL   "Build with CPU intrinsic optimizations")
 
 # This is buggy with BGFX so turned off for now
-set(KAZE_USE_WAYLAND   OFF                   CACHE BOOL   "Build with Wayland support on Linux" FORCE)
+set(KAZE_USE_WAYLAND   OFF                    CACHE BOOL   "Build with Wayland support on Linux" FORCE)
 
 set(KAZE_USE_FMT_LIB   ${KAZE_USE_FMT_LIB_DEFAULT}      CACHE BOOL   "Use fmt internal library instead of C++20 std::format")
 
+set(KAZE_NO_MAIN       OFF                    CACHE BOOL   "Build without main or necessity to implement the kaze::kmain function")
+
+set(KAZE_EMSCRIPTEN_PTHREAD_POOL_SIZE  4      CACHE STRING "Set the pthread pool size on Emscripten builds. 0 turns off pthreads")
+set(KAZE_EMSCRIPTEN_WASM_WORKERS       ON     CACHE BOOL   "Use WASM Workers on Emscripten builds, automatically turns on if Audio module is activated")
+
+# ----- Kaze Audio Options -----
+set(KAZE_AUDIO                ON              CACHE BOOL    "Build Kaze's audio library")
+set(KAZE_AUDIO_DECODE_FLAC    ON              CACHE BOOL    "Support decoding Flac audio format")
+set(KAZE_AUDIO_DECODE_MP3     ON              CACHE BOOL    "Support decoding Mp3 audio format")
+set(KAZE_AUDIO_DECODE_VORBIS  ON              CACHE BOOL    "Support decoding Ogg vorbis audio format")
+set(KAZE_AUDIO_DECODE_WAV     ON              CACHE BOOL    "Support decoding Wav audio format")
+
 # ----- Kaze Toolkit Options -----
-set(KAZE_TK_IMGUI_PLUGIN  ON CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")
+set(KAZE_TK                   ON              CACHE BOOL "Build Kaze Toolkit")
+set(KAZE_TK_IMGUI_PLUGIN      ON              CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")
 
 # ===== Projects ==============================================================
+# Prevent projects from generating ctest targets
+set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED TRUE)
 
 if (NOT KAZE_BUILD_TOOLS)
     add_subdirectory(kaze)

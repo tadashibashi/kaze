@@ -1,6 +1,7 @@
 project(kaze_unit_tests)
 
 add_executable(${PROJECT_NAME}
+    kaze/audio/SampleFormat.test.cpp
     kaze/core/AssetLoader.test.cpp
     kaze/core/Action.test.cpp
     kaze/core/ConditionalAction.test.cpp
@@ -14,6 +15,8 @@ add_executable(${PROJECT_NAME}
     kaze/core/io/BufferWriter.test.cpp
     kaze/core/io/BufferView.test.cpp
     kaze/core/io/StructLayout.test.cpp
+
+
 
     kaze/core/macros/enum.test.cpp
 
@@ -30,4 +33,8 @@ add_executable(${PROJECT_NAME}
     tests.cpp
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE kaze doctest::doctest)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    kaze_core
+    kaze_audio
+    doctest::doctest
+)

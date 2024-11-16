@@ -1,2 +1,9 @@
 add_subdirectory(core)
-add_subdirectory(tk)
+
+if (KAZE_AUDIO)
+    add_subdirectory(audio)
+endif()
+
+if (KAZE_TK)
+    add_subdirectory(tk)
+endif()

@@ -40,7 +40,7 @@ add_library(${PROJECT_NAME}
         SpriteBatch.cpp
         SpriteBatch.h
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC kaze)
+target_link_libraries(${PROJECT_NAME} PUBLIC kaze_core kaze_audio)
 
 if (KAZE_TK_IMGUI_PLUGIN)
     kaze_target_module(kaze_tk plugins/imgui)

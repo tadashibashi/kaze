@@ -1,4 +1,4 @@
-set(KAZE_MODULE_NAME PLATFORM)
+set(KAZE_MODULE PLATFORM)
 
 # Validate backend. The name must correspond to the name of a folder in:
 # "kaze/platform/backend/", which contains a "module.cmake" file.
@@ -20,7 +20,4 @@ set(PLATFORM_SOURCES_PRIVATE
 
 kaze_add_submodule(backend/${KAZE_BACKEND})
 kaze_add_submodule(filesys)
-
-if (KAZE_PLATFORM_ANDROID)
-    kaze_add_submodule(android)
-endif()
+kaze_add_submodule(native)

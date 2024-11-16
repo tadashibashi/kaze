@@ -42,19 +42,28 @@ struct Error
         ShaderLinkErr,        ///< Shader program encountered an error during link
 
         InvalidEnum,          ///< Invalid enum value passed to a function
+        InvalidHandle,        ///< Attempted to access invalid Handle
         MissingKeyErr,        ///< Dictionary/Map is missing an expected key
         DuplicateKey,         ///< Attempted to add a duplicate key into a Dictionary/Map when not permitted
         InvalidArgErr,        ///< Argument is not valid
         PlatformErr,          ///< Platform-specific error
         Unsupported,          ///< Feature not supported
 
+        NotInitialized,       ///< Attempted to use functionalities of a class that was not initialized
+        NotImplemented,       ///< Feature is not implemented, may be lack of support for a specific platform, or
+                              ///<     a function stub that has not been implemented yet.
         Count                 ///< Number of error codes
     };
 
     // constructor
-    Error() : code(Unspecified), message(), line(-1), file("") {}
-    explicit Error(const Code code, const StringView message = "",  const Cstring file = "", const int line = -1) :
-        code(code), message(message), line(line), file(file) { }
+    Error() : code(Unspecified), message(), line(-1), file(""), funcname("") {}
+    explicit Error(
+        const Code code,
+        const StringView message = "",
+        const Cstring file = "",
+        const Int line = -1,
+        const StringView funcname = "") :
+            code(code), message(message), line(line), file(file) { }
 
     // copy
     Error(const Error &other) = default;
@@ -68,8 +77,9 @@ struct Error
     Code code;        ///< error code
     String message;   ///< error message
 
-    int line;       ///< error line occured on
-    Cstring file;   ///< filename error occured in
+    Int line;         ///< error line occured on
+    Cstring file;     ///< filename error occured in
+    Cstring funcname; ///< function name error occurred in
 };
 
 /// Get the last error that occurred on the current thread
@@ -82,7 +92,7 @@ auto getError() noexcept -> Error;
 /// \param[in] filename   name of file that the error occurred in, usually set via __FILE__ [optional, default: `""`]
 /// \param[in] line       line error occurred on, usually set via __LINE__ [optional, default: `-1`]
 auto setError(StringView message, Error::Code code = Error::Unspecified,
-    const char *filename = "", int line = -1) noexcept -> const Error &;
+    Cstring filename = "", int line = -1, Cstring funcname = "") noexcept -> const Error &;
 
 /// Set the error to an empty string
 /// Useful if you intend on handling errors gracefully
@@ -94,3 +104,15 @@ auto clearError() noexcept -> void;
 auto hasError() noexcept -> Bool;
 
 KAZE_NS_END
+
+#define KAZE_HANDLE_GUARD() do { if (getError().code == Error::InvalidHandle) { \
+    clearError(); \
+    KAZE_PUSH_ERR(Error::InvalidHandle, "Invalid handle was accessed in: {}", __FUNCTION__); \
+    return; \
+} } while(0)
+
+#define KAZE_HANDLE_GUARD_RET(ret) do { if (getError().code == Error::InvalidHandle) { \
+    clearError(); \
+    KAZE_PUSH_ERR(Error::InvalidHandle, "Invalid handle was accessed in: {}", __FUNCTION__); \
+    return (ret); \
+} } while(0)

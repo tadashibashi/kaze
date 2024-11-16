@@ -1,5 +1,6 @@
 #pragma once
 #include <kaze/core/lib.h>
+#include <kaze/core/ManagedMem.h>
 #include <kaze/core/MemView.h>
 
 #include "SeekBase.h"
@@ -15,8 +16,8 @@ public:
     Rstream() = default;
     ~Rstream();
 
-    Rstream(Rstream &&other);
-    auto operator= (Rstream &&other) -> Rstream &;
+    Rstream(Rstream &&other) noexcept;
+    auto operator= (Rstream &&other) noexcept -> Rstream &;
 
     /// Open a file for streaming
     /// \param[in]  path      System file path to open
@@ -25,18 +26,18 @@ public:
     /// \returns whether operation was successful.
     auto openFile(const String &path, Bool inMemory = False) -> Bool;
 
-    /// Pass memory for streaming, it needs to remain immutable for the duration of the
+    /// Pass memory for streaming, it needs to remain valid and immutable for the duration of the
     /// time this class makes use of it
     /// \param[in]  mem  memory to stream
     /// \returns whether operation was successful.
-    auto openConstMem(MemView<const void> mem) -> Bool;
+    auto openConstMem(MemView<void> mem) -> Bool;
 
     /// Pass memory for streaming; it also hands over responsibility of memory to this Rstream
     /// \param[in]  mem          memory to stream
     /// \param[in]  deallocator  callback to deallocate memory when close is called or Rstream is destroyed;
     ///                          [optional, default: `memory::free`]
     /// \returns whether operation was successful.
-    auto openMem(MemView<void> mem, funcptr_t<void(void *mem)> deallocator = nullptr) -> Bool;
+    auto openMem(ManagedMem mem) -> Bool;
 
     /// Close the stream, invalidating it.
     auto close() -> void;
@@ -68,6 +69,11 @@ public:
     /// \param[in] base       base to seek from
     /// \returns whether seek succeeded.
     auto seek(Int64 position, SeekBase base = SeekBase::Begin) -> Bool;
+
+    [[nodiscard]]
+    auto stream() -> Rstreamable * { return m_stream; }
+    [[nodiscard]]
+    auto stream() const -> const Rstreamable * { return m_stream; }
 private:
     Rstreamable *m_stream{};
 };

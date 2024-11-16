@@ -30,9 +30,14 @@ auto getError() noexcept -> Error
     return moved;
 }
 
-auto setError(const StringView message, const Error::Code code, const Cstring filename, const int line) noexcept -> const Error &
+auto setError(
+    const StringView message,
+    const Error::Code code,
+    const Cstring filename,
+    const int line,
+    const Cstring funcname) noexcept -> const Error &
 {
-    s_curError = Error{code, String(message), filename, line};
+    s_curError = Error{code, String(message), filename, line, funcname};
     return s_curError;
 }
 

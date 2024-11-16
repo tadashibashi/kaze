@@ -10,4 +10,6 @@ kaze_target_assets(ktest_01_app
     ASSET_DIR assets
     ASSETS
         dungeon_tiles.png
+        computer_score.wav
+        player_score.wav
 )

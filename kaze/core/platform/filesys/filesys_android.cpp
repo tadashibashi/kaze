@@ -1,5 +1,5 @@
 #include "filesys.h"
-#include <kaze/core/platform/android/AndroidNative.h>
+#include <kaze/core/platform/native/android/AndroidNative.h>
 
 KAZE_NS_BEGIN
 

@@ -16,7 +16,7 @@ public:
     MemView(const T *data, const Size size) noexcept : m_data(data), m_size(size) { }
 
     [[nodiscard]]
-    auto data() const noexcept { return m_data; }
+    auto data() const noexcept -> const T * { return m_data; }
 
     /// \returns the number of elements (or bytes if `T` is void)
     [[nodiscard]]

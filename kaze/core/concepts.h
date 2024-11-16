@@ -1,7 +1,7 @@
 #pragma once
 
 #include <kaze/core/lib.h>
-#include <type_traits>
+#include <kaze/core/traits.h>
 
 KAZE_NS_BEGIN
 
@@ -64,4 +64,24 @@ concept ContainerItem =
     std::is_move_constructible_v<T> &&
     std::is_copy_constructible_v<T>;
 
+/// Poolable types are used with Pool and MultiPool.
+/// They must be default constructible, moveable, with the following member functions defined:
+///     auto init(Args...) -> Bool;
+///     auto release() -> void;
+/// Poolable objects are created once, and must be released and reinitialized when taken
+/// out again by the user. `init` and `release` effectively become the contructor and destructor
+/// to this end, which are called when a user takes out and puts back a pool object, respectively.
+///
+/// You can perform optimizations like only creating buffers once without needing to
+/// destroy and recreate them again each time.
+template <typename T>
+concept Poolable =
+    std::is_default_constructible_v<T> &&
+    std::is_move_constructible_v<T>;
+
+template <typename T>
+concept PlainFunctor =
+    requires(T &funcObj) {
+        funcObj();
+    };
 KAZE_NS_END

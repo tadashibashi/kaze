@@ -3,16 +3,19 @@
 # source files, include dirs, libraries, and link/compilations to be injected into a target.
 #
 # Possible variables to define:
-# KAZE_MODULE_NAME             => prefix NAME for each variable (required)
-# ${NAME}_SOURCES              => private source files
-# ${NAME}_INCLUDE_DIRS_PUBLIC  => public include files
-# ${NAME}_INCLUDE_DIRS_PRIVATE => private include files
-# ${NAME}_LINK_OPTS_PUBLIC     => public link options
-# ${NAME}_LINK_OPTS_PRIVATE    => private link options
-# ${NAME}_COMPILE_OPTS_PUBLIC  => public compile options
-# ${NAME}_COMPILE_OPTS_PRIVATE => private compile options
-# ${NAME}_LINK_LIBS_PUBLIC     => public link libraries
-# ${NAME}_LINK_LIBS_PRIVATE    => private link libraries
+# KAZE_MODULE                         => prefix name for each variable (required)
+# ${KAZE_MODULE}_SOURCES_PUBLIC       => public source files
+# ${KAZE_MODULE}_SOURCES_PRIVATE      => private source files
+# ${KAZE_MODULE}_INCLUDE_DIRS_PUBLIC  => public include files
+# ${KAZE_MODULE}_INCLUDE_DIRS_PRIVATE => private include files
+# ${KAZE_MODULE}_LINK_OPTS_PUBLIC     => public link options
+# ${KAZE_MODULE}_LINK_OPTS_PRIVATE    => private link options
+# ${KAZE_MODULE}_COMPILE_OPTS_PUBLIC  => public compile options
+# ${KAZE_MODULE}_COMPILE_OPTS_PRIVATE => private compile options
+# ${KAZE_MODULE}_LINK_LIBS_PUBLIC     => public link libraries
+# ${KAZE_MODULE}_LINK_LIBS_PRIVATE    => private link libraries
+# ${KAZE_MODULE}_COMPILE_DEFS_PUBLIC  => public compile definitions
+# ${KAZE_MODULE}_COMPILE_DEFS_PRIVATE => private compile definitions
 #
 # Note:
 #   - Paths of sources and include directories may be either absolute or relative
@@ -36,11 +39,11 @@ function(kaze_target_module TARGET PATH)
     endif()
 
     include(${PATH})
-    if (NOT DEFINED KAZE_MODULE_NAME)
-        message(FATAL_ERROR "Failed to define KAZE_MODULE_NAME in module located at ${PATH}")
+    if (NOT DEFINED KAZE_MODULE)
+        message(FATAL_ERROR "Failed to define KAZE_MODULE in module located at ${PATH}")
     endif()
 
-    set(NAME ${KAZE_MODULE_NAME})
+    set(NAME ${KAZE_MODULE})
 
     if (DEFINED ${NAME}_SOURCES_PUBLIC)
         kaze_make_paths_absolute(
@@ -105,7 +108,7 @@ function(kaze_target_module TARGET PATH)
         target_compile_definitions(${TARGET} PRIVATE ${${NAME}_COMPILE_DEFS_PRIVATE})
     endif()
 
-    unset(KAZE_MODULE_NAME PARENT_SCOPE)
+    unset(KAZE_MODULE PARENT_SCOPE)
     unset(MODULE_ROOT)
 endfunction()
 
@@ -125,8 +128,8 @@ function(kaze_add_submodule SUBPATH)
         message(FATAL_ERROR "Missing module root path, please make sure to only call `kaze_add_submodule` "
             "inside a module definition file")
     endif()
-    if (NOT DEFINED KAZE_MODULE_NAME)
-        message(FATAL_ERROR "Failed to define KAZE_MODULE_NAME in module located at ${SUBPATH}")
+    if (NOT DEFINED KAZE_MODULE)
+        message(FATAL_ERROR "Failed to define KAZE_MODULE in module located at ${SUBPATH}")
     endif()
 
     cmake_path(ABSOLUTE_PATH SUBPATH
@@ -142,13 +145,13 @@ function(kaze_add_submodule SUBPATH)
         cmake_path(GET PATH PARENT_PATH SUBMODULE_ROOT)
     endif()
 
-    unset(KAZE_MODULE_NAME)
+    unset(KAZE_MODULE)
     include(${SUBPATH})
-    if (NOT DEFINED KAZE_MODULE_NAME)
-        message(FATAL_ERROR "Failed to define KAZE_MODULE_NAME in plugin located at ${PATH}")
+    if (NOT DEFINED KAZE_MODULE)
+        message(FATAL_ERROR "Failed to define KAZE_MODULE in plugin located at ${PATH}")
     endif()
 
-    set(NAME ${KAZE_MODULE_NAME})
+    set(NAME ${KAZE_MODULE})
 
     if (DEFINED ${NAME}_SOURCES_PUBLIC)
         kaze_make_paths_absolute(

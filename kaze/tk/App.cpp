@@ -1,15 +1,12 @@
 #include "App.h"
 #include "AppPluginMgr.h"
 
-#include <chrono>
 #include <kaze/core/input/CursorMgr.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/BackendInitGuard.h>
 #include <kaze/core/platform/defines.h>
 
 #include <kaze/tk/FramerateCounter.h>
-
-#include <thread>
 
 #if KAZE_PLATFORM_EMSCRIPTEN
 #   include <emscripten/emscripten.h>

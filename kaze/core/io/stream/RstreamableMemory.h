@@ -1,7 +1,7 @@
 #pragma once
-
 #include <kaze/core/lib.h>
 #include <kaze/core/traits.h>
+#include <kaze/core/ManagedMem.h>
 #include <kaze/core/MemView.h>
 
 #include "Rstreamable.h"
@@ -10,7 +10,7 @@ KAZE_NS_BEGIN
 
 class RstreamableMemory : public Rstreamable {
 public:
-    RstreamableMemory();
+    RstreamableMemory() = default;
     ~RstreamableMemory() override = default;
 
     /// Open a file for streaming from a filesystem path
@@ -18,9 +18,9 @@ public:
     /// \returns whether operation was successful
     auto openFile(const String &path) -> Bool override;
 
-    auto openMem(MemView<void> mem, funcptr_t<void(void *mem)> deallocator = Null) -> Bool;
+    auto openMem(ManagedMem mem) -> Bool;
 
-    auto openConstMem(MemView<const void> mem) -> Bool;
+    auto openConstMem(MemView<void> mem) -> Bool;
 
     /// Close the stream; safe to call, even if already closed.
     auto close() -> void override;
@@ -62,10 +62,11 @@ public:
 
 private:
     auto cleanupData() -> void;
-    Ubyte *m_data, *m_head, *m_end;
-    Bool m_eof;
+    Ubyte *m_data{}, *m_head{}, *m_end{};
+    Bool m_eof{};
 
-    funcptr_t<void(void *)> m_deallocator;
+    funcptr_t<void(void *, void *)> m_deallocator{};
+    void *m_userptr;
 };
 
 KAZE_NS_END

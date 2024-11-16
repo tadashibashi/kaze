@@ -1,5 +1,5 @@
 # GLFW3 Backend Plugin
-set (KAZE_MODULE_NAME KAZE_BACKEND)
+set (KAZE_MODULE KAZE_BACKEND)
 
 if (EMSCRIPTEN)
     set(KAZE_BACKEND_LINK_OPTS_PUBLIC --use-port=contrib.glfw3)
@@ -29,9 +29,13 @@ set(KAZE_BACKEND_SOURCES_PRIVATE
     common_glfw3.cpp
     window_glfw3.cpp
 )
-set(KAZE_BACKEND_SOURCES_PUBLIC
-    main_glfw.cpp
-)
+
+if (NOT KAZE_NO_MAIN)
+    list(APPEND KAZE_BACKEND_SOURCES_PRIVATE
+        main_glfw.cpp
+    )
+endif()
+
 if (APPLE)
     list(APPEND KAZE_BACKEND_SOURCES_PRIVATE
         window_glfw3.mm)
