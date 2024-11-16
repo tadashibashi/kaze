@@ -1,4 +1,4 @@
-#include "BufferIO.h"
+#include "StructIO.h"
 
 KAZE_NS_BEGIN
 
@@ -247,7 +247,7 @@ static auto writeImpl(const void *src, BufferWriter &writer, const StructLayout 
     return writer.size() - startByte;
 }
 
-auto BufferIO::readLayout(void *dest, BufferView &view,
+auto StructIO::readLayout(void *dest, BufferView &view,
                                 const StructLayout &layout) -> Size
 {
     if (layout.empty())
@@ -258,7 +258,7 @@ auto BufferIO::readLayout(void *dest, BufferView &view,
     return readImpl(dest, view, layout);
 }
 
-auto BufferIO::writeLayout(const void *dest, BufferWriter &writer, const StructLayout &layout) -> Size
+auto StructIO::writeLayout(const void *dest, BufferWriter &writer, const StructLayout &layout) -> Size
 {
     if (layout.empty())
     {

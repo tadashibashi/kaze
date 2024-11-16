@@ -1,11 +1,11 @@
 #include <doctest/doctest.h>
-#include <kaze/core/io/BufferIO.h>
 #include <kaze/core/io/BufferWriter.h>
+#include <kaze/core/io/StructIO.h>
 #include <kaze/core/io/StructLayout.h>
 
 USING_KAZE_NAMESPACE;
 
-TEST_SUITE("BufferIO")
+TEST_SUITE("StructIO")
 {
     TEST_CASE("Read flat struct layout")
     {
@@ -35,7 +35,7 @@ TEST_SUITE("BufferIO")
             writer << "Joe" << Year::Freshman << 3.4f;
 
             BufferView view(writer.data(), writer.size());
-            auto student = BufferIO::read<Student>(view, studentLayout);
+            auto student = StructIO::read<Student>(view, studentLayout);
 
             CHECK(student.name == "Joe");
             CHECK(student.year == Year::Freshman);
@@ -50,10 +50,10 @@ TEST_SUITE("BufferIO")
             joe.gpa = 3.2f;
 
             BufferWriter writer{};
-            BufferIO::write(&joe, writer, studentLayout);
+            StructIO::write(&joe, writer, studentLayout);
 
             BufferView view(writer.data(), writer.size());
-            auto student = BufferIO::read<Student>(view, studentLayout);
+            auto student = StructIO::read<Student>(view, studentLayout);
 
             CHECK(student.name == "Robert");
             CHECK(student.year == Year::Sophomore);
@@ -101,7 +101,7 @@ TEST_SUITE("BufferIO")
             BufferView view(writer.data(), writer.size());
 
             Collection collection;
-            CHECK(BufferIO::read(&collection, view, collectionLayout));
+            CHECK(StructIO::read(&collection, view, collectionLayout));
 
             CHECK(collection.count == 4);
             CHECK(collection.records.size() == 4);
@@ -134,11 +134,11 @@ TEST_SUITE("BufferIO")
             collection.count = collection.records.size();
 
             BufferWriter writer{};
-            BufferIO::write(&collection, writer, collectionLayout);
+            StructIO::write(&collection, writer, collectionLayout);
 
             BufferView view(writer.data(), writer.size());
             Collection check;
-            BufferIO::read(&check, view, collectionLayout);
+            StructIO::read(&check, view, collectionLayout);
             CHECK(check.count == 3);
             CHECK(check.records.size() == 3);
             CHECK(check.records[0].name == "Mozart Violin Concerto in A Major");
@@ -188,7 +188,7 @@ TEST_SUITE("BufferIO")
             BufferView view(writer.data(), writer.size());
 
             Collection collection;
-            CHECK(BufferIO::read(&collection, view, collectionLayout));
+            CHECK(StructIO::read(&collection, view, collectionLayout));
 
             CHECK(collection.records[0].name == "Mozart Violin Concerto in A Major");
             CHECK(collection.records[0].value == 10);
@@ -222,11 +222,11 @@ TEST_SUITE("BufferIO")
             };
 
             BufferWriter writer{};
-            BufferIO::write(&collection, writer, collectionLayout);
+            StructIO::write(&collection, writer, collectionLayout);
 
             BufferView view(writer.data(), writer.size());
             Collection check;
-            BufferIO::read(&check, view, collectionLayout);
+            StructIO::read(&check, view, collectionLayout);
             CHECK(check.records[0].name == "Mozart Violin Concerto in A Major");
             CHECK(check.records[0].value == 10);
             CHECK(check.records[1].name == "Beethoven 7th Symphony");

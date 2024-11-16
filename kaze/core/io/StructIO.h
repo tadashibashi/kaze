@@ -12,10 +12,10 @@ KAZE_NS_BEGIN
 
 /// For now this object just contains static functions for conversion
 /// between binary and structs
-class BufferIO {
+class StructIO {
 public:
-    BufferIO() { }
-    ~BufferIO() = default;
+    StructIO() { }
+    ~StructIO() = default;
 
     /// Read a struct layout from binary data into memory
     /// \tparam       T       Type to read; must match type in `layout`.

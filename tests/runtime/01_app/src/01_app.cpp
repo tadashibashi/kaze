@@ -172,7 +172,7 @@ private:
             camera.setRotationDegrees(camera.getRotationDegrees() - 4);
         }
 
-        if (input().isJustDown(Key::P))
+        if (input().isDown(MouseBtn::Left))
         {
             audio.playSound(playerScoreSnd, False);
         }
@@ -216,6 +216,13 @@ private:
         if (ImGui::Begin("Frame rate"))
         {
             ImGui::Text("Current fps: %f", fps());
+
+            ImGui::Spacing();
+
+            if (ImGui::Button("Press Me!"))
+            {
+                audio.playSound(playerScoreSnd, False);
+            }
         }
         ImGui::End();
 

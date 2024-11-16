@@ -77,7 +77,7 @@ public:
     /// \param[in] bus       Bus to output this sound to, use `{}` to indicate null, which
     ///                          defaults to the master bus.
     /// \returns AudioSource sound instance, or an invalid handle on error.
-    auto playSound(const Handle<Sound> &sound, Bool paused, const Handle<AudioBus> &bus = {}) -> Handle<AudioSource>;
+    auto playSound(const Handle<Sound> &sound, Bool paused = False, const Handle<AudioBus> &bus = {}) -> Handle<AudioSource>;
 
     /// Create a new bus to use in the mixing graph
     /// \param paused whether bus should start off paused on initialization

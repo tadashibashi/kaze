@@ -1,7 +1,9 @@
-#include "filesys.h"
+#import "filesys.h"
+#import <kaze/core/debug.h>
+
 #import <Foundation/Foundation.h>
-#include <filesystem>
-#include <kaze/core/debug.h>
+
+#import <filesystem>
 
 KAZE_NS_BEGIN
 

@@ -1,8 +1,6 @@
 set(KAZE_MODULE KAZE_IO)
 
 set(KAZE_IO_SOURCES_PRIVATE
-    BufferIO.cpp
-    BufferIO.h
     BufferView.cpp
     BufferView.h
     BufferWriter.cpp
@@ -11,6 +9,8 @@ set(KAZE_IO_SOURCES_PRIVATE
     FileBuffer.h
     io.cpp
     io.h
+    StructIO.cpp
+    StructIO.h
     StructLayout.h
 
     stream/Rstream.cpp

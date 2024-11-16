@@ -17,6 +17,18 @@ if (NOT TARGET SDL3::SDL3)
         set(SDL_PTHREADS ON CACHE BOOL "" FORCE)
     endif()
 
+    set(SDL3_DISABLE_UNINSTALL ON  CACHE BOOL "")
+    set(SDL3_DISABLE_ININSTALL ON  CACHE BOOL "")
+    set(SDL_TEST               OFF CACHE BOOL "")
+
+    set(SDL_RENDER  OFF CACHE BOOL "")
+    set(SDL_AUDIO   OFF CACHE BOOL "")
+    set(SDL_FILE    OFF CACHE BOOL "")
+    set(SDL_FILESYSTEM OFF CACHE BOOL "")
+    set(SDL_LOCALE  OFF CACHE BOOL "")
+    set(SDL_MISC    OFF CACHE BOOL "")
+    set(SDL_CPUINFO OFF CACHE BOOL "")
+
     FetchContent_MakeAvailable(SDL3)
 endif()
 

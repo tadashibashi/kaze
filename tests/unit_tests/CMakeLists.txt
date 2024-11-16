@@ -11,12 +11,10 @@ add_executable(${PROJECT_NAME}
     kaze/core/Memory.test.cpp
     kaze/core/ServiceProvider.test.cpp
 
-    kaze/core/io/BufferIO.test.cpp
     kaze/core/io/BufferWriter.test.cpp
     kaze/core/io/BufferView.test.cpp
+    kaze/core/io/StructIO.test.cpp
     kaze/core/io/StructLayout.test.cpp
-
-
 
     kaze/core/macros/enum.test.cpp
 

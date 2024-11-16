@@ -10,20 +10,25 @@ static constexpr int BytesPerRead = 1024;
 /// Number of bytes written in iterations, as opposed to all at once
 static constexpr int BytesPerWrite = 1024;
 
+
 #if KAZE_PLATFORM_ANDROID
 #include <kaze/core/platform/native/android/AndroidNative.h>
 #include <android/asset_manager.h>
+
+static constexpr auto ApkPrefix = "apk://";
+static constexpr auto ApkPrefixLength = std::char_traits<char>::length(ApkPrefix);
+
 static auto loadFileFromApk(KAZE_NS::StringView path, KAZE_NS::Ubyte **outData, KAZE_NS::Size *outSize) -> KAZE_NS::Bool
 {
     USING_KAZE_NS;
 
-    if (path.size() <= 6) // "apk://" is the prefix
+    if (path.size() <= ApkPrefixLength) // "apk://" is the prefix
     {
         KAZE_PUSH_ERR(Error::InvalidArgErr, "path was not a valid apk path");
         return False;
     }
 
-    const auto actualPath = path.substr(6);
+    const auto actualPath = path.substr(ApkPrefixLength);
     const auto actualPathStr = String(actualPath.data(), actualPath.size()); // ensure it's null-terminated properly
 
     auto asset = android::openAssetStream(actualPathStr.c_str());
@@ -124,7 +129,7 @@ auto file::load(StringView path, Ubyte **outData, Size *outSize) -> Bool
     }
 
 #if KAZE_PLATFORM_ANDROID
-    if (path.starts_with("apk://"))
+    if (path.starts_with(ApkPrefix))
     {
         return loadFileFromApk(path, outData, outSize);
     }
