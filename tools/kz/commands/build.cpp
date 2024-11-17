@@ -90,6 +90,13 @@ namespace kz::build {
         return macos(buildType, targetName);
     }
 
+    auto ios(BuildType::Enum buildType, std::string_view targetName) -> int
+    {
+        auto buildTypeName = BuildType::getName(buildType);
+        return std::system( std::format("cmake --build build/ios/{} --target {} --parallel",
+            buildTypeName, targetName).c_str() );
+    }
+
     auto listTargets(TargetPlatform::Enum platform, BuildType::Enum buildType) -> int
     {
         const auto buildPath = fs::path("build") / TargetPlatform::getName(platform) / BuildType::getName(buildType);

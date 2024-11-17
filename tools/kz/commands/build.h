@@ -15,6 +15,7 @@ namespace kz::build {
     auto linux(BuildType::Enum buildType, std::string_view targetName) -> int;
     auto macos(BuildType::Enum buildType, std::string_view targetName) -> int;
     auto windows(BuildType::Enum buildType, std::string_view targetName) -> int;
-
+    auto ios(BuildType::Enum buildType, std::string_view targetName) -> int;
+    
     auto listTargets(TargetPlatform::Enum platform, BuildType::Enum buildType) -> int;
 }

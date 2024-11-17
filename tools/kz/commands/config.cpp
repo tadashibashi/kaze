@@ -85,7 +85,7 @@ namespace kz::config {
     auto emscripten(BuildType::Enum buildType, std::string_view emsdkPath) -> int
     {
         std::string_view buildTypeName = BuildType::getName(buildType);
-        const auto  cmakeBuildDir = fs::path("build") / "emscripten" / buildTypeName;
+        const auto cmakeBuildDir = fs::path("build") / "emscripten" / buildTypeName;
         if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.string());
             !result )
         {
@@ -105,6 +105,23 @@ namespace kz::config {
             return result;
 
         return copyCompileCommands("emscripten", buildTypeName);
+    }
+
+    auto ios(BuildType::Enum buildType) -> int
+    {
+        auto buildTypeName = BuildType::getName(buildType);
+        const auto cmakeBuildDir = fs::path("build") / "emscripten" / buildTypeName;
+        if (const auto result = cmake::api::generateQueryFile(cmakeBuildDir.string());
+            !result )
+        {
+            return result;
+        }
+
+        auto result = std::system(std::format(
+            "cmake -B build/ios/{} -S . -DCMAKE_BUILD_TYPE={} -G Xcode -DCMAKE_SYSTEM_NAME=iOS",
+            buildTypeName, buildTypeName).c_str());
+
+        return result;
     }
 
 }  // namespace kz::config

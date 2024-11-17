@@ -263,6 +263,7 @@ namespace kz {
         case TargetPlatform::Emscripten:
             result = config::emscripten(m_buildType, m_emsdkPath.string());
             break;
+        case TargetPlatform::iOS:        result = config::ios(m_buildType); break;
         default:
             return Result::PlatformNotSupported;
             break;
@@ -286,10 +287,10 @@ namespace kz {
             case TargetPlatform::MacOS:      result = build::macos(m_buildType, targetName);   break;
             case TargetPlatform::Linux:      result = build::linux(m_buildType, targetName);   break;
             case TargetPlatform::Emscripten: result = build::emscripten(m_buildType, targetName, m_emsdkPath.string()); break;
+            case TargetPlatform::iOS:        result = build::ios(m_buildType, targetName); break;
             default: return Result::PlatformNotSupported; break;
             }
         }
-
 
         return (result == 0) ? Result::Ok : Result::RuntimeError;
     }
