@@ -33,4 +33,10 @@ constexpr WindowInit::Flags operator |(const WindowInit::Flags a, const WindowIn
     return static_cast<WindowInit::Flags>(static_cast<Uint>(a) | static_cast<Uint>(b));
 }
 
+constexpr WindowInit::Flags &operator |=(WindowInit::Flags &a, const WindowInit::Flags b)
+{
+    a = static_cast<WindowInit::Flags>(static_cast<Uint>(a) | static_cast<Uint>(b));
+    return a;
+}
+
 KAZE_NS_END
