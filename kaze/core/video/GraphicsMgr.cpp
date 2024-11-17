@@ -1,6 +1,8 @@
 #include "GraphicsMgr.h"
 #include "Window.h"
+#include "bgfx/defines.h"
 
+#include <build/emscripten/Debug/_deps/bgfx-cmake-src/bgfx/include/bgfx/defines.h>
 #include <kaze/core/debug.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/backend/window.h>
@@ -145,9 +147,16 @@ auto GraphicsMgr::close() -> void
     }
 }
 
-auto GraphicsMgr::reset(Int width, Int height) -> void
+auto GraphicsMgr::reset(Int width, Int height, WindowInit::Flags flags) -> void
 {
-    bgfx::reset(width, height, BGFX_RESET_VSYNC | BGFX_RESET_HIDPI); // todo: expose flags?
+    Uint bgfxFlags = BGFX_RESET_VSYNC | BGFX_RESET_HIDPI;
+
+    if (flags & WindowInit::Fullscreen)
+        bgfxFlags |= BGFX_RESET_FULLSCREEN;
+    if (flags & WindowInit::Transparent)
+        bgfxFlags |= BGFX_RESET_TRANSPARENT_BACKBUFFER;
+
+    bgfx::reset(width, height, bgfxFlags);
 }
 
 auto GraphicsMgr::touch(Int viewId) -> void

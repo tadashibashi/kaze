@@ -266,7 +266,13 @@ auto App::processWindowEvent(const WindowEvent &e, const Double timestamp) -> vo
 
     case WindowEvent::ResizedFramebuffer:
         {
-            m->graphics.reset(e.data0, e.data1);
+            WindowInit::Flags flags = WindowInit::None;
+            if (m->window.isFullscreen())
+                flags |= WindowInit::Fullscreen;
+            if (m->window.isTransparent())
+                flags |= WindowInit::Transparent;
+
+            m->graphics.reset(e.data0, e.data1, flags);
             frame();
         #if KAZE_PLATFORM_APPLE || KAZE_PLATFORM_WINDOWS
             m->graphics.renderFrame();
