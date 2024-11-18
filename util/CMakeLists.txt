@@ -9,7 +9,7 @@ if (KAZE_TOOLS_OUTPUT_DIRECTORY)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${KAZE_TOOLS_OUTPUT_DIRECTORY})
 endif()
 
-include(kaze/deps/tools)
+include(kaze/deps/util)
 
 add_subdirectory(kshaderc)
 add_subdirectory(kz)

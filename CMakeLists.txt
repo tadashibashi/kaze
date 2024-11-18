@@ -66,7 +66,7 @@ set(KAZE_GRAPHICS_IMGUI       ON              CACHE BOOL  "Include Imgui backend
 
 # ----- Kaze Toolkit Options -----
 set(KAZE_TK                   ON                      CACHE BOOL "Build Kaze Toolkit")
-set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GRAPHICS_IMGUI}  CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")
+set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GRAPHICS_IMGUI}  CACHE BOOL "Add ImGUI plugin to Kaze Toolkit. KAZE_GRAPHICS_IMGUI must be ON")
 
 # ===== Projects ==============================================================
 # Prevent projects from generating ctest targets
@@ -80,5 +80,4 @@ if (NOT KAZE_BUILD_TOOLS)
     endif()
 endif()
 
-add_subdirectory(tools)
-
+add_subdirectory(util)

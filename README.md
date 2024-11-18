@@ -60,14 +60,14 @@ cd build/tests/runtime/bin && ./kaze_test_01_app
 #### Mac & Linux
 Terminal (bash)
 ```bash
-source scripts/setup.sh
+source util/setup.sh
 kz run kaze_test_01_app
 ```
 
 #### Windows
 Powershell
 ```powershell
-scripts\setup.ps1
+util\setup.ps1
 kz run kaze_test_01_app
 ```
 

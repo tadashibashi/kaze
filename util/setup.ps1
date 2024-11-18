@@ -87,7 +87,7 @@ $TOOLS_DIR = Split-Path -Path $SCRIPT_PATH -Parent
 $KAZE_DIR_RAW = Join-Path -Path $TOOLS_DIR -ChildPath ".."
 $KAZE_DIR = Resolve-Path -LiteralPath $KAZE_DIR_RAW
 
-$KAZE_TOOLS_BUILD_DIR = Join-Path -Path $KAZE_DIR -ChildPath build\tools
+$KAZE_TOOLS_BUILD_DIR = Join-Path -Path $KAZE_DIR -ChildPath build\util
 
 # Change directory to KAZE_DIR and run cmake commands
 Set-Location -Path $KAZE_DIR
@@ -111,4 +111,4 @@ if ($LASTEXITCODE -eq 0) {
 & cmake --build "$KAZE_TOOLS_BUILD_DIR" --target shaderc --parallel
 & cmake --build "$KAZE_TOOLS_BUILD_DIR" --target crunch --parallel
 
-$env:PATH += ";$KAZE_DIR\build\tools\bin"
+$env:PATH += ";$KAZE_DIR\build\util\bin"

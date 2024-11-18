@@ -25,8 +25,8 @@ namespace kz::config {
         std::string_view generator = console::isProgramAvailable("ninja") ? "-G Ninja" : "";
 #endif
         return std::system(
-            std::format("cmake -B build/tools -S . -DCMAKE_BUILD_TYPE=Release {} "
-                "-DKAZE_BUILD_TOOLS=1 -DKAZE_TOOLS_OUTPUT_DIRECTORY=build/tools/bin", generator).c_str()
+            std::format("cmake -B build/util -S . -DCMAKE_BUILD_TYPE=Release {} "
+                "-DKAZE_BUILD_TOOLS=1 -DKAZE_TOOLS_OUTPUT_DIRECTORY=build/util/bin", generator).c_str()
         );
     }
 

@@ -123,7 +123,7 @@ namespace kz::run {
 
         return serve::emscripten(buildType, target,
             std::format("{} {}", runtimeName,
-                (fs::path("tools") / "kserve" / "index.js").string())).code;
+                (fs::path("util") / "kserve" / "index.js").string())).code;
     }
 
 }  // namespace kz::run

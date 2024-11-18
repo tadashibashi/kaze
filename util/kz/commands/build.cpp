@@ -62,7 +62,7 @@ namespace kz::build {
 
     auto self() -> int
     {
-        return std::system("cmake --build build/tools --target kz");
+        return std::system("cmake --build build/util --target kz");
     }
 
     auto emscripten(BuildType::Enum buildType, std::string_view targetName,
