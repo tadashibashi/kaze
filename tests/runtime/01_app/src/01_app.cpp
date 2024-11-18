@@ -222,6 +222,7 @@ private:
             if (ImGui::Button("Press Me!"))
             {
                 audio.playSound(playerScoreSnd, False);
+                KAZE_LOG("Pressed the button at: {}", time());
             }
         }
         ImGui::End();

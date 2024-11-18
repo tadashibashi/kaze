@@ -8,19 +8,105 @@
 
 #if KAZE_DEBUG // =============================================================
 
-#if KAZE_PLATFORM_ANDROID
+#if KAZE_PLATFORM_EMSCRIPTEN
+#   include <emscripten/emscripten.h>
+#   include <emscripten/webaudio.h>
+#   include <emscripten/console.h>
+#   include <spdlog/spdlog.h>
+
+#   define KAZE_CORE_LOG(...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_log(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->info(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+#   define KAZE_CORE_WARN(...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_warn(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->warn(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+#   define KAZE_CORE_ERR(...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_error(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->error(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+#   define KAZE_CORE_FATAL(...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_error(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->critical(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+#   define KAZE_PUSH_ERR(code, ...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        KAZE_NS::setError(kazeCoreLogMessage, (code), (__FILE__), (__LINE__), (KAZE_FUNCTION) ); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_error(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->error(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+#   define KAZE_LOG(...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_log(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->info(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+#   define KAZE_WARN(...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_warn(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->warn(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+#   define KAZE_ERR(...) do { \
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        if (emscripten_current_thread_is_audio_worklet()) { \
+            emscripten_console_error(kazeCoreLogMessage.c_str()); \
+        } else { \
+            KAZE_NS::debug::getLogger()->error(kazeCoreLogMessage); \
+        } \
+    } while(0)
+
+KAZE_NS_BEGIN
+namespace debug {
+    spdlog::logger *getLogger();
+    spdlog::logger *getClientLogger();
+}
+KAZE_NS_END
+
+#elif KAZE_PLATFORM_ANDROID
 #   include <android/log.h>
 #   define KAZE_CORE_LOG(...) do { \
-        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__);\
-        __android_log_print(ANDROID_LOG_INFO, "kaze", "%s\n", (kazeCoreLogMessage).c_str());\
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        __android_log_print(ANDROID_LOG_INFO, "kaze", "%s\n", (kazeCoreLogMessage).c_str()); \
     } while(0)
 #   define KAZE_CORE_WARN(...) do { \
-        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__);\
-        __android_log_print(ANDROID_LOG_WARN, "kaze", "%s\n", (kazeCoreLogMessage).c_str());\
+        const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+        __android_log_print(ANDROID_LOG_WARN, "kaze", "%s\n", (kazeCoreLogMessage).c_str()); \
     } while(0)
 #   define KAZE_CORE_ERR(...) do { \
-    const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__);\
-    __android_log_print(ANDROID_LOG_ERROR, "kaze", "%s\n", (kazeCoreLogMessage).c_str());\
+    const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
+    __android_log_print(ANDROID_LOG_ERROR, "kaze", "%s\n", (kazeCoreLogMessage).c_str()); \
 } while(0)
 
 #   define KAZE_PUSH_ERR(code, ...) do { \
