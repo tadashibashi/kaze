@@ -1,10 +1,9 @@
 #pragma once
-
 #include <kaze/core/lib.h>
+#include <kaze/core/ImageContainer.h>
+#include <kaze/core/WindowConstants.h>
 #include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/math/Vec/Vec2.h>
-#include <kaze/core/video/Image.h>
-#include <kaze/core/video/WindowConstants.h>
 
 KAZE_NS_BEGIN
 
@@ -22,7 +21,7 @@ public:
     /// \param[in]  image    image with pixel data
     /// \param[in]  anchor   offset where the pointer location exists within the image
     /// \returns whether the operation succeeded.
-    auto create(const String &key, const Image &image, Vec2i anchor) -> Bool;
+    auto create(const String &key, const ImageContainer &image, Vec2i anchor) -> Bool;
 
     /// Set a custom cursor
     /// \param[in]  key   the key of custom cursor to set (case-sensitive)

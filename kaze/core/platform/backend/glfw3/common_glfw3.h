@@ -1,7 +1,6 @@
 /// \file common_glfw3.h
 /// Contains common macros, functions and data types for the GLFW3 backend
 #pragma once
-
 #include "window_glfw3.h"
 
 #include <kaze/core/lib.h>

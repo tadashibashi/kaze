@@ -1,10 +1,10 @@
 #pragma once
 
 #include <kaze/core/lib.h>
+#include <kaze/core/ImageContainer.h>
+#include <kaze/core/WindowConstants.h>
 #include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/input/MouseConstants.h>
-#include <kaze/core/video/ImageHandle.h>
-#include <kaze/core/video/WindowConstants.h>
 
 KAZE_NS_BEGIN
 
@@ -21,7 +21,7 @@ namespace backend::cursor {
     /// \param[in]  anchorY    anchor y position in pixels within the image, where the click point is
     /// \param[out] outCursor  retrieves the created cursor handle
     /// \returns whether the operation was successful.
-    auto createCustom(ImageHandle image, int anchorX, int anchorY, CursorHandle *outCursor) noexcept -> bool;
+    auto createCustom(const ImageContainer &image, int anchorX, int anchorY, CursorHandle *outCursor) noexcept -> bool;
 
     /// Set the cursor appearance
     /// \param[in]  window  window to set cursor on

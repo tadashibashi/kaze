@@ -7,7 +7,7 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/MemView.h>
 #include <kaze/core/math/Vec/Vec2.h>
-#include <kaze/core/video/Color.h>
+#include <kaze/graphics/Color.h>
 
 KAZE_NS_BEGIN
 

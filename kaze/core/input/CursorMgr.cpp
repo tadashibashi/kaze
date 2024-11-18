@@ -1,6 +1,6 @@
 #include "CursorMgr.h"
 #include <kaze/core/platform/backend/backend.h>
-#include <kaze/core/video/Window.h>
+#include <kaze/core/Window.h>
 
 #include <kaze/core/debug.h>
 
@@ -11,7 +11,7 @@ CursorMgr::~CursorMgr()
     clear();
 }
 
-auto CursorMgr::create(const String &key, const Image &image, Vec2i anchor) -> Bool
+auto CursorMgr::create(const String &key, const ImageContainer &image, Vec2i anchor) -> Bool
 {
     if (m_customCursors.contains(key)) // guard against duplicates
     {
@@ -20,7 +20,7 @@ auto CursorMgr::create(const String &key, const Image &image, Vec2i anchor) -> B
     }
 
     CursorHandle handle;
-    if ( !backend::cursor::createCustom(image.handle(), anchor.x, anchor.y, &handle) )
+    if ( !backend::cursor::createCustom(image, anchor.x, anchor.y, &handle) )
         return False;
 
     m_customCursors[key] = handle;

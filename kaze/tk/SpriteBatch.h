@@ -2,10 +2,10 @@
 #include <kaze/tk/lib.h>
 #include <kaze/core/math/Rect.h>
 #include <kaze/core/math/Vec/Vec2.h>
-#include <kaze/core/video/Color.h>
-#include <kaze/core/video/ShaderProgram.h>
-#include <kaze/core/video/Texture2D.h>
-#include <kaze/core/video/UniformMgr.h>
+#include <kaze/graphics/Color.h>
+#include <kaze/graphics/ShaderProgram.h>
+#include <kaze/graphics/Texture2D.h>
+#include <kaze/graphics/UniformMgr.h>
 
 KAZE_NS_BEGIN
 

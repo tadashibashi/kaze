@@ -1,10 +1,7 @@
 #pragma once
-
-#include "GamepadConstants.h"
-
 #include <kaze/core/lib.h>
+#include <kaze/core/input/GamepadConstants.h>
 #include <kaze/core/math/Vec/Vec2.h>
-
 
 KAZE_NS_BEGIN
 

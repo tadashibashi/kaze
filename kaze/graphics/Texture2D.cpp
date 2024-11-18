@@ -4,9 +4,9 @@
 
 #include <kaze/core/debug.h>
 #include <kaze/core/io/io.h>
-#include <kaze/core/video/Image.h>
-#include <kaze/core/video/private/image.h>
-#include <kaze/core/video/private/texture.h>
+#include <kaze/graphics/Image.h>
+#include <kaze/graphics/private/image.h>
+#include <kaze/graphics/private/texture.h>
 
 #include <bimg/decode.h>
 #include <bgfx/bgfx.h>

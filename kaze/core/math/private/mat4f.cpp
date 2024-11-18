@@ -1,6 +1,6 @@
 #include "mat4f.h"
-#include <bgfx/bgfx.h>
 #include <bx/math.h>
+#include <kaze/core/math/mathf.h>
 
 KAZE_NS_BEGIN
 
@@ -34,7 +34,7 @@ namespace mathf::mat4f {
             rt,
             near,
             far,
-            bgfx::getCaps()->homogeneousDepth);
+            mathf::getHomogenousNDC());
     }
 
     auto proj(
@@ -47,7 +47,7 @@ namespace mathf::mat4f {
             fov.ptr,
             near,
             far,
-            bgfx::getCaps()->homogeneousDepth);
+            mathf::getHomogenousNDC());
     }
 
     auto proj(
@@ -62,7 +62,7 @@ namespace mathf::mat4f {
             aspect,
             near,
             far,
-            bgfx::getCaps()->homogeneousDepth);
+            mathf::getHomogenousNDC());
     }
 
     auto projInf(
@@ -73,7 +73,7 @@ namespace mathf::mat4f {
         bx::mtxProjInf(result,
             fov.ptr,
             near,
-            bgfx::getCaps()->homogeneousDepth);
+            mathf::getHomogenousNDC());
     }
 
     auto projInf(
@@ -90,7 +90,7 @@ namespace mathf::mat4f {
             lt,
             rt,
             near,
-            bgfx::getCaps()->homogeneousDepth);
+            mathf::getHomogenousNDC());
     }
 
     auto projInf(
@@ -103,7 +103,7 @@ namespace mathf::mat4f {
             fovy,
             aspect,
             near,
-            bgfx::getCaps()->homogeneousDepth);
+            mathf::getHomogenousNDC());
     }
 
     auto ortho(
@@ -124,7 +124,7 @@ namespace mathf::mat4f {
             near,
             far,
             offset,
-            bgfx::getCaps()->homogeneousDepth);
+            mathf::getHomogenousNDC());
     }
 }
 

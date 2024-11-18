@@ -2,7 +2,7 @@
 
 #include <kaze/core/debug.h>
 #include <kaze/core/io/io.h>
-#include <kaze/core/video/private/image.h>
+#include <kaze/graphics/private/image.h>
 
 KAZE_NS_BEGIN
 

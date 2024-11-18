@@ -8,6 +8,7 @@
 
 KAUDIO_NS_BEGIN
 
+/// StreamSource Initialization struct used in StreamSource::_init
 struct StreamSourceInit {
     /// Audio context object
     AudioContext *context;
@@ -38,10 +39,11 @@ public:
     ~StreamSource() override;
     StreamSource(StreamSource &&other) noexcept;
 
+    // Pool init/release
     auto init_(const StreamSourceInit &config) -> Bool;
-
     auto release_() -> void override;
 
+    // Open stream from a file
     auto openFile(const String &filepath, Bool inMemory = false) -> Bool;
 
     /// Open stram from const memory. Memory pointer must not be moved or invalidated for

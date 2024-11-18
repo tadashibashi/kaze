@@ -1,13 +1,11 @@
 #pragma once
 #include <kaze/core/lib.h>
+#include <kaze/core/WindowConstants.h>
 #include <kaze/core/input/InputEvents.h>
 #include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/input/GamepadConstants.h>
 #include <kaze/core/input/KeyboardConstants.h>
 #include <kaze/core/input/MouseConstants.h>
-
-#include <kaze/core/video/ImageHandle.h>
-#include <kaze/core/video/WindowConstants.h>
 
 #include <kaze/core/traits.h>
 
@@ -17,8 +15,6 @@
 #include "window.h"   // IWYU pragma: export
 
 KAZE_NS_BEGIN
-
-class Image;
 
 namespace backend {
     /// Struct to pass to the backend to hook into backend events

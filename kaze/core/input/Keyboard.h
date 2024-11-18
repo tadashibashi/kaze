@@ -5,7 +5,7 @@
 #include "KeyboardConstants.h"
 
 #include <kaze/core/lib.h>
-#include <kaze/core/video/WindowConstants.h>
+#include <kaze/core/WindowConstants.h>
 
 KAZE_NS_BEGIN
 struct KeyboardEvent;

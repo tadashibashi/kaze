@@ -2,7 +2,7 @@
 #include "Uniform.h"
 
 #include <kaze/core/lib.h>
-#include <kaze/core/video/Texture2D.h>
+#include <kaze/graphics/Texture2D.h>
 
 KAZE_NS_BEGIN
 

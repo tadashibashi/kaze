@@ -7,6 +7,7 @@
 KAZE_NS_BEGIN
 namespace mathf {
 
+
     // ===== Basic Math =======================================================
 
     /// Return the greatest of two numbers
@@ -370,6 +371,17 @@ namespace mathf {
     {
         mathf::rotateCoords(x, y, originX, originY, mathf::toRadians(degrees), resultX, resultY);
     }
+
+    /// Set whether homogenous normalized device coordinates should be used for 4x4 matrix perspective calculations.
+    /// Typically only needs to be set once during graphics library initialization.
+    /// \param[in]  homogenousNDC  `True` ranges from -1 to 1;
+    ///                            `False` ranges from 0 to 1
+    auto setHomogenousNDC(Bool homogenousNDC) -> void;
+
+    /// Get whether homogenous normalized device coordinates should be used for 4x4 matrix perspective calculations.
+    /// \returns a Boolean where `True` - NDC ranges from -1 to 1;
+    ///                          `False` - NDC ranges from 0 to 1
+    auto getHomogenousNDC() noexcept -> Bool;
 } // namespace mathf
 
 KAZE_NS_END

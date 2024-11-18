@@ -1,6 +1,6 @@
 #include "TextureHandle.h"
 #include <bgfx/bgfx.h>
-#include <kaze/core/video/private/texture.h>
+#include <kaze/graphics/private/texture.h>
 
 KAZE_NS_BEGIN
 

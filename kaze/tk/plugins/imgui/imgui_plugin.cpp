@@ -1,11 +1,11 @@
 #include "imgui_plugin.h"
-#include "imgui_bgfx.h"
-#include "imgui_kaze.h"
+#include <imgui_bgfx.h>
+#include <imgui_kaze.h>
 
 #include <imgui/imgui.h>
 
 #include <kaze/core/platform/backend/backend.h>
-#include <kaze/core/video/Color.h>
+#include <kaze/graphics/Color.h>
 
 KAZE_NS_BEGIN
 

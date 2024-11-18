@@ -4,7 +4,7 @@
 #include <kaze/tk/lib.h>
 #include <kaze/core/math/Matrix.h>
 #include <kaze/core/math/Rect.h>
-#include <kaze/core/video/Window.h>
+#include <kaze/core/Window.h>
 
 KAZE_NS_BEGIN
 

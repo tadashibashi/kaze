@@ -1,12 +1,10 @@
 #pragma once
-
-#include "GamepadConstants.h"
-#include "KeyboardConstants.h"
-#include "MouseConstants.h"
-
 #include <kaze/core/lib.h>
+#include <kaze/core/WindowConstants.h>
 #include <kaze/core/math/Vec/Vec2.h>
-#include <kaze/core/video/WindowConstants.h>
+#include <kaze/core/input/GamepadConstants.h>
+#include <kaze/core/input/KeyboardConstants.h>
+#include <kaze/core/input/MouseConstants.h>
 
 KAZE_NS_BEGIN
 

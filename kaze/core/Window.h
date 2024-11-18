@@ -2,10 +2,9 @@
 /// Contains Window class, which wraps a backend window for convenience and ease of use
 /// via object-oriented encapsulation/RAII.
 #pragma once
-#include "WindowConstants.h"
-
-#include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/lib.h>
+#include <kaze/core/WindowConstants.h>
+#include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/math/Rect.h>
 

@@ -15,7 +15,7 @@ target_link_libraries(kaze_core PUBLIC
     glm
     nlohmann_json
     spdlog::spdlog
-    bgfx bx bimg bimg_decode
+    bx
 )
 
 if (NOT KAZE_PLATFORM_ANDROID) # Android ndk has difficulty linking with pch's
@@ -39,6 +39,7 @@ target_sources(kaze_core PRIVATE
         AssetLoader.h
         AlignedList.h
         Handle.h
+        ImageContainer.h
         MemView.h
         MultiPool.h
         Optional.h
@@ -46,6 +47,9 @@ target_sources(kaze_core PRIVATE
         Pool.h
         ServiceProvider.h
         ServiceProvider.cpp
+        Window.h
+        Window.cpp
+        WindowConstants.h
 
         input/CursorMgr.h
         input/CursorMgr.cpp
@@ -53,10 +57,10 @@ target_sources(kaze_core PRIVATE
         input/Gamepad.cpp
         input/InputMgr.h
         input/InputMgr.cpp
-        input/KeyboardConstants.h
-        input/KeyboardConstants.cpp
         input/Keyboard.h
         input/Keyboard.cpp
+        input/KeyboardConstants.h
+        input/KeyboardConstants.cpp
         input/Mouse.h
         input/Mouse.cpp
         input/MouseConstants.h
@@ -68,6 +72,7 @@ target_sources(kaze_core PRIVATE
         math/easings.h
         math/geometry.h
         math/Matrix.h
+        math/mathf.cpp
         math/mathf.h
         math/Rect.h
         math/Rect3D.h
@@ -79,41 +84,6 @@ target_sources(kaze_core PRIVATE
         math/Vec.hpp
         math/private/mat4f.h
         math/private/mat4f.cpp
-
-        video/Color.h
-        video/Color.cpp
-        video/GraphicsMgr.h
-        video/GraphicsMgr.cpp
-        video/Image.h
-        video/Image.cpp
-        video/ImageHandle.h
-        video/ImageHandle.cpp
-        video/PixelFormat.h
-        video/PixelFormat.cpp
-        video/Renderable.h
-        video/Renderable.cpp
-        video/Shader.h
-        video/Shader.cpp
-        video/ShaderProgram.h
-        video/ShaderProgram.cpp
-        video/Texture2D.h
-        video/Texture2D.cpp
-        video/TextureHandle.h
-        video/TextureHandle.cpp
-        video/Uniform.h
-        video/Uniform.cpp
-        video/UniformMgr.h
-        video/UniformMgr.cpp
-        video/VertexLayout.h
-        video/VertexLayout.cpp
-        video/Window.h
-        video/Window.cpp
-        video/WindowConstants.h
-
-        video/private/image.h
-        video/private/image.cpp
-        video/private/texture.h
-        video/private/texture.cpp
 )
 
 # ===== Compile defines ================

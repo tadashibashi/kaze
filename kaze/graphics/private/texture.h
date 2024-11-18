@@ -2,9 +2,9 @@
 #include <kaze/core/lib.h>
 #include <kaze/core/math/Vec/Vec2.h>
 #include <kaze/core/MemView.h>
-#include <kaze/core/video/ImageHandle.h>
-#include <kaze/core/video/PixelFormat.h>
-#include <kaze/core/video/TextureHandle.h>
+#include <kaze/graphics/ImageHandle.h>
+#include <kaze/graphics/PixelFormat.h>
+#include <kaze/graphics/TextureHandle.h>
 
 KAZE_NS_BEGIN
 

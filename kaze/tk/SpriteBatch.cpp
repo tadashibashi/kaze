@@ -1,11 +1,11 @@
 #include "SpriteBatch.h"
-
+#include <kaze/core/Window.h>
 #include <kaze/core/debug.h>
 #include <kaze/core/math/Vec/Vec3.h>
 #include <kaze/core/platform/filesys/filesys.h>
-#include <kaze/core/video/GraphicsMgr.h>
-#include <kaze/core/video/Renderable.h>
-#include <kaze/core/video/Window.h>
+#include <kaze/graphics/GraphicsMgr.h>
+#include <kaze/graphics/Renderable.h>
+
 #include <filesystem>
 
 KAZE_NS_BEGIN

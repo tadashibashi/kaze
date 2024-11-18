@@ -1,13 +1,12 @@
 /// \file Window_glfw3.h
 /// Contains GLFW3 window-handling functionality
 #pragma once
-
 #include <kaze/core/lib.h>
+#include <kaze/core/WindowConstants.h>
 #include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/math/Rect.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/defines.h>
-#include <kaze/core/video/WindowConstants.h>
 
 #include <GLFW/glfw3.h>
 

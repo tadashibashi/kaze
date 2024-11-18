@@ -1,15 +1,16 @@
 #include "GraphicsMgr.h"
-#include "Window.h"
-#include "bgfx/defines.h"
 
-#include <build/emscripten/Debug/_deps/bgfx-cmake-src/bgfx/include/bgfx/defines.h>
+#include <kaze/graphics/VertexLayout.h>
+
 #include <kaze/core/debug.h>
+#include <kaze/core/math/mathf.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/backend/window.h>
 #include <kaze/core/platform/defines.h>
-#include <kaze/core/video/VertexLayout.h>
+#include <kaze/core/Window.h>
 
 #include <bgfx/bgfx.h>
+#include <bgfx/defines.h>
 #include <bgfx/platform.h>
 
 #include <mutex>
@@ -128,6 +129,8 @@ auto GraphicsMgr::init(const GraphicsInit &initConfig) -> Bool
     m->window = std::move(Window::fromHandleRef(window));
     m->maxTransientVBufferSize = initConfig.maxTransientVBufferSize;
     m->maxTransientIBufferSize = initConfig.maxTransientIBufferSize;
+
+    mathf::setHomogenousNDC(bgfx::getCaps()->homogeneousDepth);
     return KAZE_TRUE;
 }
 

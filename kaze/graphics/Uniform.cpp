@@ -1,6 +1,5 @@
 #include "Uniform.h"
 #include "Color.h"
-#include "Texture2D.h"
 
 #include <kaze/core/debug.h>
 #include <bgfx/bgfx.h>

@@ -2,7 +2,7 @@
 #include <kaze/tk/lib.h>
 #include <kaze/tk/AppPlugin.h>
 
-#include <kaze/core/video/WindowConstants.h>
+#include <kaze/core/WindowConstants.h>
 
 KAZE_NS_BEGIN
 

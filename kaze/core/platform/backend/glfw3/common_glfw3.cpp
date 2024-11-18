@@ -5,7 +5,6 @@
 
 #include "GLFW/glfw3.h"
 
-#include <build/desktop/Debug/_deps/glfw3-src/include/GLFW/glfw3.h>
 #include <kaze/core/platform/backend/backend.h>
 #include <kaze/core/platform/defines.h>
 
@@ -408,16 +407,15 @@ namespace backend {
         return true;
     }
 
-    auto cursor::createCustom(ImageHandle image, int anchorX, int anchorY, CursorHandle *outCursor) noexcept -> bool
+    auto cursor::createCustom(const ImageContainer &image, int anchorX, int anchorY, CursorHandle *outCursor) noexcept -> bool
     {
-        RETURN_IF_NULL(image.handle);
-        RETURN_IF_NULL(image.data());
+        RETURN_IF_NULL(image.data);
         RETURN_IF_NULL(outCursor);
 
         GLFWimage glfwImage = {
-            .width = static_cast<int>(image.width()),
-            .height = static_cast<int>(image.height()),
-            .pixels = static_cast<unsigned char *>(image.data())
+            .width = static_cast<int>(image.width),
+            .height = static_cast<int>(image.height),
+            .pixels = const_cast<unsigned char *>((const unsigned char *)(image.data))
         };
 
         const auto cursor = glfwCreateCursor(&glfwImage, anchorX, anchorY);

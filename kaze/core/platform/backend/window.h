@@ -1,7 +1,7 @@
 #pragma once
-#include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/lib.h>
-#include <kaze/core/video/WindowConstants.h>
+#include <kaze/core/WindowConstants.h>
+#include <kaze/core/input/CursorConstants.h>
 
 KAZE_NS_BEGIN
 

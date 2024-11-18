@@ -1,6 +1,6 @@
 #pragma once
 #include <kaze/core/input/CursorConstants.h>
-#include <kaze/core/video/WindowConstants.h>
+#include <kaze/core/WindowConstants.h>
 #include <kaze/tk/lib.h>
 
 #include "imgui/imgui.h"

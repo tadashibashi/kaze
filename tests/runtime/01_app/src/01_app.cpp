@@ -8,12 +8,12 @@
 #include <kaze/core/input/CursorConstants.h>
 #include <kaze/core/platform/filesys/filesys.h>
 #include <kaze/core/math/Vec/Vec3.h>
-#include <kaze/core/video/GraphicsMgr.h>
-#include <kaze/core/video/Renderable.h>
-#include <kaze/core/video/Texture2D.h>
-#include <kaze/core/video/UniformMgr.h>
+#include <kaze/graphics/GraphicsMgr.h>
+#include <kaze/graphics/Image.h>
+#include <kaze/graphics/Renderable.h>
+#include <kaze/graphics/Texture2D.h>
+#include <kaze/graphics/UniformMgr.h>
 
-#include <bgfx/bgfx.h>
 #include <kaze/tk/SpriteBatch.h>
 #include <kaze/tk/plugins/imgui/imgui_plugin.h>
 

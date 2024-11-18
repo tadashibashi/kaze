@@ -9,7 +9,7 @@
 #include <kaze/core/input/InputEvents.h>
 
 #include <kaze/core/math/Vec/Vec2.h>
-#include <kaze/core/video/WindowConstants.h>
+#include <kaze/core/WindowConstants.h>
 
 KAZE_NS_BEGIN
 

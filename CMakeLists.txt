@@ -61,9 +61,12 @@ set(KAZE_AUDIO_DECODE_MP3     ON              CACHE BOOL    "Support decoding Mp
 set(KAZE_AUDIO_DECODE_VORBIS  ON              CACHE BOOL    "Support decoding Ogg vorbis audio format")
 set(KAZE_AUDIO_DECODE_WAV     ON              CACHE BOOL    "Support decoding Wav audio format")
 
+# ----- Kaze Graphics Options -----
+set(KAZE_GRAPHICS_IMGUI       ON              CACHE BOOL  "Include Imgui backend and source files")
+
 # ----- Kaze Toolkit Options -----
-set(KAZE_TK                   ON              CACHE BOOL "Build Kaze Toolkit")
-set(KAZE_TK_IMGUI_PLUGIN      ON              CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")
+set(KAZE_TK                   ON                      CACHE BOOL "Build Kaze Toolkit")
+set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GRAPHICS_IMGUI}  CACHE BOOL "Add ImGUI plugin to Kaze Toolkit")
 
 # ===== Projects ==============================================================
 # Prevent projects from generating ctest targets

@@ -542,21 +542,15 @@ namespace backend {
         return true;
     }
 
-    auto cursor::createCustom(const ImageHandle image, int anchorX, int anchorY, CursorHandle *outCursor) noexcept -> bool
+    auto cursor::createCustom(const ImageContainer &image, int anchorX, int anchorY, CursorHandle *outCursor) noexcept -> bool
     {
-        if ( !image )
-        {
-            KAZE_PUSH_ERR(Error::NullArgErr, "Required arg `image` was null");
-            return false;
-        }
-
         if ( !outCursor )
         {
             KAZE_PUSH_ERR(Error::NullArgErr, "Required arg `outCursor` was null");
             return false;
         }
 
-        const auto sdlSurf = SDL_CreateSurface(image.width(), image.height(), SDL_PIXELFORMAT_RGBA8888);
+        const auto sdlSurf = SDL_CreateSurface(image.width, image.height, SDL_PIXELFORMAT_RGBA8888);
         if ( !sdlSurf )
         {
             KAZE_PUSH_ERR(Error::BE_RuntimeErr, "Failed to create SDL_Surface: {}", SDL_GetError());
@@ -570,7 +564,7 @@ namespace backend {
             return false;
         }
 
-        memory::copy(sdlSurf->pixels, image.data(), image.size());
+        memory::copy(sdlSurf->pixels, image.data, image.size);
         SDL_UnlockSurface(sdlSurf);
         SDL_DestroySurface(sdlSurf);
 

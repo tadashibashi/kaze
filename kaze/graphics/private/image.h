@@ -2,8 +2,8 @@
 /// Contains low-level functions for handling loading images
 #pragma once
 #include <kaze/core/lib.h>
-#include <kaze/core/video/ImageHandle.h>
-#include <kaze/core/video/PixelFormat.h>
+#include <kaze/graphics/ImageHandle.h>
+#include <kaze/graphics/PixelFormat.h>
 
 KAZE_NS_BEGIN
 

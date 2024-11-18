@@ -7,8 +7,8 @@
 #include <kaze/core/Action.h>
 #include <kaze/core/input/InputMgr.h>
 #include <kaze/core/math/Vec/Vec2.h>
-#include <kaze/core/video/GraphicsMgr.h>
-#include <kaze/core/video/Window.h>
+#include <kaze/graphics/GraphicsMgr.h>
+#include <kaze/core/Window.h>
 
 KAZE_NS_BEGIN
 
