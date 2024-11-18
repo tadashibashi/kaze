@@ -33,6 +33,8 @@ if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.user.txt)
 endif()
 
 # ----- Kaze Core Options -----
+set(KAZE_BUILD_KAZE     ON                              CACHE BOOL   "Build the kaze libraries")
+set(KAZE_CORE           ON                              CACHE BOOL   "Build the kaze core library")
 set(KAZE_BACKEND        ${KAZE_BACKEND_DEFAULT}         CACHE STRING "Backend to compile Kaze with: glfw3, sdl3")
 set(KAZE_BACKEND_SHARED ${KAZE_BACKEND_SHARED_DEFAULT}  CACHE BOOL   "Whether to link dynamically to backend library; static linkage if false")
 set(KAZE_NO_NAMESPACE   OFF                             CACHE BOOL   "Unwrap all kaze engine types and functions into the global namespace")
@@ -62,17 +64,21 @@ set(KAZE_AUDIO_DECODE_VORBIS  ON              CACHE BOOL    "Support decoding Og
 set(KAZE_AUDIO_DECODE_WAV     ON              CACHE BOOL    "Support decoding Wav audio format")
 
 # ----- Kaze Graphics Options -----
+set(KAZE_GRAPHICS             ON              CACHE BOOL  "Build kaze graphics library")
 set(KAZE_GRAPHICS_IMGUI       ON              CACHE BOOL  "Include Imgui backend and source files")
 
 # ----- Kaze Toolkit Options -----
 set(KAZE_TK                   ON                      CACHE BOOL "Build Kaze Toolkit")
 set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GRAPHICS_IMGUI}  CACHE BOOL "Add ImGUI plugin to Kaze Toolkit. KAZE_GRAPHICS_IMGUI must be ON")
 
+# ----- Kaze Util -----
+set(KAZE_BUILD_UTIL           OFF              CACHE BOOL   "Build")
+
 # ===== Projects ==============================================================
 # Prevent projects from generating ctest targets
 set_property(GLOBAL PROPERTY CTEST_TARGETS_ADDED TRUE)
 
-if (NOT KAZE_BUILD_TOOLS)
+if (KAZE_BUILD_KAZE)
     add_subdirectory(kaze)
 
     if (KAZE_BUILD_TESTS)
@@ -80,4 +86,6 @@ if (NOT KAZE_BUILD_TOOLS)
     endif()
 endif()
 
-add_subdirectory(util)
+if (KAZE_BUILD_UTIL)
+    add_subdirectory(util)
+endif()

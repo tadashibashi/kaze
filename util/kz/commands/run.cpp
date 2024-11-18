@@ -126,4 +126,53 @@ namespace kz::run {
                 (fs::path("util") / "kserve" / "index.js").string())).code;
     }
 
+    auto ios(TargetPlatform::Enum platform, BuildType::Enum buildType,
+           std::string_view target, std::string_view iosSimulator) -> int
+    {
+        auto platformName = TargetPlatform::getName(platform);
+        auto buildTypeName = BuildType::getName(buildType);
+        std::string targetPathFromBuildDir;
+        if (const auto result = getTargetPath(buildTypeName, platformName, target, &targetPathFromBuildDir);
+            result != 0)
+        {
+            return result;
+        }
+
+        auto buildRoot = fs::absolute(fs::path("build") / platformName / buildTypeName);
+        auto targetPath = buildRoot / targetPathFromBuildDir;
+        auto parentPath = targetPath.parent_path();
+
+        const auto runCommand = std::format(
+            "DEVICE_UUID=$(xcrun simctl list devices {} | grep -oE '[A-F0-9-]{{36}}' | head -n 1)\n"
+            "if [ -z \"$DEVICE_UUID\" ]; then\n"
+            "    echo \"No simulator device was found\"\n"
+            "    exit 1\n"
+            "fi\n"
+            "\n"
+            "BOOT_STATUS=$(xcrun simctl list devices | grep \"$DEVICE_UUID\" | grep -o \"Booted\")\n"
+            "\n"
+            "if [ \"$BOOT_STATUS\" == \"Booted\" ]; then\n"
+            "    echo \"Device $DEVICE_UUID is booted\"\n"
+            "else\n"
+            "    echo \"Booting device $DEVICE_UUID\"\n"
+            "    xcrun simctl boot $DEVICE_UUID\n"
+            "fi\n"
+            "APP_BUNDLE=\"{}\"\n"
+            "xcrun simctl install $DEVICE_UUID \"$APP_BUNDLE\"\n"
+            "INFO_PLIST=\"{}\"\n"
+            "BUNDLE_NAME=$(defaults read \"$APP_BUNDLE/Info\" CFBundleIdentifier)\n"
+            "echo \"Bundle name: $BUNDLE_NAME\"\n"
+            "if [ -z \"$BUNDLE_NAME\" ]; then\n"
+            "    echo \"Failed to find bundle from app's Info.plist. Did you set the CFBundleIdentifier?\"\n"
+            "    exit 1\n"
+            "fi\n"
+            "xcrun simctl launch $DEVICE_UUID $BUNDLE_NAME\n"
+            "open -a Simulator"
+            ,
+            (iosSimulator.empty() ? std::string("") : std::format("| grep -w \"{}\"", iosSimulator)),
+            parentPath.string(),
+            (parentPath / "Info.plist").string());
+        return std::system(runCommand.c_str()) == 0 ? Result::Ok : Result::RuntimeError;
+    }
+
 }  // namespace kz::run

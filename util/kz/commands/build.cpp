@@ -93,7 +93,7 @@ namespace kz::build {
     auto ios(BuildType::Enum buildType, std::string_view targetName) -> int
     {
         auto buildTypeName = BuildType::getName(buildType);
-        return std::system( std::format("cmake --build build/ios/{} --target {} --parallel",
+        return std::system( std::format("cmake --build build/ios/{} --target {} --parallel -- -sdk iphonesimulator",
             buildTypeName, targetName).c_str() );
     }
 

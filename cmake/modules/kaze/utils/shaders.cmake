@@ -471,7 +471,7 @@ function(kaze_compile_shaders)
         endif()
 
         _kaze_compile_shaders_impl(
-            SHADERC "${KAZE_ROOT}/build/tools/bin/shaderc" # if this wasn't built by tools/setup it will attempt to build it with this configuration
+            SHADERC "${KAZE_ROOT}/build/util/bin/shaderc" # if this wasn't built by util/setup it will attempt to build it with this configuration
             TYPE "${SHADER_TYPE}"
             SHADERS "${SHADER_DIR_ABSOLUTE}/${SHADER_FILE}"
             VARYING_DEF "${IN_VARYING_DEF}"
@@ -519,7 +519,7 @@ function(kaze_target_shaders TARGET)
         endif()
 
         _kaze_target_shaders_impl("${TARGET}"
-            SHADERC "${KAZE_ROOT}/build/tools/bin/shaderc" # if this wasn't built by tools/setup it will attempt to build it with this configuration
+            SHADERC "${KAZE_ROOT}/build/util/bin/shaderc" # if this wasn't built by util/setup it will attempt to build it with this configuration
             TYPE "${SHADER_TYPE}"
             SHADERS "${SHADER_FILE_ABSOLUTE}"
             VARYING_DEF "${IN_VARYING_DEF}"

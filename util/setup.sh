@@ -22,7 +22,7 @@ else
 fi
 
 cd "$KAZE_DIR" && \
-    cmake -B $KAZE_DIR/build/util -S . -DCMAKE_BUILD_TYPE=Release $GENERATOR -DKAZE_BUILD_TOOLS=1 -DKAZE_TOOLS_OUTPUT_DIRECTORY=$KAZE_DIR/build/util/bin && \
+    cmake -B $KAZE_DIR/build/util -S . -DCMAKE_BUILD_TYPE=Release $GENERATOR -DKAZE_BUILD_KAZE=0 -DKAZE_BUILD_UTIL=1 -DKAZE_TOOLS_OUTPUT_DIRECTORY=$KAZE_DIR/build/util/bin && \
     cmake --build $KAZE_DIR/build/util --target kz --parallel && \
     cmake --build $KAZE_DIR/build/util --target shaderc --parallel && \
     cmake --build $KAZE_DIR/build/util --target crunch --parallel

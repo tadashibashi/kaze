@@ -25,6 +25,8 @@ auto kz::Result::message(Enum code) noexcept -> std::string_view
             return "Missing expected JSON key";
         case Enum::MissingJSRuntime:
             return "No supported JS Runtime is available in the path (checked for bun, node)";
+        case Enum::MissingXcodeProject:
+            return "Generated Xcode project was not found at the expected location";
         case Enum::JsonTypeError:
             return "Failed to cast a JSON value";
         case Enum::NotImplemented:

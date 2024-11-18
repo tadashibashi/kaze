@@ -12,6 +12,7 @@ namespace kz {
             MissingBuildTarget,
             MissingCmakeApiFile,
             MissingJSRuntime,
+            MissingXcodeProject,
             NullArg,
             InvalidCmd,
             InvalidBuildType,

@@ -17,7 +17,6 @@ auto windows(TargetPlatform::Enum platform, BuildType::Enum buildType,
            std::string_view target) -> int;
 auto emscripten(TargetPlatform::Enum platform, BuildType::Enum buildType,
            std::string_view target) -> int;
-
-// emscripten should run live server
-
+auto ios(TargetPlatform::Enum platform, BuildType::Enum buildType,
+           std::string_view target, std::string_view iosEmulator) -> int;
 }

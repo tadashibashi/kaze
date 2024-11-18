@@ -16,5 +16,5 @@ namespace kz::config {
     auto linux(BuildType::Enum buildType) -> int;
     auto emscripten(BuildType::Enum buildType, std::string_view emsdkPath) -> int;
     auto windows(BuildType::Enum buildType) -> int;
-    auto ios(BuildType::Enum buildType) -> int;
+    auto ios(BuildType::Enum buildType, std::string_view simulator = "", bool explicitSimulator = false) -> int;
 }
