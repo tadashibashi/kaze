@@ -91,12 +91,12 @@ FetchContent_Declare(spdlog
 if (KAZE_USE_FMT_LIB)
     set(SPDLOG_USE_STD_FORMAT     OFF CACHE BOOL "Use C++20 std::format")
 else()
-    set(SPDLOG_USE_STD_FORMAT     ON CACHE BOOL "Use C++20 std::format")
+    set(SPDLOG_USE_STD_FORMAT     ON  CACHE BOOL "Use C++20 std::format")
 endif()
-set(SPDLOG_ENABLE_PCH             ON CACHE BOOL "Build static or shared library using precompiled header to speed up compilation time")
-set(SPDLOG_SYSTEM_INCLUDES        ON CACHE BOOL "Include as system headers (skip for clang-tidy).")
-set(SPDLOG_NO_EXCEPTIONS          ON CACHE BOOL "Compile with -fno-exceptions. Call abort() on any spdlog exceptions")
-set(SPDLOG_DISABLE_DEFAULT_LOGGER ON CACHE BOOL "Disable instantiation of default logger")
+set(SPDLOG_ENABLE_PCH             ON  CACHE BOOL "Build static or shared library using precompiled header to speed up compilation time")
+set(SPDLOG_SYSTEM_INCLUDES        ON  CACHE BOOL "Include as system headers (skip for clang-tidy).")
+set(SPDLOG_NO_EXCEPTIONS          ON  CACHE BOOL "Compile with -fno-exceptions. Call abort() on any spdlog exceptions")
+set(SPDLOG_DISABLE_DEFAULT_LOGGER ON  CACHE BOOL "Disable instantiation of default logger")
 
 FetchContent_MakeAvailable(spdlog)
 

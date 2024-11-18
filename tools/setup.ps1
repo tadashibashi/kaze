@@ -109,5 +109,6 @@ if ($LASTEXITCODE -eq 0) {
 
 & cmake --build "$KAZE_TOOLS_BUILD_DIR" --target kz --parallel
 & cmake --build "$KAZE_TOOLS_BUILD_DIR" --target shaderc --parallel
+& cmake --build "$KAZE_TOOLS_BUILD_DIR" --target crunch --parallel
 
 $env:PATH += ";$KAZE_DIR\build\tools\bin"
