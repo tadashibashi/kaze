@@ -71,22 +71,23 @@ util\setup.ps1
 kz run kaze_test_01_app
 ```
 
-### Other Platform Builds
-
 #### iOS
+Make sure you have an iOS simulator installed.
+
+Terminal (bash)
 ```sh
-cmake -B build/ios -S . -G Xcode -DCMAKE_SYSTEM_NAME=iOS -DCMAKE_BUILD_TYPE=Debug
+source util/setup.sh
+kz run kaze_test_01_app -p ios
 ```
 
-##### Emulator build
-Open the generated Xcode project in Xcode. It should run in an emulator out of the box.
+Running via `kz run` only works for simulators at the moment.
 
 ##### Hardware build
-To test on hardware, you'll need an Apple Developer account.
+To run on hardware, you'll need an Apple Developer account and an iOS device that can run iOS 16.
 Make sure your device is registered with your Apple Account, and recognized by and connected to your Mac.
 
-Then, in the Xcode, under the executable project's "Signing & Capabilities", make sure to tick
-"Automatically manage signing". Then select your account under "Team" dropdown menu.
+Manually open the generated Xcode project. Under the executable project's "Signing & Capabilities",
+make sure to tick "Automatically manage signing". Then select your account under "Team" dropdown menu.
 (The UI for these settings may vary by Xcode version. I'm currently on Xcode 16.1)
 
 Now the project should run on your connected device.

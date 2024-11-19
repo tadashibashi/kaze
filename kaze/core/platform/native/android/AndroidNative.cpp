@@ -15,33 +15,33 @@ static int defaultFramesPerBuffer = 512;
 static KAZE_NS::String dataDirectory;
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_kaze_Kaze_nativeInit(JNIEnv *env, jclass clazz, jobject activity)
+Java_com_kaze_app_Kaze_nativeInit(JNIEnv *env, jclass clazz, jobject activity)
 {
     g_activity = activity;
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_kaze_Kaze_nativeClose(JNIEnv *env, jclass clazz)
+Java_com_kaze_app_Kaze_nativeClose(JNIEnv *env, jclass clazz)
 {
     g_activity = nullptr;
     g_assets = nullptr;
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_kaze_Kaze_provideAssetManager(JNIEnv *env, jclass clazz, jobject assetMgr)
+Java_com_kaze_app_Kaze_provideAssetManager(JNIEnv *env, jclass clazz, jobject assetMgr)
 {
     g_assets = AAssetManager_fromJava(env, assetMgr);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_kaze_Kaze_provideAudioDefaults(JNIEnv *env, jclass clazz, jint sampleRate, jint framesPerBuffer)
+Java_com_kaze_app_Kaze_provideAudioDefaults(JNIEnv *env, jclass clazz, jint sampleRate, jint framesPerBuffer)
 {
     defaultSampleRate = static_cast<int>(sampleRate);
     defaultFramesPerBuffer = static_cast<int>(framesPerBuffer);
 }
 
 extern "C" JNIEXPORT void JNICALL
-Java_com_kaze_Kaze_provideDataDirectory(JNIEnv *env, jclass clazz, jstring path)
+Java_com_kaze_app_Kaze_provideDataDirectory(JNIEnv *env, jclass clazz, jstring path)
 {
     char dataFilePath[4096];
     std::strncpy(dataFilePath, env->GetStringUTFChars(path, nullptr), 4096);

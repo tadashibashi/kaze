@@ -1,4 +1,4 @@
-package com.kaze;
+package com.kaze.app;
 
 import android.app.Activity;
 import android.content.Context;

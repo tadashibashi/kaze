@@ -23,6 +23,7 @@ endif()
 include(kaze/detection/compiler)
 include(kaze/detection/platform)
 include(kaze/utils)
+include(kaze/utils/target)
 
 # ===== Options =================================================================
 include(kaze/option_defaults)

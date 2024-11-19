@@ -11,30 +11,34 @@ android {
     if (buildAsApplication) {
         namespace "com.kaze.app"
     }
-    compileSdkVersion 34
+    compileSdkVersion ${KAZE_ANDROID_SDK_VERSION}
     defaultConfig {
-        minSdkVersion 31
-        targetSdkVersion 34
-        versionCode 1
-        versionName "1.0"
+        applicationId "${KAZE_ANDROID_APP_ID}"
+        minSdkVersion ${KAZE_ANDROID_SDK_MIN_VERSION}
+        targetSdkVersion ${KAZE_ANDROID_SDK_VERSION}
+        versionCode ${KAZE_ANDROID_VERSION_CODE}
+        versionName "${KAZE_ANDROID_VERSION_NAME}"
         externalNativeBuild {
             cmake {
-                arguments "-DANDROID_PLATFORM=android-31", "-DANDROID_STL=c++_shared"
+                arguments "-DANDROID_APP_PLATFORM=android-${KAZE_ANDROID_SDK_MIN_VERSION}", "-DANDROID_STL=c++_shared"
                 //abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
                 abiFilters 'arm64-v8a'
             }
         }
     }
+
     buildTypes {
         release {
-            minifyEnabled false
+            debuggable false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
     }
-    applicationVariants.all { variant ->
-        tasks["merge${variant.name.capitalize()}Assets"]
-            .dependsOn("externalNativeBuild${variant.name.capitalize()}")
-    }
+
     if (!project.hasProperty('EXCLUDE_NATIVE_LIBS')) {
         sourceSets.main {
             jniLibs.srcDir 'libs'
@@ -55,7 +59,7 @@ android {
             variant.outputs.each { output ->
                 def outputFile = output.outputFile
                 if (outputFile != null && outputFile.name.endsWith(".aar")) {
-                    def fileName = "com.kaze.app.aar";
+                    def fileName = "${KAZE_ANDROID_APP_ID}.aar";
                     output.outputFile = new File(outputFile.parent, fileName);
                 }
             }

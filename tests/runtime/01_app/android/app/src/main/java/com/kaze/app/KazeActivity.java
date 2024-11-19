@@ -1,4 +1,4 @@
-package com.kaze;
+package com.kaze.app;
 
 import org.libsdl.app.SDLActivity;
 
@@ -18,14 +18,14 @@ public class KazeActivity extends SDLActivity {
         super.onCreate(savedInstanceState);
 
         /// Initialize the Insound's native runtime code
-        com.kaze.Kaze.init(this);
+        com.kaze.app.Kaze.init(this);
     }
 
     @Override
     protected void onDestroy()
     {
         /// Clean up Insound's native runtime code
-        com.kaze.Kaze.close();
+        com.kaze.app.Kaze.close();
 
         super.onDestroy();
     }
