@@ -1,10 +1,7 @@
 #include <doctest/doctest.h>
+#include <kaze/core.h>
 
-#include <kaze/core/errors.h>
-#include <kaze/core/io/StructLayout.h>
-#include <kaze/core/lib.h>
-
-USING_KAZE_NAMESPACE;
+USING_KAZE_NS;
 
 TEST_SUITE("StructMap")
 {
@@ -13,8 +10,8 @@ TEST_SUITE("StructMap")
         StructLayout layout{};
         CHECK(layout.empty());
         CHECK(layout.size() == 0);
-        CHECK(layout.getDefaultArithmeticEndian() == Endian::Little);
-        CHECK(layout.getDefaultStringEndian() == Endian::Big);
+        CHECK(layout.getDefaultArithmeticEndian() == endian::Little);
+        CHECK(layout.getDefaultStringEndian() == endian::Big);
     }
 
     TEST_CASE("Map a simple, one-layer layout with numeric types")

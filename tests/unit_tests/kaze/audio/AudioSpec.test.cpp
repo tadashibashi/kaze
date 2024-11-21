@@ -1,3 +1,3 @@
 #include <doctest/doctest.h>
-#include <kaze/core/io/audio/AudioSpec.h>
+#include <kaze/internal/audio/AudioSpec.h>
 

@@ -1,5 +1,4 @@
 #include <doctest/doctest.h>
-
 #include <kaze/core/debug.h>
 
 USING_KAZE_NAMESPACE;

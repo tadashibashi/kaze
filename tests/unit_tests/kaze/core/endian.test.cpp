@@ -7,16 +7,16 @@ TEST_SUITE("Endian")
 {
     TEST_CASE("opposite")
     {
-        CHECK(Endian::opposite(Endian::Big) == Endian::Little);
-        CHECK(Endian::opposite(Endian::Little) == Endian::Big);
-        CHECK(Endian::opposite(Endian::Unknown) == Endian::Unknown);
-        CHECK(Endian::opposite(
-            static_cast<Endian::Type>(123456)) == Endian::Unknown);
+        CHECK(endian::opposite(endian::Big) == endian::Little);
+        CHECK(endian::opposite(endian::Little) == endian::Big);
+        CHECK(endian::opposite(endian::Unknown) == endian::Unknown);
+        CHECK(endian::opposite(
+            static_cast<endian::Type>(123456)) == endian::Unknown);
     }
 
     TEST_CASE("isLittle/isBig")
     {
-        CHECK(Endian::isLittle() != Endian::isBig());
+        CHECK(endian::isLittle() != endian::isBig());
     }
 
     TEST_CASE("swap")
@@ -28,7 +28,7 @@ TEST_SUITE("Endian")
 
         IntChecker a;
         a.u32 = 0x1234U;
-        auto b = Endian::swap(a);
+        auto b = endian::swap(a);
 
         CHECK(b.u32 != a.u32);
         CHECK(a.u8[0] == b.u8[3]);

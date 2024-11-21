@@ -1,0 +1,15 @@
+#if !KAZE_NO_MAIN
+
+#include <kaze/internal/core/kmain.h>
+#ifdef main
+#undef main
+#endif
+
+#include <SDL3/SDL_main.h>
+
+auto main(int argc, char *argv[]) -> int
+{
+    return KAZE_NS_INTERNAL::kmain(argc, argv);
+}
+
+#endif

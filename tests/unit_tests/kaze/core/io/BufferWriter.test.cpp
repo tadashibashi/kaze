@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
-#include <kaze/core/io/BufferWriter.h>
-#include <kaze/core/io/BufferView.h>
-USING_KAZE_NAMESPACE;
+#include <kaze/core/io.h>
+
+USING_KAZE_NS;
 
 TEST_SUITE("BufferWriter")
 {
@@ -10,8 +10,8 @@ TEST_SUITE("BufferWriter")
         BufferWriter writer{};
         CHECK(writer.empty());
         CHECK(writer.size() == 0);
-        CHECK(writer.defaultArithmeticEndian() == Endian::Little);
-        CHECK(writer.defaultStringEndian() == Endian::Big);
+        CHECK(writer.defaultArithmeticEndian() == endian::Little);
+        CHECK(writer.defaultStringEndian() == endian::Big);
     }
 
     TEST_CASE("Write numeric data")
@@ -111,13 +111,13 @@ TEST_SUITE("BufferWriter")
     TEST_CASE("Swap default endian")
     {
         BufferWriter writer({
-            .arithmeticEndian = Endian::opposite(Endian::Native),
-            .stringEndian     = Endian::Little,
+            .arithmeticEndian = endian::opposite(endian::Native),
+            .stringEndian     = endian::Little,
         });
 
         String a = "01234"; String b = "43210";
         Int c = 12345;
-        Int d =  Endian::swap(c);
+        Int d =  endian::swap(c);
 
         writer << a << b << c << d;
 
@@ -134,10 +134,10 @@ TEST_SUITE("BufferWriter")
 
         String a = "01234"; String b = "43210";
         Int c = 12345;
-        Int d =  Endian::swap(c);
+        Int d =  endian::swap(c);
 
-        writer.write(a, {.endian = Endian::Little});
-        writer.write(c, Endian::opposite(Endian::Native));
+        writer.write(a, {.endian = endian::Little});
+        writer.write(c, endian::opposite(endian::Native));
 
         BufferView view(writer.data(), writer.size());
         CHECK(view.readString() == b);

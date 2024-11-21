@@ -1,12 +1,12 @@
 #include <doctest/doctest.h>
 
-#include <kaze/audio/SampleFormat.h>
-#include <kaze/audio/conv/extern/miniaudio/miniaudio.h>
+#include <kaze/internal/audio/SampleFormat.h>
+#include <kaze/internal/audio/conv/extern/miniaudio/miniaudio.h>
 
 #include <kaze/core/endian.h>
 
 using namespace KAZE_NS;
-using namespace KAUDIO_NS;
+using namespace KAUDIO_NS_INTERNAL;
 
 TEST_SUITE("io/audio/SampleFormat")
 {
@@ -129,11 +129,11 @@ TEST_SUITE("io/audio/SampleFormat")
 
     TEST_CASE("create from ma_format")
     {
-        CHECK(SampleFormat::fromMaFormat(ma_format_f32) == (Endian::isBig() ? SampleFormat::Float32BE : SampleFormat::Float32LE));
+        CHECK(SampleFormat::fromMaFormat(ma_format_f32) == (endian::isBig() ? SampleFormat::Float32BE : SampleFormat::Float32LE));
         CHECK(SampleFormat::fromMaFormat(ma_format_u8) ==  SampleFormat::Uint8);
-        CHECK(SampleFormat::fromMaFormat(ma_format_s16) == (Endian::isBig() ? SampleFormat::Int16BE : SampleFormat::Int16LE));
-        CHECK(SampleFormat::fromMaFormat(ma_format_s24) == (Endian::isBig() ? SampleFormat::Int24BE : SampleFormat::Int24LE));
-        CHECK(SampleFormat::fromMaFormat(ma_format_s32) == (Endian::isBig() ? SampleFormat::Int32BE : SampleFormat::Int32LE));
+        CHECK(SampleFormat::fromMaFormat(ma_format_s16) == (endian::isBig() ? SampleFormat::Int16BE : SampleFormat::Int16LE));
+        CHECK(SampleFormat::fromMaFormat(ma_format_s24) == (endian::isBig() ? SampleFormat::Int24BE : SampleFormat::Int24LE));
+        CHECK(SampleFormat::fromMaFormat(ma_format_s32) == (endian::isBig() ? SampleFormat::Int32BE : SampleFormat::Int32LE));
     }
 
     TEST_CASE("convert to ma_format")

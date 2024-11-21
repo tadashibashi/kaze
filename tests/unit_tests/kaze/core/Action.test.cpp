@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
-#include <kaze/core/Action.h>
+#include <kaze/core.h>
 
-USING_KAZE_NAMESPACE;
+USING_KAZE_NS;
 
 TEST_SUITE("Action")
 {

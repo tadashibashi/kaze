@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <kaze/core/MemView.h>
+#include <kaze/core/memory.h>
 
 USING_KAZE_NAMESPACE;
 
@@ -7,7 +7,7 @@ TEST_SUITE("Memory")
 {
     TEST_CASE("Default constructor")
     {
-        const auto mem = Mem{};
+        const auto mem = MemView<void>{};
         CHECK(mem.data() == nullptr);
         CHECK(mem.elemCount() == 0);
     }

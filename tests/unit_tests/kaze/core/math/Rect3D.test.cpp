@@ -1,6 +1,5 @@
 #include <doctest/doctest.h>
-
-#include <kaze/core/math/Rect3D.h>
+#include <kaze/core/math.h>
 
 USING_KAZE_NAMESPACE;
 

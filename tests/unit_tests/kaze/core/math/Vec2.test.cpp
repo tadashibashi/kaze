@@ -1,7 +1,7 @@
 #include <doctest/doctest.h>
-#include <kaze/core/math/Vec.hpp>
+#include <kaze/core/math.h>
 
-USING_KAZE_NAMESPACE;
+USING_KAZE_NS;
 
 TEST_SUITE("Vec2")
 {

@@ -1,7 +1,5 @@
 #include <doctest/doctest.h>
-
-
-#include <kaze/core/ServiceProvider.h>
+#include <kaze/core/lib.h>
 
 USING_KAZE_NAMESPACE;
 

@@ -1,30 +1,9 @@
-#include <kaze/tk/App.h>
-#include <kaze/tk/Camera2D.h>
-
-#include <kaze/core/AssetLoader.h>
-#include <kaze/core/debug.h>
-#include <kaze/core/kmain.h>
-
-#include <kaze/core/input/CursorConstants.h>
-#include <kaze/core/platform/filesys/filesys.h>
-#include <kaze/core/math/Vec/Vec3.h>
-#include <kaze/graphics/GraphicsMgr.h>
-#include <kaze/graphics/Image.h>
-#include <kaze/graphics/Renderable.h>
-#include <kaze/graphics/Texture2D.h>
-#include <kaze/graphics/UniformMgr.h>
-
-#include <kaze/tk/SpriteBatch.h>
-#include <kaze/tk/plugins/imgui/imgui_plugin.h>
-
-#include <kaze/audio/engine/AudioEngine.h>
-#include <kaze/audio/engine/AudioSource.h>
+#include <kaze/tk.h>
 
 #include <imgui/imgui.h>
 #include <filesystem>
 
-USING_KAZE_NS;
-using namespace KAUDIO_NS;
+USING_KTK_NS;
 
 class Demo final : public App {
 public:
@@ -82,8 +61,8 @@ private:
         if ( !testTexture.loadImage(image) )
             return False;
 
-        images.reserve(1000);
-        for (Int i = 0; i < 1000; ++i)
+        images.reserve(6);
+        for (Int i = 0; i < 6; ++i)
         {
             images.emplace_back(TestImage{
                 .texture = &testTexture,
@@ -102,18 +81,18 @@ private:
             .viewId=1,
         }));
 
-        if ( !audio.open({
-            .samplerate = 0,
-            .bufferFrameSize = 1024
-        }) )
-            return False;
+        // if ( !audio.open({
+        //     .samplerate = 0,
+        //     .bufferFrameSize = 1024
+        // }) )
+        //     return False;
 
-        computerScoreSnd = audio.createSound( (baseDir / "assets/computer_score.wav").string(),
-            Sound::InMemory | Sound::OneShot);
-        playerScoreSnd = audio.createSound( (baseDir / "assets/player_score.wav").string(),
-            Sound::InMemory | Sound::OneShot);
-        if ( !computerScoreSnd || !playerScoreSnd )
-            return False;
+        // computerScoreSnd = audio.createSound( (baseDir / "assets/computer_score.wav").string(),
+        //     Sound::InMemory | Sound::OneShot);
+        // playerScoreSnd = audio.createSound( (baseDir / "assets/player_score.wav").string(),
+        //     Sound::InMemory | Sound::OneShot);
+        // if ( !computerScoreSnd || !playerScoreSnd )
+        //     return False;
 
         return True;
     }
@@ -186,8 +165,8 @@ private:
         {
             image.rotation = mathf::fmod(image.rotation + 4.f, 360.f);
         }
-        Size i = 0;
-        for (; i <= images.size() - 4; i += 4)
+        Int i = 0;
+        for (; i <= (int)images.size() - 4; i += 4)
         {
             images[i].rotation = mathf::fmod(images[i].rotation + 4.f, 360.f);
             images[i+1].rotation = mathf::fmod(images[i+1].rotation + 4.f, 360.f);
@@ -195,7 +174,7 @@ private:
             images[i+3].rotation = mathf::fmod(images[i+3].rotation + 4.f, 360.f);
         }
 
-        for (; i < images.size(); ++i)
+        for (; i < (int)images.size(); ++i)
         {
             images[i].rotation = mathf::fmod(images[i].rotation + 4.f, 360.f);
         }
@@ -227,7 +206,7 @@ private:
         }
         ImGui::End();
 
-        audio.update();
+        // audio.update();
     }
 
     auto render() -> void override {
@@ -241,8 +220,8 @@ private:
             .projMtx = camera.getProj(),
         });
 
-        Size i = 0;
-        const Size half = images.size() / 2UL;
+        Int i = 0;
+        const Int half = static_cast<Int>(images.size() / 2UL);
         for (; i <= half - 4; i += 4)
         {
             images[i].draw(batch);
@@ -256,7 +235,6 @@ private:
             images[i].draw(batch);
         }
 
-
         batch.end();
 
         batch.begin({
@@ -264,7 +242,7 @@ private:
             .projMtx = camera.getProj(),
         });
 
-        for (; i <= images.size() - 4; i += 4)
+        for (; i <= (int)images.size() - 4; i += 4)
         {
             images[i].draw(batch);
             images[i+1].draw(batch);
@@ -272,7 +250,7 @@ private:
             images[i+3].draw(batch);
         }
 
-        for (; i < images.size(); ++i)
+        for (; i < (int)images.size(); ++i)
         {
             images[i].draw(batch);
         }
@@ -287,7 +265,7 @@ private:
     }
 };
 
-auto kaze::kmain(Int argc, Char *argv[]) -> Int
+auto main(Int argc, Char *argv[]) -> Int
 {
     Demo().run();
     return 0;

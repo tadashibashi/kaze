@@ -86,8 +86,8 @@ function(add_kaze_executable TARGET)
             ARCHIVE_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/bin"
             ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/bin"
             ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/bin"
-            VERSION   "${VERSION}"
-            SOVERSION "${VERSION_MAJOR}"
+            KAZE_VERSION       "${VERSION}"
+            KAZE_VERSION_MAJOR "${VERSION_MAJOR}"
     )
 
     if (IN_SOURCES)
@@ -169,7 +169,7 @@ function(add_kaze_executable TARGET)
         set(BUNDLE_ID "com.${COMPANY_NAME}.${APP_NAME_SLUG}.gui")
 
         # Get App version, set it to 0.0.1 if non-existent
-        get_target_property(TARGET_VERSION "${TARGET}" VERSION)
+        get_target_property(TARGET_VERSION "${TARGET}" KAZE_VERSION)
         if (NOT TARGET_VERSION)
             set(TARGET_VERSION "0.0.1")
         endif()

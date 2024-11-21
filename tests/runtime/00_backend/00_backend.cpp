@@ -1,10 +1,10 @@
 
-#include <kaze/core/debug.h>
-#include <kaze/core/kmain.h>
-#include <kaze/core/input/Gamepad.h>
-#include <kaze/core/video/Window.h>
+#include <kaze/internal/core/debug.h>
+#include <kaze/internal/core/kmain.h>
+#include <kaze/internal/core/input/Gamepad.h>
+#include <kaze/internal/core/video/Window.h>
 
-#include <kaze/core/platform/backend/backend.h>
+#include <kaze/internal/core/platform/backend/backend.h>
 
 USING_KAZE_NS;
 

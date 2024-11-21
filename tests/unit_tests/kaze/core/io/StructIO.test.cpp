@@ -1,9 +1,7 @@
 #include <doctest/doctest.h>
-#include <kaze/core/io/BufferWriter.h>
-#include <kaze/core/io/StructIO.h>
-#include <kaze/core/io/StructLayout.h>
+#include <kaze/core/io.h>
 
-USING_KAZE_NAMESPACE;
+USING_KAZE_NS;
 
 TEST_SUITE("StructIO")
 {
@@ -81,14 +79,14 @@ TEST_SUITE("StructIO")
 
         auto collectionLayout = StructLayout()
             .begin()
-                .add(&Collection::count, Endian::opposite(Endian::Native)) // test individual reverse endian
+                .add(&Collection::count, endian::opposite(endian::Native)) // test individual reverse endian
                 .add(&Collection::records, &Collection::count, &recordLayout)
             .end();
 
         SUBCASE("Read")
         {
             BufferWriter writer{};
-            writer << Endian::swap(4) << // reverse endian of count
+            writer << endian::swap(4) << // reverse endian of count
                 "Mozart Violin Concerto in A Major" <<
                 10 <<
                 "Bach Brandenburg Concerto No. 4" <<

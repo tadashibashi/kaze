@@ -1,5 +1,5 @@
 #include <doctest/doctest.h>
-#include <kaze/core/ConditionalAction.h>
+#include <kaze/core.h>
 
 USING_KAZE_NAMESPACE;
 

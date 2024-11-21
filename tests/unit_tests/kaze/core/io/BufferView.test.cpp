@@ -1,9 +1,9 @@
 #include <doctest/doctest.h>
-#include <kaze/core/io/BufferView.h>
+#include <kaze/core/io.h>
 
 #include <cstring>
 
-USING_KAZE_NAMESPACE;
+USING_KAZE_NS;
 
 TEST_SUITE("BufferView")
 {
@@ -117,20 +117,20 @@ TEST_SUITE("BufferView")
         int ints[] = {0, 1, 2, 3};
         BufferView bv(makeRef(ints));
 
-        bv.seek(sizeof(int) * 2, SeekBase::Start);
+        bv.seek(sizeof(int) * 2, SeekBase::Begin);
         CHECK(bv.read<int>() == 2);
 
         bv.seek(sizeof(int) * -3, SeekBase::End);
         CHECK(bv.read<int>() == 1);
 
-        bv.seek(sizeof(int), SeekBase::Relative);
+        bv.seek(sizeof(int), SeekBase::Current);
         CHECK(bv.read<int>() == 3);
 
         // Clamps on both ends
-        bv.seek(100000, SeekBase::Start);
+        bv.seek(100000, SeekBase::Begin);
         CHECK(bv.tell() == sizeof(ints));
 
-        bv.seek(-100, SeekBase::Start);
+        bv.seek(-100, SeekBase::Begin);
         CHECK(bv.tell() == 0);
     }
 
@@ -138,8 +138,8 @@ TEST_SUITE("BufferView")
     {
         SUBCASE("Integral types")
         {
-            Endian::Type endianness = (Endian::Native == Endian::Big) ?
-            Endian::Little : Endian::Big;
+            endian::Type endianness = (endian::Native == endian::Big) ?
+            endian::Little : endian::Big;
 
             int ints[] = {10, 11, 12, 13};
             BufferView bv(makeRef(ints));
@@ -148,17 +148,17 @@ TEST_SUITE("BufferView")
             bv.readNumber(&value, sizeof(int), endianness);
             CHECK(value != 10);
 
-            value = Endian::swap(value);
+            value = endian::swap(value);
             CHECK(value == 10);
 
             bv.readNumber(&value, sizeof(int), endianness);
-            CHECK(Endian::swap(value) == 11);
+            CHECK(endian::swap(value) == 11);
 
             bv.readNumber(&value, sizeof(int), endianness);
-            CHECK(Endian::swap(value) == 12);
+            CHECK(endian::swap(value) == 12);
 
             bv.readNumber(&value, sizeof(int), endianness);
-            CHECK(Endian::swap(value) == 13);
+            CHECK(endian::swap(value) == 13);
 
             CHECK(bv.readNumber(&value, sizeof(int), endianness) == 0);
             CHECK(bv.eof());
@@ -170,7 +170,7 @@ TEST_SUITE("BufferView")
             auto view = BufferView(makeRef(data));
 
             String value;
-            CHECK(view.read(&value, {.endian = Endian::Little}) == std::strlen(data));
+            CHECK(view.read(&value, {.endian = endian::Little}) == std::strlen(data));
             CHECK(value == "dlrow olleh");
         }
     }
