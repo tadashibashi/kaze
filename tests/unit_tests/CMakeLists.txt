@@ -1,23 +1,18 @@
 project(kaze_unit_tests)
 
 add_executable(${PROJECT_NAME}
-    kaze/audio/SampleFormat.test.cpp
     kaze/core/AssetLoader.test.cpp
     kaze/core/Action.test.cpp
     kaze/core/ConditionalAction.test.cpp
     kaze/core/debug.test.cpp
     kaze/core/endian.test.cpp
-    kaze/core/graphics/Color.test.cpp
     kaze/core/Memory.test.cpp
     kaze/core/ServiceProvider.test.cpp
-
     kaze/core/io/BufferWriter.test.cpp
     kaze/core/io/BufferView.test.cpp
     kaze/core/io/StructIO.test.cpp
     kaze/core/io/StructLayout.test.cpp
-
     kaze/core/macros/enum.test.cpp
-
     kaze/core/math/Circle.test.cpp
     kaze/core/math/geometry.test.cpp
     kaze/core/math/mathf.test.cpp
@@ -28,11 +23,15 @@ add_executable(${PROJECT_NAME}
     kaze/core/math/Vec3.test.cpp
     kaze/core/math/Vec4.test.cpp
 
+    kaze/gfx/Color.test.cpp
+
+    kaze/snd/SampleFormat.test.cpp
+
     tests.cpp
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     kaze_core
-    kaze_audio
+    kaze_snd
     doctest::doctest
 )

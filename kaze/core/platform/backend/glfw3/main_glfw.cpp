@@ -1,6 +1,10 @@
 #if !KAZE_NO_MAIN
-#include <kaze/core/kmain.h>
+#include <kaze/core/main.h>
 #include <kaze/core/platform/defines.h>
+
+#ifdef main
+#undef main
+#endif
 
 #if KAZE_PLATFORM_WINDOWS
 #include <windows.h>

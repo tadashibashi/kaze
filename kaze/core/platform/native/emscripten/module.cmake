@@ -31,7 +31,7 @@ if (KAZE_DEBUG)
 endif()
 
 if (${KAZE_EMSCRIPTEN_PTHREAD_POOL_SIZE} GREATER 0)
-    if (KAZE_AUDIO)
+    if (KAZE_SND)
         if (${KAZE_EMSCRIPTEN_PTHREAD_POOL_SIZE} LESS 4)
             set(KAZE_EMSCRIPTEN_PTHREAD_POOL_SIZE 4)
         endif()

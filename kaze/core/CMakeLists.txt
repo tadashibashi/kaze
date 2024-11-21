@@ -7,8 +7,9 @@ endif()
 include(kaze/deps/core)
 
 add_library(kaze_core)
+add_library(kaze::core ALIAS kaze_core)
 kaze_target_modules(kaze_core platform io)
-target_include_directories(kaze_core SYSTEM PUBLIC ${KAZE_ROOT})
+target_include_directories(kaze_core SYSTEM PUBLIC "${KAZE_ROOT}" "${KAZE_ROOT}/include")
 
 target_link_libraries(kaze_core PUBLIC
     gcem

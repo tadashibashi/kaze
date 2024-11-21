@@ -78,7 +78,7 @@ static auto readImpl(void *dest,
             if ( !layout )
             {
                 KAZE_PUSH_ERR(Error::RuntimeErr, "Missing composite layout");
-                view.seek(startSrcByte, SeekBase::Start);
+                view.seek(startSrcByte, SeekBase::Begin);
                 return 0;
             }
 
@@ -89,7 +89,7 @@ static auto readImpl(void *dest,
                 if ( !entry.getDataPtr )
                 {
                     KAZE_PUSH_ERR(Error::RuntimeErr, "Missing expected `getDataPtr` field in entry");
-                    view.seek(startSrcByte, SeekBase::Start);
+                    view.seek(startSrcByte, SeekBase::Begin);
                     return 0;
                 }
 
@@ -101,7 +101,7 @@ static auto readImpl(void *dest,
                     if ( !entry.setDataElemSize )
                     {
                         KAZE_PUSH_ERR(Error::RuntimeErr, "Missing expected `setDataElemSize` field in varying list entry");
-                        view.seek(startSrcByte, SeekBase::Start);
+                        view.seek(startSrcByte, SeekBase::Begin);
                         return 0;
                     }
 
@@ -109,7 +109,7 @@ static auto readImpl(void *dest,
                     if ( !readSize((Ubyte *)dest + entry.countMemberOffset, entry.countMemberType, KAZE_FALSE, &count) )
                     {
                         KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to read varying list element count");
-                        view.seek(startSrcByte, SeekBase::Start);
+                        view.seek(startSrcByte, SeekBase::Begin);
                         return 0;
                     }
 

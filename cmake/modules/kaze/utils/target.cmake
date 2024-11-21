@@ -95,10 +95,18 @@ function(add_kaze_executable TARGET)
     endif()
 
     if (IN_KAZE_TK)
-        target_link_libraries(${TARGET} PUBLIC kaze_tk)
+        target_link_libraries(${TARGET} PUBLIC kaze::tk)
         kaze_copy_builtin_assets(${TARGET} "")
     else()
-        target_link_libraries(${TARGET} PUBLIC kaze)
+        target_link_libraries(${TARGET} PUBLIC kaze::core)
+
+        if (KAZE_SND)
+            target_link_libraries(${TARGET} PUBLIC kaze::snd)
+        endif()
+
+        if (KAZE_GFX)
+            target_link_libraries(${TARGET} PUBLIC kaze::gfx)
+        endif()
     endif()
 
     # Get app name and slug

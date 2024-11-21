@@ -17,7 +17,11 @@ else()
             set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
         endif()
 
-        set(GLFW_BUILD_WAYLAND ${KAZE_USE_WAYLAND} CACHE BOOL "" FORCE)
+        set(GLFW_BUILD_WAYLAND  ${KAZE_USE_WAYLAND} CACHE BOOL "" FORCE)
+        set(GLFW_INSTALL        OFF                 CACHE BOOL "")
+        set(GLFW_BUILD_EXAMPLES OFF                 CACHE BOOL "")
+        set(GLFW_BUILD_TESTS    OFF                 CACHE BOOL "")
+        set(GLFW_BUILD_DOCS     OFF                 CACHE BOOL "")
         FetchContent_MakeAvailable(glfw3)
 
     endif()

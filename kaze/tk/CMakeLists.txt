@@ -26,22 +26,19 @@ function (kaze_copy_builtin_assets TARGET OUTPUT_DIR)
     )
 endfunction()
 
-add_library(${PROJECT_NAME}
+add_library(kaze_tk
         App.cpp
         App.h
         AppPlugin.h
         AppPluginMgr.cpp
         AppPluginMgr.h
-        Camera2D.cpp
-        Camera2D.h
         FramerateCounter.cpp
         FramerateCounter.h
         lib.h
-        SpriteBatch.cpp
-        SpriteBatch.h
 )
+add_library(kaze::tk ALIAS kaze_tk)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC kaze_core kaze_audio kaze_graphics)
+target_link_libraries(kaze_tk PUBLIC kaze::core kaze::gfx kaze::snd)
 
 if (KAZE_TK_IMGUI_PLUGIN)
     kaze_target_module(kaze_tk plugins/imgui)

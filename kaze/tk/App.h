@@ -7,7 +7,7 @@
 #include <kaze/core/Action.h>
 #include <kaze/core/input/InputMgr.h>
 #include <kaze/core/math/Vec/Vec2.h>
-#include <kaze/graphics/GraphicsMgr.h>
+#include <kaze/gfx/GraphicsMgr.h>
 #include <kaze/core/Window.h>
 
 KAZE_NS_BEGIN
@@ -16,7 +16,7 @@ KAZE_NS_BEGIN
 struct AppInit {
     String title                 {String("")}; ///< App title bar text
     Vec2i size                   {640, 480};   ///< Initial window size
-    Color clearColor             {100, 154, 206, 235}; ///< Default background clear color
+    gfx::Color clearColor             {100, 154, 206, 235}; ///< Default background clear color
     Double targetFPS             {60.0};
     WindowInit::Flags flags      {};           ///< Initial window attribute flags, can be or'd together
     Size maxTransientVBufferSize {4000 * 1024};
@@ -63,11 +63,11 @@ public:
 
     /// \returns GraphicsMgr for this application
     [[nodiscard]]
-    auto graphics() const noexcept -> const GraphicsMgr &;
+    auto graphics() const noexcept -> const gfx::GraphicsMgr &;
 
     /// \returns GraphicsMgr for this application
     [[nodiscard]]
-    auto graphics() noexcept -> GraphicsMgr &;
+    auto graphics() noexcept -> gfx::GraphicsMgr &;
 
     [[nodiscard]]
     auto cursors() const noexcept -> const CursorMgr &;

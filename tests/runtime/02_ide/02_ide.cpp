@@ -1,14 +1,10 @@
-#include <kaze/core/kmain.h>
-#include <kaze/core/platform/filesys/filesys.h>
-
-#include <kaze/tk/App.h>
-#include <kaze/tk/plugins/imgui/imgui_plugin.h>
+#include <kaze/tk.hpp>
 
 #include <imgui/imgui.h>
 
 USING_KAZE_NS;
 
-class KazeIDE : public App {
+class KazeIDE final : public App {
 public:
     KazeIDE() : App({
         .title = "Kaze IDE",
@@ -17,9 +13,9 @@ public:
     }) { }
 
 private:
-    List<String> targets;
-    String baseDir;
-    String userDir;
+    List<String> targets{};
+    String baseDir{};
+    String userDir{};
     auto init() -> Bool override
     {
         addPlugin(plugins::imgui::create({
@@ -58,7 +54,7 @@ private:
     }
 };
 
-auto kaze::kmain(int argc, char *argv[]) -> int
+auto main(int argc, char *argv[]) -> int
 {
     KazeIDE().run();
     return 0;

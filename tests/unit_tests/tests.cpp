@@ -1,7 +1,7 @@
 #define DOCTEST_CONFIG_IMPLEMENT
 #include <doctest/doctest.h>
 
-#include <kaze/core/kmain.h>
+#include <kaze/core/main.h>
 
 auto kaze::kmain(int argc, char *argv[]) -> Int
 {

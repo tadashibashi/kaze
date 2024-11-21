@@ -24,7 +24,7 @@ struct App::Impl
     Bool isRunning{};
     Double lastTime{}, deltaTime{};
     InputMgr input{};
-    GraphicsMgr graphics{};
+    gfx::GraphicsMgr graphics{};
     AppPluginMgr plugins{};
     CursorMgr cursors{};
 
@@ -112,12 +112,12 @@ auto App::window() noexcept -> Window &
     return m->window;
 }
 
-auto App::graphics() const noexcept -> const GraphicsMgr &
+auto App::graphics() const noexcept -> const gfx::GraphicsMgr &
 {
     return m->graphics;
 }
 
-auto App::graphics() noexcept -> GraphicsMgr &
+auto App::graphics() noexcept -> gfx::GraphicsMgr &
 {
     return m->graphics;
 }

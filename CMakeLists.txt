@@ -58,19 +58,19 @@ set(KAZE_EMSCRIPTEN_PTHREAD_POOL_SIZE  4      CACHE STRING "Set the pthread pool
 set(KAZE_EMSCRIPTEN_WASM_WORKERS       ON     CACHE BOOL   "Use WASM Workers on Emscripten builds, automatically turns on if Audio module is activated")
 
 # ----- Kaze Audio Options -----
-set(KAZE_AUDIO                ON              CACHE BOOL    "Build Kaze's audio library")
-set(KAZE_AUDIO_DECODE_FLAC    ON              CACHE BOOL    "Support decoding Flac audio format")
-set(KAZE_AUDIO_DECODE_MP3     ON              CACHE BOOL    "Support decoding Mp3 audio format")
-set(KAZE_AUDIO_DECODE_VORBIS  ON              CACHE BOOL    "Support decoding Ogg vorbis audio format")
-set(KAZE_AUDIO_DECODE_WAV     ON              CACHE BOOL    "Support decoding Wav audio format")
+set(KAZE_SND                ON              CACHE BOOL    "Build Kaze's audio library")
+set(KAZE_SND_DECODE_FLAC    ON              CACHE BOOL    "Support decoding Flac audio format")
+set(KAZE_SND_DECODE_MP3     ON              CACHE BOOL    "Support decoding Mp3 audio format")
+set(KAZE_SND_DECODE_VORBIS  ON              CACHE BOOL    "Support decoding Ogg vorbis audio format")
+set(KAZE_SND_DECODE_WAV     ON              CACHE BOOL    "Support decoding Wav audio format")
 
 # ----- Kaze Graphics Options -----
-set(KAZE_GRAPHICS             ON              CACHE BOOL  "Build kaze graphics library")
-set(KAZE_GRAPHICS_IMGUI       ON              CACHE BOOL  "Include Imgui backend and source files")
+set(KAZE_GFX             ON              CACHE BOOL  "Build kaze graphics library")
+set(KAZE_GFX_IMGUI       ON              CACHE BOOL  "Include Imgui backend and source files")
 
 # ----- Kaze Toolkit Options -----
 set(KAZE_TK                   ON                      CACHE BOOL "Build Kaze Toolkit")
-set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GRAPHICS_IMGUI}  CACHE BOOL "Add ImGUI plugin to Kaze Toolkit. KAZE_GRAPHICS_IMGUI must be ON")
+set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GFX_IMGUI}  CACHE BOOL "Add ImGUI plugin to Kaze Toolkit. KAZE_GFX_IMGUI must be ON")
 
 # ----- Kaze Util -----
 set(KAZE_BUILD_UTIL           OFF              CACHE BOOL   "Build")

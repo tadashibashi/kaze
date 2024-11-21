@@ -1,9 +1,7 @@
 #include "BufferView.h"
-
 #include <kaze/core/debug.h>
 #include <kaze/core/math/mathf.h>
 #include <kaze/core/memory.h>
-
 
 KAZE_NS_BEGIN
 
@@ -140,13 +138,13 @@ auto BufferView::read(void *data, Int64 bytes, Bool reverse) noexcept -> Int64
     return bytesToRead;
 }
 
-auto BufferView::seek(Int64 offset, SeekBase::Enum base) -> BufferView &
+auto BufferView::seek(Int64 offset, SeekBase base) -> BufferView &
 {
     // Seek by base
     switch (base)
     {
-    case SeekBase::Start:     m_head = m_begin + offset; break;
-    case SeekBase::Relative:  m_head = m_head + offset;  break;
+    case SeekBase::Begin:     m_head = m_begin + offset; break;
+    case SeekBase::Current:  m_head = m_head + offset;  break;
     case SeekBase::End:       m_head = m_end + offset;   break;
     default:                  return *this;
     }

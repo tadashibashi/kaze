@@ -1,30 +1,9 @@
-#include <kaze/tk/App.h>
-#include <kaze/tk/Camera2D.h>
-
-#include <kaze/core/AssetLoader.h>
-#include <kaze/core/debug.h>
-#include <kaze/core/kmain.h>
-
-#include <kaze/core/input/CursorConstants.h>
-#include <kaze/core/platform/filesys/filesys.h>
-#include <kaze/core/math/Vec/Vec3.h>
-#include <kaze/graphics/GraphicsMgr.h>
-#include <kaze/graphics/Image.h>
-#include <kaze/graphics/Renderable.h>
-#include <kaze/graphics/Texture2D.h>
-#include <kaze/graphics/UniformMgr.h>
-
-#include <kaze/tk/SpriteBatch.h>
-#include <kaze/tk/plugins/imgui/imgui_plugin.h>
-
-#include <kaze/audio/engine/AudioEngine.h>
-#include <kaze/audio/engine/AudioSource.h>
+#include <kaze/tk.hpp>
 
 #include <imgui/imgui.h>
 #include <filesystem>
 
 USING_KAZE_NS;
-using namespace KAUDIO_NS;
 
 class Demo final : public App {
 public:
@@ -36,21 +15,21 @@ public:
 
     ~Demo() override { }
 private:
-    Camera2D camera;
+    gfx::Camera2D camera;
     //AssetLoader<String, Texture2D> textures;
-    Texture2D testTexture{};
-    SpriteBatch batch{};
-    AudioEngine audio{};
-    Handle<Sound> computerScoreSnd{}, playerScoreSnd{};
+    gfx::Texture2D testTexture{};
+    gfx::SpriteBatch batch{};
+    snd::AudioEngine audio{};
+    Handle<snd::Sound> computerScoreSnd{}, playerScoreSnd{};
 
     struct TestImage
     {
-        const Texture2D *texture{};
+        const gfx::Texture2D *texture{};
         Vec2f position{};
         Float rotation{};
         Vec2f scale{1.f, 1.f};
 
-        auto draw(SpriteBatch &batch) -> void
+        auto draw(gfx::SpriteBatch &batch) -> void
         {
             if (texture)
             {
@@ -75,7 +54,7 @@ private:
 
         const std::filesystem::path baseDir = filesys::getBaseDir();
 
-        Image image;
+        gfx::Image image;
         if ( !image.load((baseDir / "assets/dungeon_tiles.png").string()) )
             return False;
 
@@ -109,9 +88,9 @@ private:
             return False;
 
         computerScoreSnd = audio.createSound( (baseDir / "assets/computer_score.wav").string(),
-            Sound::InMemory | Sound::OneShot);
+            snd::Sound::InMemory | snd::Sound::OneShot);
         playerScoreSnd = audio.createSound( (baseDir / "assets/player_score.wav").string(),
-            Sound::InMemory | Sound::OneShot);
+            snd::Sound::InMemory | snd::Sound::OneShot);
         if ( !computerScoreSnd || !playerScoreSnd )
             return False;
 
@@ -287,7 +266,7 @@ private:
     }
 };
 
-auto kaze::kmain(Int argc, Char *argv[]) -> Int
+auto main(Int argc, Char *argv[]) -> Int
 {
     Demo().run();
     return 0;

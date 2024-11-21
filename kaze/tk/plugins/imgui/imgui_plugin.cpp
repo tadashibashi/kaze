@@ -5,7 +5,10 @@
 #include <imgui/imgui.h>
 
 #include <kaze/core/platform/backend/backend.h>
-#include <kaze/graphics/Color.h>
+#include <kaze/gfx/Color.h>
+
+using namespace KGFX_NS;
+using namespace KGFX_NS::plugins::imgui;
 
 KAZE_NS_BEGIN
 

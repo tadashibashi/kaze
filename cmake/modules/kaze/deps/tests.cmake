@@ -8,5 +8,9 @@ if (NOT EXISTS doctest::doctest)
             GIT_REPOSITORY https://github.com/doctest/doctest.git
             GIT_TAG        v2.4.11
     )
+
+    set(DOCTEST_WITH_TESTS OFF)
+    set(DOCTEST_NO_INSTALL ON)
+    set(DOCTEST_WITH_MAIN_IN_STATIC_LIB OFF)
     FetchContent_MakeAvailable(doctest)
 endif()

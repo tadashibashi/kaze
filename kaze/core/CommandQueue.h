@@ -1,5 +1,5 @@
 #pragma once
-#include <kaze/audio/lib.h>
+#include <kaze/snd/lib.h>
 #include <kaze/core/concepts.h>
 
 KAZE_NS_BEGIN

@@ -1,6 +1,7 @@
 #pragma once
-
 #include <kaze/core/lib.h>
+#include <kaze/core/io/stream/SeekBase.h>
+
 #include <kaze/core/concepts.h>
 #include <kaze/core/debug.h>
 #include <kaze/core/endian.h>
@@ -9,15 +10,7 @@
 #include <limits>
 #include <stdexcept>
 
-
 KAZE_NS_BEGIN
-    struct SeekBase {
-    enum Enum {
-        Start,
-        Relative,
-        End
-    };
-};
 
 struct BufferViewOpts {
     Endian::Type arithmeticEndian = Endian::Little;
@@ -170,7 +163,7 @@ public:
     auto eof() const noexcept -> Bool { return m_isEof; }
 
     /// Seek to a position in the data. Resets the eof flag if it was set before calling this function.
-    auto seek(Int64 offset, SeekBase::Enum base = SeekBase::Start) -> BufferView &;
+    auto seek(Int64 offset, SeekBase base = SeekBase::Begin) -> BufferView &;
 
     /// Checks the validity of the buffer. Returns false if internal buffer is null or eof flag was set.
     [[nodiscard]]
