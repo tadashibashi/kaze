@@ -94,6 +94,8 @@ using Array = std::array<T, Size>;
 
 using String = std::string;
 using StringView = std::string_view;
+using Wstring = std::wstring;
+using WstringView = std::wstring_view;
 
 template <typename Class, typename T>
 Size byteOffsetOf(T Class::*member)

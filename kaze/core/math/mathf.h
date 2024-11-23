@@ -4,6 +4,14 @@
 
 #include <gcem.hpp>
 
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 KAZE_NS_BEGIN
 namespace mathf {
 

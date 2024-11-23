@@ -58,6 +58,7 @@ function(add_kaze_executable TARGET)
     endif()
 
     set(BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+    cmake_path(ABSOLUTE_PATH BINARY_DIR OUTPUT_VARIABLE BINARY_DIR)
 
     # Version
     kaze_get_or(IN_VERSION "1.0.0" VERSION)

@@ -5,7 +5,7 @@ check_cxx_source_compiles("
 #if defined(i386) || defined(__i386) || defined(__i386__) || defined(__i486__) ||    \
   defined(__i586__) || defined(__i686__) || defined(__IA32__)|| defined(_M_I86) ||   \
   defined(_M_IX86)|| defined(__X86__) || defined(_X86_) || defined(__THW_INTEL__) || \
-  defined(__I86__) || defined(__INTEL__) || defined(__386)
+  defined(__I86__) || defined(__INTEL__) || defined(__386) || defined(_M_X64)
     int main() { return 0; }
 #else
     #error Not an Intel cpu
@@ -15,7 +15,7 @@ check_cxx_source_compiles("
 check_cxx_source_compiles("
 #if defined(__arm__) || defined(__thumb__) || defined(__TARGET_ARCH_ARM) ||               \
   defined(__TARGET_ARCH_THUMB) || defined(__ARM) || defined(_M_ARM) || defined(_M_ARM_T) || \
-  defined(__ARM_ARCH)
+  defined(__ARM_ARCH) || defined(_M_ARM64)
     int main() { return 0; }
 #else
     #error Not an Arm cpu

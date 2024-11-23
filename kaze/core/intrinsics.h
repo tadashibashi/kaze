@@ -2,7 +2,7 @@
 
 #if KAZE_CPU_INTRINSICS
 
-#   if defined(__ARM_NEON) || defined(_M_ARM) || defined(_M_ARM64) // ARM NEON
+#   if defined(__ARM_NEON) || defined(_M_ARM) || defined(_M_ARM64) || defined(_ARM_) || defined(_ARM64_) // ARM NEON
 #       define KAZE_CPU_ARM_NEON 1
 #       include <arm_neon.h>
 

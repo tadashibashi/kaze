@@ -29,8 +29,8 @@ include(kaze/utils/target)
 include(kaze/option_defaults)
 
 # Bring in user cmake file if it exists
-if (EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.user.txt)
-    include(${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.user.txt)
+if (EXISTS ${CMAKE_SOURCE_DIR}/CMakeLists.user.txt)
+    include(${CMAKE_SOURCE_DIR}/CMakeLists.user.txt)
 endif()
 
 # ----- Kaze Core Options -----
@@ -74,6 +74,9 @@ set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GFX_IMGUI}  CACHE BOOL "Add ImGUI plugin to
 
 # ----- Kaze Util -----
 set(KAZE_BUILD_UTIL           OFF              CACHE BOOL   "Build")
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/build/util")
+    set(KAZE_BUILD_UTIL ON CACHE BOOL "" FORCE)
+endif()
 
 # ===== Projects ==============================================================
 # Prevent projects from generating ctest targets

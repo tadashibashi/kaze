@@ -48,21 +48,21 @@ struct HttpRequest {
     /// \returns whether request was successfully sent.
     auto send(funcptr_t<void (const HttpResponse &res, void *userptr)> callback, void *userptr) -> Bool;
 
-    auto url() const noexcept { return m_url; }
+    auto url() const noexcept -> const String & { return m_url; }
     auto method() const noexcept { return m_method; }
     auto methodString() const noexcept { return getMethodString(m_method); }
     auto mimeType() const noexcept { return m_mimeType; }
-    auto body() const noexcept { return m_body; }
-    auto headers() const noexcept -> const std::initializer_list<std::pair<CStringView, CStringView>> &
+    auto body() const noexcept -> const String & { return m_body; }
+    auto headers() const noexcept -> const List<std::pair<String, String>> &
     {
         return m_headers;
     }
 private:
-    CStringView m_url;
+    String m_url;
     Method m_method = Get;
-    CStringView m_mimeType = {};
-    CStringView m_body = {};
-    std::initializer_list<std::pair<CStringView, CStringView>> m_headers = {};
+    String m_mimeType = {};
+    String m_body = {};
+    List<std::pair<String, String>> m_headers = {};
 };
 
 struct HttpRequestCreate {
@@ -70,7 +70,7 @@ struct HttpRequestCreate {
     HttpRequest::Method method = HttpRequest::Get;
     CStringView         mimeType = {};
     CStringView         body = {};
-    std::initializer_list<std::pair<CStringView, CStringView>> headers = {};
+    List<std::pair<CStringView, CStringView>> headers = { };
 };
 
 KAZE_NS_END

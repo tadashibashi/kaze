@@ -271,8 +271,8 @@ function(_kaze_compile_shaders_impl)
                 VARYINGDEF ${IN_VARYING_DEF}
                 INCLUDES ${BGFX_SHADER_INCLUDE_PATH} ${IN_INCLUDE_DIRS}
             )
-            list(APPEND OUTPUTS ${OUTPUT})
-            list(APPEND ALL_OUTPUTS ${OUTPUT})
+            list(APPEND OUTPUTS "${OUTPUT}")
+            list(APPEND ALL_OUTPUTS "${OUTPUT}")
             list(
                 APPEND
                 MKDIR_COMMANDS
@@ -280,7 +280,7 @@ function(_kaze_compile_shaders_impl)
                 ${CMAKE_COMMAND}
                 -E
                 make_directory
-                ${IN_OUTPUT_DIR}/${PROFILE_EXT}
+                "${IN_OUTPUT_DIR}/${PROFILE_EXT}"
             )
 
             list(APPEND COMMANDS COMMAND ${IN_SHADERC} ${CLI})
@@ -316,7 +316,7 @@ function(_kaze_target_shaders_impl TARGET)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if (NOT EXISTS "${IN_SHADERC}")
-        set(IN_SHADERC bgfx::shaderc)
+        set(IN_SHADERC $<TARGET_FILE:bgfx::shaderc>)
     endif()
 
     set(PROFILES 120 300_es spirv)
@@ -395,7 +395,7 @@ function(_kaze_target_shaders_impl TARGET)
                 VARYINGDEF ${IN_VARYING_DEF}
                 INCLUDES ${BGFX_SHADER_INCLUDE_PATH} ${IN_INCLUDE_DIRS}
             )
-            list(APPEND OUTPUTS ${OUTPUT})
+            list(APPEND OUTPUTS "${OUTPUT}")
             list(
                 APPEND
                 MKDIR_COMMANDS
@@ -403,9 +403,9 @@ function(_kaze_target_shaders_impl TARGET)
                 ${CMAKE_COMMAND}
                 -E
                 make_directory
-                ${IN_OUTPUT_DIR}/${PROFILE_EXT}
+                "${OUTPUT_DIR}/${PROFILE_EXT}"
             )
-
+               
             list(APPEND COMMANDS COMMAND ${IN_SHADERC} ${CLI})
 
             if (KAZE_PLATFORM_APPLE)

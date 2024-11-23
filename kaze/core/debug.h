@@ -187,7 +187,6 @@ KAZE_NS_END
 #   define KAZE_ERR(...) KAZE_NOOP
 #   define KAZE_CORE_FATAL(...) (code, ...) do { \
         const auto kazeCoreLogMessage = fmt_lib::format(__VA_ARGS__); \
-        KAZE_NS::debug::getLogger()->critical(kazeCoreLogMessage); \
         KAZE_NS::setError(kazeCoreLogMessage, (code), (__FILE__), (__LINE__), (KAZE_FUNCTION) ); \
         throw std::runtime_error(kazeCoreLogMessage); \
     } while(0)
