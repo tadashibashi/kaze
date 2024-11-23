@@ -35,11 +35,16 @@ target_sources(kaze_core PRIVATE
         lib.h
         memory.h
         memory.cpp
+        str.h
+        str.cpp
         traits.h
 
         AssetLoader.h
         AlignedList.h
         Handle.h
+        HttpRequest.cpp
+        HttpRequest.h
+        HttpResponse.h
         ImageContainer.h
         MemView.h
         MultiPool.h

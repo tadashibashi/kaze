@@ -42,7 +42,8 @@ namespace kz::config {
         }
 
         if (const auto result = std::system(std::format(
-                "-DKAZE_BUILD_UTIL=OFF cmake -B build/desktop/{} -S . {} -DCMAKE_BUILD_TYPE={} -DCMAKE_EXPORT_COMPILE_COMMANDS=1",
+                "cmake -B build/desktop/{} -S . {} -DCMAKE_BUILD_TYPE={} "
+                "-DCMAKE_EXPORT_COMPILE_COMMANDS=1 -DKAZE_BUILD_UTIL=OFF",
                 buildTypeName, generator, buildTypeName).c_str());
             result != 0)
         {

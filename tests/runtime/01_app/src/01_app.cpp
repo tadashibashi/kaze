@@ -1,6 +1,7 @@
 #include <kaze/tk.hpp>
 
 #include <imgui/imgui.h>
+
 #include <filesystem>
 
 USING_KAZE_NS;
@@ -203,6 +204,29 @@ private:
                 audio.playSound(playerScoreSnd, False);
                 KAZE_LOG("Pressed the button at: {}", time());
             }
+
+            static String resString;
+            if (ImGui::Button("Request"))
+            {
+                HttpRequest::create({
+                        .url = "https://pokeapi.co/api/v2/pokemon/ditto",
+                        .method = HttpRequest::Get,
+                        .body = {},
+                        .headers = {}
+                }).send(
+                    [] (const HttpResponse &res, void *userdata) {
+                        auto str = static_cast<String *>(userdata);
+                        *str = res.body;
+
+                        for (const auto &[header, value] : res.headers)
+                        {
+                            KAZE_LOG("Header => {}: {}", header, value);
+                        }
+                    },
+                    &resString);
+            }
+
+            ImGui::Text("%s", resString.c_str());
         }
         ImGui::End();
 

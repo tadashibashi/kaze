@@ -20,4 +20,5 @@ set(PLATFORM_SOURCES_PRIVATE
 
 kaze_add_submodule(backend/${KAZE_BACKEND})
 kaze_add_submodule(filesys)
+kaze_add_submodule(http)
 kaze_add_submodule(native)

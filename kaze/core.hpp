@@ -7,10 +7,13 @@
 #include <kaze/core/CommandQueue.h>
 #include <kaze/core/concepts.h>
 #include <kaze/core/ConditionalAction.h>
+#include <kaze/core/CStringView.h>
 #include <kaze/core/debug.h>
 #include <kaze/core/endian.h>
 #include <kaze/core/errors.h>
 #include <kaze/core/Handle.h>
+#include <kaze/core/HttpRequest.h>
+#include <kaze/core/HttpResponse.h>
 #include <kaze/core/ImageContainer.h>
 #include <kaze/core/intrinsics.h>
 #include <kaze/core/json.h>
@@ -21,6 +24,7 @@
 #include <kaze/core/MultiPool.h>
 #include <kaze/core/Pool.h>
 #include <kaze/core/ServiceProvider.h>
+#include <kaze/core/str.h>
 #include <kaze/core/traits.h>
 #include <kaze/core/Window.h>
 #include <kaze/core/WindowConstants.h>

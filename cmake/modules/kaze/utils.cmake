@@ -18,9 +18,9 @@ endfunction()
 
 # Get the last `COUNT` number of characters of a string
 # Arguments:
-#   STR          String to get substring of
-#   COUNT        Number of characters to copy
-#   RESULT_VAR   Out variable to populate with resulting string
+#   - STR         : String to get substring of
+#   - COUNT       : Number of characters to copy
+#   - RESULT_VAR  : Out variable to populate with resulting string
 function(substring_end STR COUNT RESULT_VAR)
     string(LENGTH "${STR}" STR_LENGTH)
     math(EXPR START_INDEX "${STR_LENGTH} - ${COUNT}")
@@ -36,9 +36,9 @@ endfunction()
 
 # Check if string ends with another
 # Arguments:
-#   STR          String to check
-#   SUFFIX       case-sensitive substring to check if STR ends
-#   RESULT_VAR   Output variable: TRUE if suffix matches the end of string, FALSE if not
+#   - STR         : the string to check
+#   - SUFFIX      : case-sensitive substring to check if STR ends
+#   - RESULT_VAR  : output variable: TRUE if suffix matches the end of string, FALSE if not
 function (string_ends_with STR SUFFIX RESULT_VAR)
     string(LENGTH "${STR}" STR_LENGTH)
     string(LENGTH "${SUFFIX}" SUFFIX_LENGTH)
@@ -59,13 +59,11 @@ function (string_ends_with STR SUFFIX RESULT_VAR)
     endif()
 endfunction()
 
-function(kaze_slugify STR OUT_VAR)
-    string(REGEX REPLACE "[_ \t\r\n]+" "-" SLUGIFIED_STR "${STR}")
-    string(TOLOWER "${SLUGIFIED_STR}" LOWER_STR)
-
-    set(${OUT_VAR} "${LOWER_STR}" PARENT_SCOPE)
-endfunction()
-
+# Slugify a string, replacing white space with a specified replacement string
+# Arguments:
+#    - STR          : the string to slugify
+#    - REPLACEMENT  : the string to replace sections of whitespace with, i.e. "_" or "."
+#    - OUT_VAR      : variable to receive the slugified string
 function(kaze_slugify_ex STR REPLACEMENT OUT_VAR)
     string(REGEX REPLACE "[_ \t\r\n]+" "${REPLACEMENT}" SLUGIFIED_STR "${STR}")
     string(TOLOWER "${SLUGIFIED_STR}" LOWER_STR)
@@ -73,6 +71,20 @@ function(kaze_slugify_ex STR REPLACEMENT OUT_VAR)
     set(${OUT_VAR} "${LOWER_STR}" PARENT_SCOPE)
 endfunction()
 
+# Slugify a string, making it lowercase, and replacing whitespace with "-"
+# Arguments:
+#    - STR          : the string to slugify
+#    - OUT_VAR      : variable to receive the slugified string
+function(kaze_slugify STR OUT_VAR)
+    kaze_slugify_ex("${STR}" "-" TEMP)
+    set("${OUT_VAR}" "${TEMP}" PARENT_SCOPE)
+endfunction()
+
+# Retrieve a value if defined, otherwise, set a default
+# Arguments:
+#    - VAR_NAME      : variable to parse
+#    - DEFAULT_VALUE : default value if VAR_NAME is not defined
+#    - OUT_VAR       : variable name to receive the value
 function(kaze_get_or VAR_NAME DEFAULT_VALUE OUT_VAR)
     set(VALUE "${${VAR_NAME}}")
     if (VALUE)
@@ -84,8 +96,8 @@ endfunction()
 
 # Transform a truthy/falsy value to 1 and 0 respectively
 # Arguments:
-#   IN_VAR  the name of the variable to check
-#   OUT_VAR the variable to write to
+#   - IN_VAR  : the name of the variable to check
+#   - OUT_VAR : the variable to write to
 function(kaze_normalize_bool IN_VAR OUT_VAR)
     if (${${IN_VAR}})
         set(${OUT_VAR} 1 PARENT_SCOPE)
@@ -95,10 +107,10 @@ function(kaze_normalize_bool IN_VAR OUT_VAR)
 endfunction()
 
 # Transform a list of paths to become absolute
-# Arguments:
-#   PATHS    contains a list of paths that can either be absolute or relative
-#   ROOT_DIR root directory of where the variables were defined
-#   OUT_VAR  variable to fill with absolute paths
+# Named Arguments:
+#    - PATHS    : contains multiple paths that can either be absolute or relative
+#    - ROOT_DIR : root directory of where relative paths must stem from [optional, default: ${CMAKE_CURRENT_SOURCE_DIR}]
+#    - OUT_VAR  : variable to receive absolute path list
 function(kaze_make_paths_absolute)
     set(options "")
     set(oneValueArgs ROOT_DIR OUT_VAR)
@@ -110,7 +122,7 @@ function(kaze_make_paths_absolute)
     endif()
 
     if (NOT DEFINED IN_ROOT_DIR)
-        message(FATAL_ERROR "kaze_make_paths_absolute required argument ROOT_DIR was undefined")
+        set(IN_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
     endif()
 
     set(RESULT "")

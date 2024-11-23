@@ -61,7 +61,7 @@ function(add_kaze_executable TARGET)
 
     # Version
     kaze_get_or(IN_VERSION "1.0.0" VERSION)
-    string(REPLACE "." ";" VERSION_LIST ${VERSION})
+    string(REPLACE "." ";" VERSION_LIST "${VERSION}")
 
     list(GET VERSION_LIST 0 VERSION_MAJOR)
 
@@ -86,8 +86,8 @@ function(add_kaze_executable TARGET)
             ARCHIVE_OUTPUT_DIRECTORY_RELEASE        "${BINARY_DIR}/bin"
             ARCHIVE_OUTPUT_DIRECTORY_RELWITHDEBINFO "${BINARY_DIR}/bin"
             ARCHIVE_OUTPUT_DIRECTORY_MINSIZEREL     "${BINARY_DIR}/bin"
-            VERSION   "${VERSION}"
-            SOVERSION "${VERSION_MAJOR}"
+            KAZE_VERSION       "${VERSION}"
+            KAZE_VERSION_MAJOR "${VERSION_MAJOR}"
     )
 
     if (IN_SOURCES)
@@ -309,7 +309,7 @@ function(kaze_target_assets IN_TARGET)
     if (NOT IN_ASSET_DIR)
         message(FATAL_ERROR "kaze_target_copy_assets is missing an ASSET_DIR")
     endif()
-
+    
     cmake_path(ABSOLUTE_PATH IN_ASSET_DIR
         BASE_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         NORMALIZE

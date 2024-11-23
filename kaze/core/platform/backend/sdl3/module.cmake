@@ -5,7 +5,7 @@ if (NOT TARGET SDL3::SDL3)
             GIT_REPOSITORY https://github.com/libsdl-org/SDL.git
             GIT_TAG        6f80d47d64d8b8113df5a64870ff782e8fde45cc
     )
-    if (KAZE_BACKEND_SHARED AND NOT EMSCRIPTEN)
+    if (KAZE_PLATFORM_ANDROID OR (KAZE_BACKEND_SHARED AND NOT EMSCRIPTEN))
         set(SDL_SHARED ON  CACHE BOOL "" FORCE)
         set(SDL_STATIC OFF CACHE BOOL "" FORCE)
     else()
