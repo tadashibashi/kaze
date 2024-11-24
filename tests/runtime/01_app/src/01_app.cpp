@@ -199,7 +199,7 @@ private:
 
             ImGui::Spacing();
 
-            if (ImGui::Button("Press Me!"))
+            if (ImGui::Button("Play Sound!"))
             {
                 audio.playSound(playerScoreSnd, False);
                 KAZE_LOG("Pressed the button at: {}", time());
@@ -209,24 +209,55 @@ private:
             if (ImGui::Button("Request"))
             {
                 HttpRequest::create({
-                        .url = "https://pokeapi.co/api/v2/pokemon/ditto",
+                        .url = "http://localhost:3000",
                         .method = HttpRequest::Get,
                         .body = {},
                         .headers = {}
                 }).send(
                     [] (const HttpResponse &res, void *userdata) {
-                        auto str = static_cast<String *>(userdata);
-                        *str = res.body;
-
-                        for (const auto &[header, value] : res.headers)
+                        if (res.ok())
                         {
-                            KAZE_LOG("Header => {}: {}", header, value);
+                            auto str = static_cast<String *>(userdata);
+                            *str = res.body;
+
+                            for (const auto &[header, value] : res.headers)
+                            {
+                                KAZE_LOG("Header => {}: {}", header, value);
+                            }
+                        }
+                        else
+                        {
+                            KAZE_ERR("Http error: {}: {}", res.status, res.error);
+                            for (const auto &[header, value] : res.headers)
+                            {
+                                KAZE_LOG("Header => {}: {}", header, value);
+                            }
                         }
                     },
                     &resString);
             }
 
+            static String uploadRes;
+            static Int uploadTimes;
+            if (ImGui::Button("Upload"))
+            {
+                HttpRequest::create({
+                    .url = "http://localhost:3000/upload",
+                    .method = HttpRequest::Post,
+                    .mimeType = "text/plain",
+                    .body = fmt_lib::format("Testing 1 2 3 at app time: {}", time()),
+                }).send(
+                    [] (const HttpResponse &res, void *userdata) {
+                        if (res.ok())
+                        {
+                            auto str = (String *)userdata;
+                            *str = fmt_lib::format("Uploaded x{} times", ++uploadTimes);
+                        }
+                    }, &uploadRes);
+            }
+
             ImGui::Text("%s", resString.c_str());
+            ImGui::Text("%s", uploadRes.c_str());
         }
         ImGui::End();
 

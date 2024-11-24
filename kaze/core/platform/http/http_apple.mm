@@ -1,12 +1,19 @@
 #include "http.h"
-
 #import <Foundation/Foundation.h>
+#include <kaze/core/errors.h>
 #include <kaze/core/str.h>
-#include <initializer_list>
+#include <kaze/core/io/stream/RstreamableMemory.h>
 
 KAZE_NS_BEGIN
 
 static auto toNSString(CStringView str)
+{
+    return [[NSString alloc] initWithBytes: str.data()
+                                    length: str.length()
+                                 encoding: NSUTF8StringEncoding];
+}
+
+static auto toNSString(const String &str)
 {
     return [[NSString alloc] initWithBytes: str.data()
                                     length: str.length()
@@ -30,7 +37,7 @@ auto http::sendHttpRequestSync(
         for (const auto &[header, value] : req.headers())
         {
             [request setValue: toNSString(value)
-                       forKey: toNSString(header)];
+           forHTTPHeaderField: toNSString(header)];
         }
 
         const auto method = HttpRequest::getMethodString(req.method());
@@ -39,14 +46,24 @@ auto http::sendHttpRequestSync(
         if ( !req.mimeType().empty() )
         {
             [request setValue: toNSString(req.mimeType())
-                       forKey: @"Content-Type"];
+           forHTTPHeaderField: @"Content-Type"];
         }
 
         if (!req.body().empty())
         {
-            request.HTTPBody = [[NSData alloc] initWithBytes: req.body().data()
-                                               length: req.body().length()];
+            [request setValue: [NSString stringWithFormat:@"%zu", req.body().size()]
+           forHTTPHeaderField: @"Content-Length"];
+            [request setValue: @"Keep-Alive"
+           forHTTPHeaderField: @"Connection"];
+            NSInputStream *stream = [NSInputStream inputStreamWithData:[[NSData alloc] initWithBytes: req.body().data() length: req.body().length()]];
+            [request setHTTPBodyStream: stream];
         }
+
+        // Create URLSession data task
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+        config.timeoutIntervalForRequest = 30.0;
+        config.timeoutIntervalForResource = 60.0;
+        NSURLSession *session = [NSURLSession sessionWithConfiguration: config];
 
         // Create semophore to wait for async task
         dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
@@ -58,7 +75,7 @@ auto http::sendHttpRequestSync(
         __block List<String> cookies;
 
         // Create URLSession data task
-        NSURLSessionDataTask *task = [[NSURLSession sharedSession]
+        NSURLSessionDataTask *task = [session
             dataTaskWithRequest: request
             completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
                 if (error)
@@ -120,34 +137,31 @@ auto http::sendHttpRequest(
                                      length: req.url().length()
                                    encoding: NSUTF8StringEncoding];
         NSURL *url = [NSURL URLWithString: nsURLString];
+        if ( !url )
+        {
+            KAZE_PUSH_ERR(Error::RuntimeErr, "Invalid URL: {}", [nsURLString UTF8String]);
+            return False;
+        }
 
         NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: url];
 
         for (const auto &[header, value] : req.headers())
         {
             [request setValue: toNSString(value)
-                       forKey: toNSString(header)];
+           forHTTPHeaderField: toNSString(header)];
         }
 
-        const auto method = HttpRequest::getMethodString(req.method());
+        const auto method = req.methodString();
         request.HTTPMethod = toNSString(method);
 
         if ( !req.mimeType().empty() )
         {
             [request setValue: toNSString(req.mimeType())
-                       forKey: @"Content-Type"];
+           forHTTPHeaderField: @"Content-Type"];
         }
 
-        if (!req.body().empty())
-        {
-            request.HTTPBody = [[NSData alloc] initWithBytes: req.body().data()
-                                               length: req.body().length()];
-        }
-
-        // Create URLSession data task
-        NSURLSessionDataTask *task = [[NSURLSession sharedSession]
-            dataTaskWithRequest: request
-            completionHandler: ^(NSData *data, NSURLResponse *response, NSError *error) {
+        void(^completionHandler)(NSData *data, NSURLResponse *response, NSError *error) =
+            ^(NSData *data, NSURLResponse *response, NSError *error) {
                 HttpResponse res{};
                 if (error)
                 {
@@ -181,8 +195,25 @@ auto http::sendHttpRequest(
                 }
 
                 callback(res, userptr);
-            }];
+            };
 
+        if (!req.body().empty())
+        {
+            [request setValue: [NSString stringWithFormat:@"%zu", req.body().size()]
+           forHTTPHeaderField: @"Content-Length"];
+            [request setValue: @"Keep-Alive"
+           forHTTPHeaderField: @"Connection"];
+            NSInputStream *stream = [NSInputStream inputStreamWithData:[[NSData alloc] initWithBytes: req.body().data() length: req.body().length()]];
+            [request setHTTPBodyStream: stream];
+        }
+
+        // Create URLSession data task
+        NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+        config.timeoutIntervalForRequest = 30.0;
+        config.timeoutIntervalForResource = 60.0;
+        NSURLSession *session = [NSURLSession sessionWithConfiguration: config];
+        NSURLSessionDataTask *task = [session dataTaskWithRequest: request
+                                                  completionHandler:completionHandler];
         [task resume];
 
         return True;

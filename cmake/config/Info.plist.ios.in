@@ -57,6 +57,14 @@
   <dict>
     <key>NSAllowsArbitraryLoads</key>
     <true/>
+    <key>NSExceptionDomains</key>
+    <dict>
+        <key>localhost</key>
+        <dict>
+            <key>NSExceptionAllowsInsecureHTTPLoads</key>
+            <true/>
+        </dict>
+    </dict>
   </dict>
   <key>NSMicrophoneUsageDescription</key>
   <string>This app requires access to your microphone to record audio for interactive gameplay features.</string>

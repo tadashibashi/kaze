@@ -46,7 +46,7 @@ auto http::sendHttpRequestSync(const HttpRequest &req) -> HttpResponse
     emscripten_fetch_attr_t attr;
     emscripten_fetch_attr_init(&attr);
 
-    attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS;
+    attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS | EMSCRIPTEN_FETCH_STREAM_DATA;
 
     auto method = HttpRequest::getMethodString(req.method());
     if (method.empty())
@@ -107,6 +107,7 @@ auto http::sendHttpRequestSync(const HttpRequest &req) -> HttpResponse
 struct EmURLContext {
     funcptr_t<void (const HttpResponse &, void *)> callback;
     void *userdata;
+    String body;
 };
 
 static auto asyncErrorCallback(emscripten_fetch_t *fetch) -> void
@@ -157,7 +158,7 @@ auto http::sendHttpRequest(
     emscripten_fetch_attr_t attr;
     emscripten_fetch_attr_init(&attr);
 
-    attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+    attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_STREAM_DATA;
 
     auto method = HttpRequest::getMethodString(req.method());
     if (method.empty())
@@ -183,16 +184,19 @@ auto http::sendHttpRequest(
         attr.overriddenMimeType = req.mimeType().data();
     }
 
-    if ( !req.body().empty() )
-    {
-        attr.requestData = req.body().data();
-        attr.requestDataSize = req.body().size();
-    }
-
-    attr.userData = new EmURLContext {
+    auto userdata = new EmURLContext {
         .callback = callback,
         .userdata = userptr,
+        .body = req.body(),
     };
+
+    attr.userData = userdata;
+
+    if ( !userdata->body.empty() )
+    {
+        attr.requestData = userdata->body.c_str();
+        attr.requestDataSize = userdata->body.size();
+    }
 
     attr.onerror = asyncErrorCallback;
     attr.onsuccess = asyncSuccessCallback;

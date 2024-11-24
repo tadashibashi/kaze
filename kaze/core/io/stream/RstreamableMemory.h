@@ -60,6 +60,7 @@ public:
     /// \returns whether operation was successful.
     auto seek(Int64 position, SeekBase base = SeekBase::Begin) -> Bool override;
 
+    auto data() const noexcept -> const Ubyte * { return m_data; }
 private:
     auto cleanupData() -> void;
     Ubyte *m_data{}, *m_head{}, *m_end{};

@@ -6,7 +6,7 @@ const util             = require("./src/util.js");
 
 // ===== Constants ============================================================
 const HOSTNAME = "127.0.0.1"; ///< servers will be hosted on localhost
-const FILE_PORT = 3000;       ///< port number of the file server
+const FILE_PORT = 5432;       ///< port number of the file server
 const WS_PORT = 1234;         ///< port number of the websocket reload server
 
 // ===== Global Variables =====================================================
