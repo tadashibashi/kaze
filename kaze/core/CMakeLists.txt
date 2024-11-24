@@ -112,5 +112,5 @@ target_compile_definitions(kaze_core PUBLIC
 # ===== Compiler-specific settings =====
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     # May potentially hide an important warning, but otherwise the console gets cluttered
-    target_compile_options(kaze PUBLIC "-Wno-psabi")
+    target_compile_options(kaze_core PUBLIC "-Wno-psabi")
 endif()

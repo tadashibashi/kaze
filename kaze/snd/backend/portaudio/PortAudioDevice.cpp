@@ -185,7 +185,7 @@ struct PortAudioDevice::Impl {
         if (err != paNoError)
         {
             KAZE_PUSH_ERR(Error::RuntimeErr, "Pa_OpenStream failed: {}", Pa_GetErrorText(err));
-            return false;
+            return False;
         }
 
         auto id = Pa_GetDefaultOutputDevice();
@@ -193,7 +193,7 @@ struct PortAudioDevice::Impl {
         if (err = Pa_StartStream(stream); err != paNoError)
         {
             KAZE_PUSH_ERR(Error::RuntimeErr, "Pa_StartStream failed: {}", Pa_GetErrorText(err));
-            return false;
+            return False;
         }
 
         lockGuard.unlock();
@@ -220,7 +220,7 @@ struct PortAudioDevice::Impl {
 
         AudioObjectAddPropertyListener(kAudioObjectSystemObject, &propAddress, deviceChangedListener, this);
 #endif
-        return true;
+        return True;
     }
 
     void close()
@@ -248,7 +248,9 @@ struct PortAudioDevice::Impl {
                 devEnumerator = nullptr;
             }
 #endif
-            Pa_StopStream(stream);
+#if !KAZE_PLATFORM_LINUX
+            Pa_StopStream(stream); // causes a lock with asound due to mixer lock prior to close
+#endif
             Pa_CloseStream(stream);
             this->stream.store(nullptr, std::memory_order_release);
         }
@@ -285,7 +287,16 @@ PortAudioDevice::~PortAudioDevice()
 
 auto PortAudioDevice::open(const AudioDeviceOpen &config) -> Bool
 {
-    return m->open(Pa_GetDefaultOutputDevice(), config.frequency, config.frameBufferSize,
+    const auto device = Pa_GetDefaultOutputDevice();
+    if (device == paNoDevice)
+    {
+        KAZE_PUSH_ERR(Error::RuntimeErr,
+            "Pa_GetDefaultOutputDevice: no device could be retrieved");
+        return False;
+    }
+
+    return m->open(device,
+        config.frequency, config.frameBufferSize,
         config.audioCallback, config.userdata);
 }
 
@@ -332,7 +343,19 @@ auto PortAudioDevice::getBufferSize() const -> Int
 auto PortAudioDevice::getDefaultSampleRate() const -> Int
 {
     const auto dev = Pa_GetDefaultOutputDevice();
+    if (dev == paNoDevice)
+    {
+        KAZE_PUSH_ERR(Error::RuntimeErr,
+            "Pa_GetDefaultOutputDevice failed");
+        return -1;
+    }
     const auto info = Pa_GetDeviceInfo(dev);
+    if ( !info )
+    {
+        KAZE_PUSH_ERR(Error::RuntimeErr,
+            "Pa_GetDeviceInfo failed to get audio device info");
+        return -1;
+    }
     return static_cast<Int>(info->defaultSampleRate);
 }
 

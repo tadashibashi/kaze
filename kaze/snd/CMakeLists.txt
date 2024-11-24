@@ -21,7 +21,7 @@ target_sources(kaze_snd PRIVATE
         AudioSource.h
         AudioSpec.h
         AudioTime.cpp
-        Audiotime.h
+        AudioTime.h
         FadePoint.h
         lib.h
         SampleFormat.cpp

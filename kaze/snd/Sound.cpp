@@ -1,4 +1,5 @@
 #include "Sound.h"
+#include <kaze/core/math/mathf.h>
 #include <kaze/snd/AudioContext.h>
 #include <kaze/snd/conv/extern/miniaudio/miniaudio_ext.h>
 #include <kaze/core/io/io.h>
@@ -29,7 +30,7 @@ static bool loadAudioMarkersImpl(
             const auto sizeFactor = (float)targetSpec.freq / (float)freq;
             for (auto &marker : markers)
             {
-                marker.position = static_cast<Uint64>(std::round((float)marker.position * sizeFactor));
+                marker.position = static_cast<Uint64>(mathf::round((float)marker.position * sizeFactor));
             }
         }
 
@@ -208,7 +209,7 @@ auto Sound::addMarker(const Double position, const AudioTime::Unit units, const 
     SOUND_INIT_GUARD(False);
 
     const auto framePos = static_cast<Uint64>(
-        std::round(AudioTime::convert(position, units, AudioTime::PCMFrames, m->targetSpec)));
+        mathf::round(AudioTime::convert(position, units, AudioTime::PCMFrames, m->targetSpec)));
 
     AudioMarker marker(label, framePos);
 

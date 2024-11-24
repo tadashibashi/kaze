@@ -27,11 +27,11 @@ endif()
 
 # ----- Crunch ----------------------------------------------------------------
 
-FetchContent_Declare(crunch
-    GIT_REPOSITORY https://github.com/tadashibashi/crunch.git
-    GIT_TAG        df8494b39c6be928009aadd140182e2fbeeaeb82
-)
-FetchContent_MakeAvailable(crunch)
+# FetchContent_Declare(crunch
+#     GIT_REPOSITORY https://github.com/tadashibashi/crunch.git
+#     GIT_TAG        df8494b39c6be928009aadd140182e2fbeeaeb82
+# )
+# FetchContent_MakeAvailable(crunch)
 
 # ----- Nlohmann Json ---------------------------------------------------------
 # License: MIT

@@ -1,9 +1,11 @@
 #include "http.h"
 #include <kaze/core/debug.h>
+#include <kaze/core/memory.h>
+#include <kaze/core/io/stream/Rstream.h>
+#include <kaze/core/str.h>
 
 #include <curl/curl.h>
-#include <kaze/core/memory.h>
-#include <kaze/core/str.h>
+
 #include <thread>
 
 KAZE_NS_BEGIN
@@ -64,9 +66,10 @@ static auto curlWriteCallback(char *data, size_t size, size_t numItems, void *cl
 
     const size_t fullSize = size * numItems;
 
-    res.body.resize(fullSize);
+    const auto oldSize = res.body.size();
+    res.body.resize(oldSize + fullSize);
 
-    memory::copy(res.body.data(), data, fullSize);
+    memory::copy(res.body.data() + oldSize, data, fullSize);
     return fullSize;
 }
 
@@ -89,7 +92,7 @@ static auto curlHeaderCallback(const char *buffer, const size_t size, const size
         return 0; // faulty header
 
     const auto header = str::toLower(str::trim(view.substr(0, colonPos), True, False));
-    const auto value = str::toLower(str::trim(view.substr(colonPos + 1), True, True));
+    const auto value = str::trim(view.substr(colonPos + 1), True, True);
 
     if (header == "set-cookie")
     {
@@ -103,12 +106,21 @@ static auto curlHeaderCallback(const char *buffer, const size_t size, const size
     return size * nitems;
 }
 
+static auto curlReadCallback(char *buffer, size_t size, size_t nitems, void *userdata) -> size_t
+{
+    // Read data from the stream to the out buffer
+    auto &stream = *static_cast<Rstream *>(userdata);
+    const auto bytesRead = stream.read(buffer, static_cast<Int64>(size * nitems));
+
+    // Report number of bytes read, 0 will signal end of file
+    return static_cast<size_t>(bytesRead);
+}
+
 auto http::sendHttpRequestSync(
     const HttpRequest &req
 ) -> HttpResponse
 {
     HttpResponse res{};
-
     auto curl = curl_easy_init();
     if ( !curl )
     {
@@ -128,11 +140,14 @@ auto http::sendHttpRequestSync(
         CURL_CHECK(curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.data()));
     }
 
-    // Set body
+    // Set body stream
+    Rstream bodyStream;
+    bodyStream.openConstMem({res.body.data(), res.body.size()});
+
     if (req.body().data())
     {
-        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_POSTFIELDS, req.body().data()));
-        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_POSTFIELDSIZE, req.body().size()));
+        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_READFUNCTION, curlReadCallback));
+        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_READDATA, &bodyStream));
     }
 
     // Create headers
@@ -198,7 +213,7 @@ auto http::sendHttpRequest(
     }
 
     auto thd = std::thread([](
-        HttpRequest req,
+        const HttpRequest &req,
         funcptr_t<void(const HttpResponse &res, void *userdata)> callback,
         void *userdata)
     {

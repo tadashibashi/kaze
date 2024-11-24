@@ -48,11 +48,11 @@ auto AudioContext::open(const AudioContextOpen &config) -> Bool
 
 auto AudioContext::close() -> void
 {
+    auto lockGuard = std::lock_guard(m_mixMutex);
     if (isOpen())
     {
         if (m_masterBus.isValid())
         {
-            auto lockGuard = std::lock_guard(m_mixMutex);
             m_masterBus->m_isMaster = False;
             m_masterBus->release();
             m_immediateCmds.processCommandsLocked();
