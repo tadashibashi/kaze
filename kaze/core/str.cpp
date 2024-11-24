@@ -105,7 +105,7 @@ auto str::toLower(StringView s) -> String
 
 auto str::makeLower(String *s) -> String &
 {
-    if (!s) throw std::logic_error("Passed a null string to str::makeLower");
+    if (!s) throw std::invalid_argument("Passed a null string to str::makeLower");
 
     for (auto &c : *s)
     {
@@ -132,7 +132,7 @@ auto str::toLower(WstringView s) -> Wstring
 
 auto str::makeLower(Wstring *s) -> Wstring &
 {
-    if (!s) throw std::logic_error("Passed a null string to str::makeLower");
+    if (!s) throw std::invalid_argument("Passed a null string to str::makeLower");
 
     for (auto &c : *s)
     {
@@ -158,7 +158,7 @@ auto str::toUpper(StringView s) -> String
 
 auto str::makeUpper(String *s) -> String &
 {
-    if (!s) throw std::logic_error("Passed a null string to str::makeUpper");
+    if (!s) throw std::invalid_argument("Passed a null string to str::makeUpper");
 
     for (auto &c : *s)
     {
@@ -185,7 +185,7 @@ auto str::toUpper(WstringView s) -> Wstring
 
 auto str::makeUpper(Wstring *s) -> Wstring &
 {
-    if (!s) throw std::logic_error("Passed a null string to str::makeUpper");
+    if (!s) throw std::invalid_argument("Passed a null string to str::makeUpper");
 
     for (auto &c : *s)
     {

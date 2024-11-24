@@ -29,18 +29,23 @@
 
 KAZE_NS_BEGIN
 
-static auto getComponentsFromURL(const Wstring &url, Wstring *hostname, Wstring *pathAndQuery) -> Bool
+/// Get host name and path/query string from a URL
+/// \param[in]  url       url to parse
+/// \param[out] outHostname
+/// \param[out] outPathAndQuery
+/// \returns Boolean indicating whether parse was successful
+static auto getComponentsFromURL(const Wstring &url, Wstring *outHostname, Wstring *outPathAndQuery) -> Bool
 {
     static std::wregex regex(LR"((?:https?://)?([^/:]+)(/[^?]*)?(\?.*)?)");
     std::wsmatch match;
 
     if (std::regex_search(url, match, regex))
     {
-        if (hostname)
-            *hostname = match[1].str();
+        if (outHostname)
+            *outHostname = match[1].str();
 
-        if (pathAndQuery)
-            *pathAndQuery = match[2].str();
+        if (outPathAndQuery)
+            *outPathAndQuery = match[2].str();
 
         return True;
     }
@@ -48,6 +53,9 @@ static auto getComponentsFromURL(const Wstring &url, Wstring *hostname, Wstring 
     return False;
 }
 
+/// Parse data from the request body.
+/// \param[in]  hRequest request handle; request must have have successfully received a response
+/// \returns Response body in a string
 static auto getResponseBody(HINTERNET hRequest) -> String
 {
     String body;
@@ -82,6 +90,11 @@ static auto getResponseBody(HINTERNET hRequest) -> String
     return body;
 }
 
+/// Get headers and cookies from a response
+/// \param[in]  hRequest    request that succesfully received a response
+/// \param[out] outHeaders  pointer to retrieve dictionary of headers
+/// \param[out] cookies     pointer to retrieve cookie list
+/// \returns Boolean indicating whether parse was successful
 static auto parseResponseHeaders(HINTERNET hRequest, Dictionary<String, String> *outHeaders, List<String> *outCookies) -> Bool
 {
     // Get the header buffer size
@@ -159,6 +172,7 @@ static auto parseResponseHeaders(HINTERNET hRequest, Dictionary<String, String> 
     return True;
 }
 
+/// \returns flags indicating which secure protocols are available to WinHTTP
 static auto getSecureProtocols() -> DWORD
 {
     static DWORD protocols;
@@ -182,8 +196,8 @@ auto http::sendHttpRequestSync(
     HttpResponse res{};
 
     const auto url = str::toWstring(req.url());
-    std::wstring hostname;
-    std::wstring pathAndQuery;
+    Wstring hostname;
+    Wstring pathAndQuery;
     if (!getComponentsFromURL(url, &hostname, &pathAndQuery))
     {
         KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to get components from URL");
@@ -285,13 +299,13 @@ auto http::sendHttpRequest(
     }
 
     auto thd = std::thread([](
-            HttpRequest req,
-            funcptr_t<void(const HttpResponse &res, void *userdata)> callback,
-            void *userdata)
-        {
-            const auto res = sendHttpRequestSync(req);
-            callback(res, userdata);
-        }, req, callback, userdata);
+        HttpRequest req,
+        funcptr_t<void(const HttpResponse &res, void *userdata)> callback,
+        void *userdata)
+    {
+        const auto res = sendHttpRequestSync(req);
+        callback(res, userdata);
+    }, req, callback, userdata);
 
     thd.detach();
     return True;
