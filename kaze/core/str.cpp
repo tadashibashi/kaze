@@ -195,6 +195,68 @@ auto str::makeUpper(Wstring *s) -> Wstring &
     return *s;
 }
 
+// Encode Wstring to Unicode string
+static auto wstringToStringImpl(WstringView wideStrView) -> String
+{
+    if (wideStrView.empty()) return {};
+
+    // Get the total string length in bytes
+    Size length = 0;
+    for (const auto wc : wideStrView)
+    {
+        if (wc <= 0x7F)          // 1-byte sequence (ASCII)
+            ++length;
+        else if (wc <= 0x7FF)    // 2-byte sequence
+            length += 2;
+        else if (wc <= 0xFFFF)   // 3-byte sequence
+            length += 3;
+        else if (wc <= 0x10FFFF) // 4-byte sequence
+            length += 4;
+        else                     // Replacement character (U+FFFD)
+            length += 3;
+    }
+
+    // Fill the buffer
+    String result;
+    result.resize(length);
+
+    Char *buffer = result.data();
+    for (const auto wc : wideStrView)
+    {
+        if (wc <= 0x7F)         // ASCII range
+        {
+            *buffer++ = static_cast<Char>(wc);
+        }
+        else if (wc <= 0x7FF)   // 2-byte sequence
+        {
+            *buffer++ = static_cast<Char>(0xC0 | ((wc >> 6) & 0x1F));
+            *buffer++ = static_cast<Char>(0x80 | (wc & 0x3F));
+        }
+        else if (wc <= 0xFFFF)  // 3-byte sequence
+        {
+            *buffer++ = static_cast<Char>(0xE0 | ((wc >> 12) & 0x0F));
+            *buffer++ = static_cast<Char>(0x80 | ((wc >> 6) & 0x3F));
+            *buffer++ = static_cast<Char>(0x80 | (wc & 0x3F));
+        }
+        else if (wc <= 0x10FFFF) // 4-byte sequence
+        {
+            // Unicode above U+FFFF
+            *buffer++ = static_cast<Char>(0xF0 | ((wc >> 18) & 0x07));
+            *buffer++ = static_cast<Char>(0x80 | ((wc >> 12) & 0x3F));
+            *buffer++ = static_cast<Char>(0x80 | ((wc >> 6) & 0x3F));
+            *buffer++ = static_cast<Char>(0x80 | (wc & 0x3F));
+        }
+        else                     // Replace invalid character with U+FFFD
+        {
+            *buffer++ = static_cast<Char>(0xEF);
+            *buffer++ = static_cast<Char>(0xBF);
+            *buffer++ = static_cast<Char>(0xBD);
+        }
+    }
+
+    return result;
+}
+
 auto str::toWstring(const String &s) -> Wstring
 {
     return toWstring(StringView(s.data(), s.length()));
@@ -248,8 +310,7 @@ auto str::toString(WstringView ws) -> String
 
     return s;
 #else
-    std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-    return String(converter.to_bytes(wstr));
+    return wstringToStringImpl(ws);
 #endif
 }
 

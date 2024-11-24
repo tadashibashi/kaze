@@ -62,6 +62,7 @@ using Size = size_t;
 
 using Char = char;
 using Uchar = unsigned char;
+using Wchar = wchar_t;
 
 using Cstring = const char *;
 
