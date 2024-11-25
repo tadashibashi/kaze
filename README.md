@@ -2,20 +2,57 @@
 
 *A flexible cross-platform game development framework*
 
-Kaze is a unified C++ toolkit to craft real-time games and applications.
-Cross-platform, supporting modern Gpu shaders (vertex, fragment, and compute) through a Bgfx backend.
+Kaze is a unified C++20 toolkit to craft real-time games and applications.
+Cross-platform, supporting modern graphics and audio apis.
 
 ## Features
-
-- Cross-platform graphics pipeline: Metal, Vulkan, DirectX, OpenGL, OpenGLES
-- Bring your own backend: SDL3, GLFW3, or implement your own
+- Cross-platform graphics
+    - Metal (macOS, iOS)
+    - DirectX (Windows)
+    - OpenGL (Linux)
+    - OpenGLES (Android)
+    - WebGL
+- Cross-platform audio
+    - PortAudio (macOS, Windows, Linux)
+    - AAudio (Android)
+    - AudioUnit (iOS)
+    - WebAudio
+- Cross-platform window / input backends
+    - SDL3
+    - GLFW3
+    - Implement your own?
 - ImGUI plugin
 
 ## Architecture
+This framework is comprised of several lower-level libraries, and one higher level toolkit
 
-This toolkit is comprised of two main libraries:
-- **Kaze Core** – contains low-level abstractions over windowing, input, and the graphics pipeline into a convenient interface.
-- **Kaze Tk** – an intermediate-level app framework built on top of Core. It contains classes to get you up and running quickly, but is purely optional to link to.
+**Core**
+- Debug logging
+- Http requests
+- Input handling
+- Math functions and types
+- Object pooling
+- Serialization/deserialization
+- Streams
+- Windowing
+
+**Graphics (Gfx)**
+- 2D Sprites
+- Graphics pipeline
+    - Bgfx Shaders
+    - Uniforms
+    - Custom Vertices
+- Image Loading
+- Dear ImGui
+
+**Sound (Snd)**
+- Audio mix graph
+- Effects API
+- Supported Formats: Wav, Mp3, Flac, Vorbis
+
+**Toolkit**
+- Application driver
+- Plugin System
 
 ## Getting Started
 
@@ -24,15 +61,19 @@ This toolkit is comprised of two main libraries:
 - cmake 3.20+
 - ninja build (recommended)
 
-Tested Compilers
-- AppleClang 15
-- Clang 19
-- Emscripten 20
-- GCC 13
-- MSVC 17 (Visual Studio 2022)
-- Android NDK 28
+#### Tested Compilers
 
-Tested Target Platforms
+| Compiler    | Version |
+| ----------- | ------- |
+| Apple Clang | 15      |
+| Clang       | 19      |
+| GCC         | 13      |
+| MSVC        | 17      |
+| Emscripten  | 20      |
+| Android NDK | 28      |
+
+#### Tested Target Platforms
+
 - MacOS Sonoma 14.6.1 - M1
 - Linux Ubuntu 24.04 LTS - Arm64
 - Windows 11 - Arm64
@@ -43,33 +84,41 @@ Tested Target Platforms
 *Linux Requirements*
 - X11 dev libraries
 - OpenGL dev libraries
+- libcurl, libssl
 
 ### Building the Example
 
-There are two primary methods for building:
-1. `cmake` - the project can be compiled as usual with the CMake command line or IDE tooling.
+The project can be built using CMake 3.20+
 
-```sh
-cmake -B build -S . -G Ninja -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Debug
-cmake --build build --target kaze_test_01_app
-cd build/tests/runtime/bin && ./kaze_test_01_app
-```
-
-2. `kz` - a build tool compiled by this project that abstracts Kaze's CMake options and build process with a simple interface. It's intended for convenient use in text editor environments where CMake tooling isn't as robust.
+It also includes a custom tool called `kz`, which automates CMake and enables ease of building and running projects cross-platform. `kz` is especially helpful for text editor environments where CMake tooling isn't as robust.
 
 #### Mac & Linux
 Terminal (bash)
 ```bash
 source util/setup.sh
-kz run kaze_test_01_app
+kz run ktest_01_app
 ```
 
 #### Windows
 Powershell
 ```powershell
 util\setup.ps1
-kz run kaze_test_01_app
+kz run ktest_01_app
 ```
+#### WebGL
+You'll need Emsdk installed on your system.
+Set `EMSDK` in your local environment to an absolute path to the EMSDK installation root.
+Alternatively, place a `.env` file with this variable defined.
+
+Make sure the latest version of Emscripten has been installed and activated (v20 as of
+writing these instructions).
+
+Then, source the proper util/setup file on your OS as shown above.
+```bash
+kz run ktest_01_app -p emscripten
+```
+
+A default browser should open with the project running in it.
 
 #### iOS
 Make sure you have an iOS simulator installed.
@@ -77,7 +126,7 @@ Make sure you have an iOS simulator installed.
 Terminal (bash)
 ```sh
 source util/setup.sh
-kz run kaze_test_01_app -p ios
+kz run ktest_01_app -p ios
 ```
 
 Running via `kz run` only works for simulators at the moment.
@@ -86,26 +135,13 @@ Running via `kz run` only works for simulators at the moment.
 To run on hardware, you'll need an Apple Developer account and an iOS device that can run iOS 16.
 Make sure your device is registered with your Apple Account, and recognized by and connected to your Mac.
 
-Manually open the generated Xcode project. Under the executable project's "Signing & Capabilities",
+Manually open the generated Xcode project in "build/ios". Under the executable project's "Signing & Capabilities",
 make sure to tick "Automatically manage signing". Then select your account under "Team" dropdown menu.
 (The UI for these settings may vary by Xcode version. I'm currently on Xcode 16.1)
 
-Now the project should run on your connected device.
+With your device selected, hit run, and the project should install and run on your connected device.
 
 #### Android
 Currently, only test/01_app has a working Android project.
 Open the "android" folder in Android Studio, and with the latest Android SDK and NDK installed
 (SDK v35, NDK v28, as of writing these instructions) it should build and run.
-
-#### WebGL
-You'll need Emsdk installed on your system.
-Place a `.env` file in your project's root directory with an EMSDK variable with an absolute path to the root
-of the installation. Make sure the latest version of Emscripten has been installed and activated (v20 as of
-writing these instructions).
-
-Make sure to source the proper tools/setup file on your OS as shown above.
-```bash
-kz run ktest_01_app -p emscripten
-```
-
-A default browser should open with the project running in it
