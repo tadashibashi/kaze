@@ -140,29 +140,37 @@ auto http::sendHttpRequestSync(
         CURL_CHECK(curl_easy_setopt(curl, CURLOPT_CUSTOMREQUEST, method.data()));
     }
 
-    // Set body stream
-    Rstream bodyStream;
-    bodyStream.openConstMem({res.body.data(), res.body.size()});
-
-    if (req.body().data())
-    {
-        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_READFUNCTION, curlReadCallback));
-        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_READDATA, &bodyStream));
-    }
-
     // Create headers
     curl_slist *headers = Null;
     for (const auto &[header, value] : req.headers())
     {
         if (!header.data() || !value.data())
             continue;
-        headers = curl_slist_append(headers, fmt_lib::format("{}: {}", header.data(), value.data()).data());
+        headers = curl_slist_append(headers,
+            fmt_lib::format("{}: {}", header, value).data());
     }
 
-    // Mime type
-    if (req.mimeType().data())
+    // Set body stream
+    String bodyStr;
+    req.swapBody(bodyStr);
+
+    Rstream bodyStream;
+    bodyStream.openConstMem({bodyStr.data(), bodyStr.size()});
+
+    if (!bodyStr.empty())
     {
-        headers = curl_slist_append(headers, fmt_lib::format("Content-Type: {}", req.mimeType().data()).data());
+        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L));
+        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_READFUNCTION, curlReadCallback));
+        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_READDATA, &bodyStream));
+        CURL_CHECK(curl_easy_setopt(curl, CURLOPT_INFILESIZE_LARGE,
+            static_cast<curl_off_t>(bodyStr.length())));
+
+        // Mime type
+        if (req.mimeType().data())
+        {
+            headers = curl_slist_append(headers,
+                fmt_lib::format("Content-Type: {}", req.mimeType().data()).data());
+        }
     }
 
     // Set headers
