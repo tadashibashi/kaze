@@ -16,6 +16,32 @@ auto HttpRequest::create(const HttpRequestCreate &config) -> HttpRequest
     return req;
 }
 
+auto HttpRequest::methodToString(const Method method) -> CStringView
+{
+    switch (method)
+    {
+    case Get:
+        return {"GET", 3};
+    case Post:
+        return {"POST", 4};
+    case Put:
+        return {"PUT", 3};
+    case Delete:
+        return {"DELETE", 6};
+    case Patch:
+        return {"PATCH", 5};
+    case Head:
+        return {"HEAD", 4};
+    case Options:
+        return {"OPTIONS", 7};
+    case Merge:
+        return {"MERGE", 5};
+    default:
+        return {"", 0};
+    }
+}
+
+
 auto HttpRequest::sendSync() -> HttpResponse
 {
     return http::sendHttpRequestSync(*this);

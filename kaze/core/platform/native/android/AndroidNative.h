@@ -15,6 +15,7 @@ namespace android {
     auto getDefaultSampleRate() -> int;
     auto getDefaultFramesPerBuffer() -> int;
     auto getDataDirectory() -> const String &;
+    auto isEmulator() -> Bool;
 
     /// Send a synchronous (blocking) http request
     /// \param[in] req   request to send

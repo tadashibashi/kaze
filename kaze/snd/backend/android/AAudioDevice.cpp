@@ -63,11 +63,6 @@ struct AAudioDevice::Impl {
 
         AAudioStreamBuilder_delete(builder);
 
-        if (auto result = AAudioStream_requestStart(m_stream); result != AAUDIO_OK)
-        {
-            AAudioStream_close(m_stream);
-            return False;
-        }
         // TODO: double check that we're 2-channel Float?
         return True;
     }

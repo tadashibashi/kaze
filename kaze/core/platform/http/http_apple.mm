@@ -20,44 +20,55 @@ static auto toNSString(const String &str)
                                  encoding: NSUTF8StringEncoding];
 }
 
+/// Create NSURLRequest * from kaze::HttpRequest
+static auto createRequest(const HttpRequest &req) -> NSURLRequest *
+{
+    // Create request with URL
+    NSString *nsURLString =
+        [[NSString alloc] initWithBytes: req.url().data()
+                                 length: req.url().length()
+                               encoding: NSUTF8StringEncoding];
+    NSURL *url = [NSURL URLWithString: nsURLString];
+    NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: url];
+
+    // Set method
+    const auto method = HttpRequest::methodToString(req.method());
+    request.HTTPMethod = toNSString(method);
+
+    // Setup headers
+    for (const auto &[header, value] : req.headers())
+    {
+        [request      setValue: toNSString(value)
+            forHTTPHeaderField: toNSString(header)];
+    }
+
+    // Set mime type
+    if ( !req.mimeType().empty() )
+    {
+        [request      setValue: toNSString(req.mimeType())
+            forHTTPHeaderField: @"Content-Type"];
+    }
+
+    // Set body TODO: implement own streaming type
+    if (!req.body().empty())
+    {
+        [request      setValue: [NSString stringWithFormat:@"%zu", req.body().size()]
+            forHTTPHeaderField: @"Content-Length"];
+        [request      setValue: @"Keep-Alive"
+            forHTTPHeaderField: @"Connection"];
+        NSInputStream *stream = [NSInputStream inputStreamWithData:[[NSData alloc] initWithBytes: req.body().data() length: req.body().length()]];
+        [request setHTTPBodyStream: stream];
+    }
+
+    return request;
+}
+
 auto http::sendHttpRequestSync(
     const HttpRequest &req
 ) -> HttpResponse
 {
     @autoreleasepool {
-        // Convert StringView -> NSString
-        NSString *nsURLString =
-            [[NSString alloc] initWithBytes: req.url().data()
-                                     length: req.url().length()
-                                   encoding: NSUTF8StringEncoding];
-        NSURL *url = [NSURL URLWithString: nsURLString];
-
-        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: url];
-
-        for (const auto &[header, value] : req.headers())
-        {
-            [request setValue: toNSString(value)
-           forHTTPHeaderField: toNSString(header)];
-        }
-
-        const auto method = HttpRequest::getMethodString(req.method());
-        request.HTTPMethod = toNSString(method);
-
-        if ( !req.mimeType().empty() )
-        {
-            [request setValue: toNSString(req.mimeType())
-           forHTTPHeaderField: @"Content-Type"];
-        }
-
-        if (!req.body().empty())
-        {
-            [request setValue: [NSString stringWithFormat:@"%zu", req.body().size()]
-           forHTTPHeaderField: @"Content-Length"];
-            [request setValue: @"Keep-Alive"
-           forHTTPHeaderField: @"Connection"];
-            NSInputStream *stream = [NSInputStream inputStreamWithData:[[NSData alloc] initWithBytes: req.body().data() length: req.body().length()]];
-            [request setHTTPBodyStream: stream];
-        }
+        NSURLRequest *request = createRequest(req);
 
         // Create URLSession data task
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -131,34 +142,7 @@ auto http::sendHttpRequest(
     void *userptr) -> Bool
 {
     @autoreleasepool {
-        // Convert StringView -> NSString
-        NSString *nsURLString =
-            [[NSString alloc] initWithBytes: req.url().data()
-                                     length: req.url().length()
-                                   encoding: NSUTF8StringEncoding];
-        NSURL *url = [NSURL URLWithString: nsURLString];
-        if ( !url )
-        {
-            KAZE_PUSH_ERR(Error::RuntimeErr, "Invalid URL: {}", [nsURLString UTF8String]);
-            return False;
-        }
-
-        NSMutableURLRequest *request = [[NSMutableURLRequest alloc] initWithURL: url];
-
-        for (const auto &[header, value] : req.headers())
-        {
-            [request setValue: toNSString(value)
-           forHTTPHeaderField: toNSString(header)];
-        }
-
-        const auto method = req.methodString();
-        request.HTTPMethod = toNSString(method);
-
-        if ( !req.mimeType().empty() )
-        {
-            [request setValue: toNSString(req.mimeType())
-           forHTTPHeaderField: @"Content-Type"];
-        }
+        NSURLRequest *request = createRequest(req);
 
         void(^completionHandler)(NSData *data, NSURLResponse *response, NSError *error) =
             ^(NSData *data, NSURLResponse *response, NSError *error) {
@@ -197,16 +181,6 @@ auto http::sendHttpRequest(
                 callback(res, userptr);
             };
 
-        if (!req.body().empty())
-        {
-            [request setValue: [NSString stringWithFormat:@"%zu", req.body().size()]
-           forHTTPHeaderField: @"Content-Length"];
-            [request setValue: @"Keep-Alive"
-           forHTTPHeaderField: @"Connection"];
-            NSInputStream *stream = [NSInputStream inputStreamWithData:[[NSData alloc] initWithBytes: req.body().data() length: req.body().length()]];
-            [request setHTTPBodyStream: stream];
-        }
-
         // Create URLSession data task
         NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
         config.timeoutIntervalForRequest = 30.0;
@@ -218,6 +192,11 @@ auto http::sendHttpRequest(
 
         return True;
     }
+}
+
+auto http::getLocalHost() -> Cstring
+{
+    return "localhost";
 }
 
 KAZE_NS_END

@@ -9,6 +9,7 @@ KAZE_NS_BEGIN
 struct HttpRequestCreate;
 
 struct HttpRequest {
+
     enum Method {
         Get,
         Post,
@@ -22,21 +23,9 @@ struct HttpRequest {
 
     static auto create(const HttpRequestCreate &config) -> HttpRequest;
 
-    static inline auto getMethodString(const Method method) -> CStringView
-    {
-        switch(method)
-        {
-        case Get: return {"GET", 3};
-        case Post: return {"POST", 4};
-        case Put: return {"PUT", 3};
-        case Delete: return {"DELETE", 6};
-        case Patch: return {"PATCH", 5};
-        case Head: return {"HEAD", 4};
-        case Options: return {"OPTIONS", 7};
-        case Merge: return {"MERGE", 5};
-        default: return {"", 0};
-        }
-    }
+    /// \returns string form of an `HttpRequest::Method`
+    /// \note returns an empty string if not a recognized enum value.
+    static auto methodToString(const Method method) -> CStringView;
 
     /// Send a synchronous (blocking) http request
     /// \returns response object, if status is < 0, a system exception likely occurred
@@ -48,11 +37,26 @@ struct HttpRequest {
     /// \returns whether request was successfully sent.
     auto send(funcptr_t<void (const HttpResponse &res, void *userptr)> callback, void *userptr) -> Bool;
 
+    /// \returns the request URL
     auto url() const noexcept -> const String & { return m_url; }
+
+    /// \returns the request method enum
     auto method() const noexcept { return m_method; }
-    auto methodString() const noexcept { return getMethodString(m_method); }
-    auto mimeType() const noexcept { return m_mimeType; }
+
+    /// \returns the reuqest method as a string
+    auto methodString() const noexcept { return methodToString(m_method); }
+
+    /// \returns the mime type as a string, may be empty
+    auto mimeType() const noexcept -> const String & { return m_mimeType; }
+
+    /// \returns the body
     auto body() const noexcept -> const String & { return m_body; }
+
+    /// Swap out body. Caution: mutates this `HttpRequest` instance, even if const.
+    /// This is necessary for very large uploads.
+    /// \param[in]  other  string to swap with the internal one
+    auto swapBody(String &other) const noexcept -> void { m_body.swap(other); }
+
     auto headers() const noexcept -> const List<std::pair<String, String>> &
     {
         return m_headers;
@@ -61,7 +65,7 @@ private:
     String m_url;
     Method m_method = Get;
     String m_mimeType = {};
-    String m_body = {};
+    mutable String m_body = {}; // made mutable to swap out, even if const
     List<std::pair<String, String>> m_headers = {};
 };
 

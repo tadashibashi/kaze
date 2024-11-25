@@ -17,4 +17,9 @@ auto http::sendHttpRequest(
     return android::sendHttpRequest(req, callback, userdata);
 }
 
+auto http::getLocalHost() -> Cstring
+{
+    return android::isEmulator() ? "10.0.2.2" : "127.0.0.1";
+}
+
 KAZE_NS_END

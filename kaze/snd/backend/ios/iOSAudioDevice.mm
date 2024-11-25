@@ -389,8 +389,8 @@ auto iOSAudioDevice::open(const AudioDeviceOpen &config) -> Bool
                          0,
                          &retrievedSampleRate,
                          &size);
-    assert(sizeof(retrievedSampleRate) == size);
-    assert(retrievedSampleRate == frequency);
+    KAZE_ASSERT(sizeof(retrievedSampleRate) == size);
+    KAZE_ASSERT(retrievedSampleRate == frequency);
 
     AudioStreamBasicDescription retrievedStreamDesc;
     size = sizeof(retrievedStreamDesc);
@@ -400,11 +400,11 @@ auto iOSAudioDevice::open(const AudioDeviceOpen &config) -> Bool
                          0,
                          &retrievedStreamDesc,
                          &size);
-    assert(sizeof(retrievedStreamDesc) == size);
-    assert(retrievedStreamDesc.mBitsPerChannel == sizeof(Float) * CHAR_BIT);
-    assert(retrievedStreamDesc.mFormatID == kAudioFormatLinearPCM);
-    assert(retrievedStreamDesc.mChannelsPerFrame == 2);
-    assert((retrievedStreamDesc.mFormatFlags & formatFlags) == formatFlags);
+    KAZE_ASSERT(sizeof(retrievedStreamDesc) == size);
+    KAZE_ASSERT(retrievedStreamDesc.mBitsPerChannel == sizeof(Float) * CHAR_BIT);
+    KAZE_ASSERT(retrievedStreamDesc.mFormatID == kAudioFormatLinearPCM);
+    KAZE_ASSERT(retrievedStreamDesc.mChannelsPerFrame == 2);
+    KAZE_ASSERT((retrievedStreamDesc.mFormatFlags & formatFlags) == formatFlags);
 
     auto curAudioUnit = m->audioUnit.load(std::memory_order_acquire);
     if (curAudioUnit)

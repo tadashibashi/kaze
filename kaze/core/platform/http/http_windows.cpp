@@ -311,4 +311,9 @@ auto http::sendHttpRequest(
     return True;
 }
 
+auto http::getLocalHost() -> Cstring
+{
+    return "localhost";
+}
+
 KAZE_NS_END

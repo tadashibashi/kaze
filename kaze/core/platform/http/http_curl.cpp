@@ -180,6 +180,7 @@ auto http::sendHttpRequestSync(
     CURL_CHECK(curl_easy_setopt(curl, CURLOPT_HEADERDATA, &res));
 
     CURL_CHECK(curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L));
+
     // Perform request
     const auto result = curl_easy_perform(curl);
     if (headers)
@@ -212,6 +213,7 @@ auto http::sendHttpRequest(
         return False;
     }
 
+    // Fire synchronous request in a thread
     auto thd = std::thread([](
         const HttpRequest &req,
         funcptr_t<void(const HttpResponse &res, void *userdata)> callback,
@@ -225,8 +227,12 @@ auto http::sendHttpRequest(
     }, req, callback, userdata);
 
     thd.detach();
-
     return True;
+}
+
+auto http::getLocalHost() -> Cstring
+{
+    return "localhost"; // This may need to change depending if we use curl on other platforms besides linux
 }
 
 KAZE_NS_END

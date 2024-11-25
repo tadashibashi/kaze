@@ -13,6 +13,7 @@ static jobject g_activity;
 static AAssetManager *g_assets;
 static int defaultSampleRate = 48000;
 static int defaultFramesPerBuffer = 512;
+static bool isEmulator = false;
 
 static KAZE_NS::String dataDirectory;
 
@@ -92,7 +93,11 @@ Java_com_kaze_app_Kaze_provideDataDirectory(JNIEnv *env, jclass clazz, jstring p
     env->ReleaseStringUTFChars(path, cppPath);
 }
 
-
+extern "C" JNIEXPORT void JNICALL
+Java_com_kaze_app_Kaze_provideIsEmulator(JNIEnv *env, jclass clazz, jboolean isEmulator)
+{
+    ::isEmulator = static_cast<bool>(isEmulator);
+}
 
 KAZE_NS_BEGIN
 
@@ -147,7 +152,7 @@ namespace android {
 
     static auto headersToArrayList(
         JNIEnv *env,
-        const std::initializer_list< std::pair<CStringView, CStringView> > &headers
+        const List< std::pair<String, String> > &headers
         ) -> jobject
     {
         jclass arrayListClass = env->FindClass("java/util/ArrayList");
@@ -357,7 +362,7 @@ namespace android {
             jmethodID sendHTTPRequestMethod = env->GetStaticMethodID(
                 kazeClass,
                 "sendHTTPRequestSync",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/ArrayList;)Lcom/kaze/app/HttpResponse;"
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/nio/ByteBuffer;Ljava/util/ArrayList;)Lcom/kaze/app/HttpResponse;"
             );
 
             if (sendHTTPRequestMethod == Null)
@@ -367,12 +372,16 @@ namespace android {
                 return {};
             }
 
+            jobject jbody = req.body().empty() ? Null :
+                    env->NewDirectByteBuffer((void *) req.body().data(), req.body().size());
+
             const auto jres = env->CallStaticObjectMethod(
                 kazeClass,
                 sendHTTPRequestMethod,
                 url,
                 method,
                 mimeType,
+                jbody,
                 headers);
 
             return toHttpResponse(env, jres);
@@ -394,6 +403,13 @@ namespace android {
             return {};
         }
     }
+    struct HttpCallbackUserData {
+        funcptr_t<void(const HttpResponse &res, void *userdata)> callback;
+        void *userdata;
+        String body;
+    };
+
+    static Map<jlong, HttpCallbackUserData> s_bodyData;
 
     auto sendHttpRequest(
         const HttpRequest &req,
@@ -429,7 +445,7 @@ namespace android {
             jmethodID sendHTTPRequestMethod = env->GetStaticMethodID(
                 kazeClass,
                 "sendHTTPRequest",
-                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/util/ArrayList;JJ)V"
+                "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/nio/ByteBuffer;Ljava/util/ArrayList;J)V"
             );
 
             if (sendHTTPRequestMethod == Null) {
@@ -439,15 +455,28 @@ namespace android {
                 return False;
             }
 
+            // Instantiate context data (required to keep this alive until callback)
+            static jlong requestIdTicket = 0;    // context data id, tied to this request
+            jlong curTicket = requestIdTicket++;
+
+            auto &reqData = s_bodyData[curTicket];
+            reqData.callback = callback;
+            reqData.userdata = userdata;
+            req.swapBody(reqData.body);
+
+            // Create direct byte buffer to efficiently pass body data to Java
+            jobject jbody = reqData.body.empty() ? Null :
+                    env->NewDirectByteBuffer((void *)reqData.body.data(), reqData.body.size());
+
             env->CallStaticVoidMethod(
                 kazeClass,
                 sendHTTPRequestMethod,
                 url,
                 method,
                 mimeType,
+                jbody,
                 headers,
-                static_cast<jlong>(reinterpret_cast<uintptr_t>(callback)),
-                static_cast<jlong>(reinterpret_cast<uintptr_t>(userdata)));
+                curTicket);
 
             if (env->ExceptionOccurred())
             {
@@ -455,6 +484,7 @@ namespace android {
                               "sendHttpRequest: an exception occurred when calling "
                               "the underlying Java function:");
                 env->ExceptionDescribe();
+                s_bodyData.erase(curTicket);
                 return False;
             }
 
@@ -472,18 +502,38 @@ namespace android {
             return False;
         }
     }
-}
+
+    auto isEmulator() -> Bool
+    {
+        return ::isEmulator;
+    }
+
+} // namespace android
 
 KAZE_NS_END
 
 extern "C" JNIEXPORT void JNICALL
 Java_com_kaze_app_Kaze_doHttpCallback(JNIEnv *env, jclass clazz, jint status, jstring body, jobject jheaders,
-    jobject jcookies, jlong callback, jlong userptr)
+    jobject jcookies, jlong requestId)
 {
     using namespace KAZE_NS;
 
-    auto cppCallback = reinterpret_cast< funcptr_t<void(const HttpResponse &, void *)> >(callback);
-    auto cppUserptr = reinterpret_cast<void *>(userptr);
+    funcptr_t<void (const HttpResponse &, void *)> cppCallback = nullptr;
+    void *cppUserPtr = nullptr;
+    {
+        const auto &it = android::s_bodyData.find(requestId);
+        if (it == android::s_bodyData.end())
+        {
+            KAZE_CORE_WARN("Failed to find context data for http request id: {}",
+                           static_cast<long>(requestId));
+            return; // failed to find requestId's context data
+        }
+
+        cppCallback = it->second.callback;
+        cppUserPtr = it->second.userdata;
+        android::s_bodyData.erase(requestId);
+    }
+
     auto cppBody = body ? env->GetStringUTFChars(body, nullptr) : "";
 
     if ( !cppBody )
@@ -513,7 +563,7 @@ Java_com_kaze_app_Kaze_doHttpCallback(JNIEnv *env, jclass clazz, jint status, js
 
     res.cookies = std::move(cookies);
 
-    cppCallback(res, cppUserptr);
+    cppCallback(res, cppUserPtr);
 }
 
 #endif

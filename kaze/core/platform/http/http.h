@@ -23,6 +23,9 @@ namespace http {
         funcptr_t<void(const HttpResponse &res, void *userdata)> callback,
         void *userdata
     ) -> Bool;
+
+    /// \returns the localhost address, minus the http://
+    auto getLocalHost() -> Cstring;
 }
 
 KAZE_NS_END

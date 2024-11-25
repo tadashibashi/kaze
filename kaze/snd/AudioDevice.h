@@ -25,6 +25,7 @@ public:
     /// Make sure to call `delete` on it when done with.
     static auto create() -> AudioDevice *;
 
+    /// \note Audio devices should be in a suspended state on open
     virtual auto open(const AudioDeviceOpen &config) -> Bool = 0;
 
     virtual auto close() -> void = 0;

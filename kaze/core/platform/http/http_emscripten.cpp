@@ -6,7 +6,7 @@
 
 KAZE_NS_BEGIN
 
-static auto emplaceHeaders(HttpResponse *res, emscripten_fetch_t *fetch) -> void
+static auto parseResponseHeaders(HttpResponse *res, emscripten_fetch_t *fetch) -> void
 {
     auto length = emscripten_fetch_get_response_headers_length(fetch);
     if (length == 0)
@@ -48,7 +48,7 @@ auto http::sendHttpRequestSync(const HttpRequest &req) -> HttpResponse
 
     attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS | EMSCRIPTEN_FETCH_STREAM_DATA;
 
-    auto method = HttpRequest::getMethodString(req.method());
+    auto method = req.methodString();
     if (method.empty())
         method = "GET";
     memory::copy(attr.requestMethod, method.data(), method.length());
@@ -84,7 +84,7 @@ auto http::sendHttpRequestSync(const HttpRequest &req) -> HttpResponse
         auto res = static_cast<HttpResponse *>(fetch->userData);
         res->status = static_cast<Int>(fetch->status);
         res->error = fetch->statusText;
-        emplaceHeaders(res, fetch);
+        parseResponseHeaders(res, fetch);
         emscripten_fetch_close(fetch);
     };
 
@@ -92,7 +92,7 @@ auto http::sendHttpRequestSync(const HttpRequest &req) -> HttpResponse
         auto res = static_cast<HttpResponse *>(fetch->userData);
         res->status = static_cast<Int>(fetch->status);
 
-        emplaceHeaders(res, fetch);
+        parseResponseHeaders(res, fetch);
 
         if (fetch->data)
             res->body = String(fetch->data, fetch->numBytes);
@@ -118,7 +118,7 @@ static auto asyncErrorCallback(emscripten_fetch_t *fetch) -> void
         .error = fetch->statusText,
     };
 
-    emplaceHeaders(&res, fetch);
+    parseResponseHeaders(&res, fetch);
 
     if (context)
     {
@@ -138,7 +138,7 @@ static auto asyncSuccessCallback(emscripten_fetch_t *fetch) -> void
         .body = fetch->data ? String(fetch->data, fetch->numBytes) : ""
     };
 
-    emplaceHeaders(&res, fetch);
+    parseResponseHeaders(&res, fetch);
 
     if (context)
     {
@@ -160,7 +160,7 @@ auto http::sendHttpRequest(
 
     attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_STREAM_DATA;
 
-    auto method = HttpRequest::getMethodString(req.method());
+    auto method = req.methodString();
     if (method.empty())
         method = "GET";
     memory::copy(attr.requestMethod, method.data(), method.length());
@@ -187,8 +187,8 @@ auto http::sendHttpRequest(
     auto userdata = new EmURLContext {
         .callback = callback,
         .userdata = userptr,
-        .body = req.body(),
     };
+    req.swapBody(userdata->body);
 
     attr.userData = userdata;
 
@@ -204,6 +204,11 @@ auto http::sendHttpRequest(
     emscripten_fetch(&attr, req.url().data() ? req.url().data() : "");
 
     return True;
+}
+
+auto http::getLocalHost() -> Cstring
+{
+    return "localhost";
 }
 
 KAZE_NS_END

@@ -1,5 +1,5 @@
 #include <kaze/tk.hpp>
-
+#include <kaze/core/platform/http/http.h>
 #include <imgui/imgui.h>
 
 #include <filesystem>
@@ -209,7 +209,7 @@ private:
             if (ImGui::Button("Request"))
             {
                 HttpRequest::create({
-                        .url = "http://localhost:3000",
+                        .url = fmt_lib::format("http://{}:3000", http::getLocalHost()),
                         .method = HttpRequest::Get,
                         .body = {},
                         .headers = {}
@@ -242,7 +242,7 @@ private:
             if (ImGui::Button("Upload"))
             {
                 HttpRequest::create({
-                    .url = "http://localhost:3000/upload",
+                    .url = fmt_lib::format("http://{}:3000/upload", http::getLocalHost()),
                     .method = HttpRequest::Post,
                     .mimeType = "text/plain",
                     .body = fmt_lib::format("Testing 1 2 3 at app time: {}", time()),

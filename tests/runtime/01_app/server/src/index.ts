@@ -16,6 +16,9 @@ app.post("/upload", async (c) => {
   console.log("Upload route hit!");
 
   const body = await c.req.arrayBuffer();
+
+  console.log(c.req.header("Content-Type"));
+
   const decoder = new TextDecoder("utf-8");
   const str = decoder.decode(body);
   console.log(str);
