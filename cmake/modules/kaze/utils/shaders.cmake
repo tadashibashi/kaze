@@ -413,7 +413,7 @@ function(_kaze_target_shaders_impl TARGET)
                 make_directory
                 "${OUTPUT_DIR}/${PROFILE_EXT}"
             )
-               
+
             list(APPEND COMMANDS COMMAND ${IN_SHADERC} ${CLI})
 
             if (KAZE_PLATFORM_APPLE)
@@ -453,6 +453,11 @@ function(kaze_compile_shaders)
     set(oneValueArgs VARYING_DEF OUTPUT_DIR)
     set(multiValueArgs SHADERS INCLUDE_DIRS)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    # TODO: Enable Android shader builds as a part of the Cmake build process. Currently broken.
+    if (KAZE_PLATFORM_ANDROID)
+        return()
+    endif()
 
     if (DEFINED IN_OUTPUT_DIR)
         if (NOT EXISTS ${IN_OUTPUT_DIR})
@@ -502,6 +507,11 @@ function(kaze_target_shaders TARGET)
     set(oneValueArgs VARYING_DEF OUTDIR_NAME)
     set(multiValueArgs SHADERS INCLUDE_DIRS)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    # TODO: Enable Android shader builds as a part of the Cmake build process. Currently broken.
+    if (KAZE_PLATFORM_ANDROID)
+        return()
+    endif()
 
     get_target_property(TARGET_BINARY_DIR ${TARGET} RUNTIME_OUTPUT_DIRECTORY)
     set(OUTDIR_FULL "${TARGET_BINARY_DIR}/${IN_OUTDIR_NAME}")
