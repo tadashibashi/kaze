@@ -128,8 +128,6 @@ auto http::sendHttpRequestSync(
         return {};
     }
 
-    CURL_CHECK(curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L));
-
     // Set url
     CURL_CHECK(curl_easy_setopt(curl, CURLOPT_URL, req.url().data() ? req.url().data() : ""));
 
