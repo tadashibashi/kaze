@@ -34,9 +34,9 @@ KAZE_NS_BEGIN
 /// \param[out] outHostname
 /// \param[out] outPathAndQuery
 /// \returns Boolean indicating whether parse was successful
-static auto getComponentsFromURL(const Wstring &url, Wstring *outHostname, Wstring *outPathAndQuery) -> Bool
+static auto getComponentsFromURL(const Wstring &url, Wstring *outHostname, Int *outPort, Wstring *outPath, Wstring *outQuery) -> Bool
 {
-    static std::wregex regex(LR"((?:https?://)?([^/:]+)(/[^?]*)?(\?.*)?)");
+    static std::wregex regex(LR"((?:https?://)?([^/:]+)(?::(\d+))?(/[^?]*)?(\?.*)?)");
     std::wsmatch match;
 
     if (std::regex_search(url, match, regex))
@@ -44,8 +44,24 @@ static auto getComponentsFromURL(const Wstring &url, Wstring *outHostname, Wstri
         if (outHostname)
             *outHostname = match[1].str();
 
-        if (outPathAndQuery)
-            *outPathAndQuery = match[2].str();
+        if (outPort)
+        {
+            const auto portString = match[2].str();
+
+            try {
+                *outPort = std::stoi(portString);
+            }
+            catch (...)
+            {
+                *outPort = -1;
+            }
+        }
+
+        if (outPath)
+            *outPath = match[3].str();
+
+        if (outQuery)
+            *outQuery = match[4].str();
 
         return True;
     }
@@ -195,14 +211,22 @@ auto http::sendHttpRequestSync(
 {
     HttpResponse res{};
 
+    String bodyStr;
+    req.swapBody(bodyStr);
+
     const auto url = str::toWstring(req.url());
     Wstring hostname;
-    Wstring pathAndQuery;
-    if (!getComponentsFromURL(url, &hostname, &pathAndQuery))
+    Int port;
+    Wstring path;
+    Wstring query;
+
+    if (!getComponentsFromURL(url, &hostname, &port, &path, &query))
     {
         KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to get components from URL");
         return {};
     }
+    KAZE_CORE_LOG("Got components from URL: hostname: {}, port: {}, and path: {}, and query: {}",
+        str::toString(hostname), port, str::toString(path), str::toString(query));
 
     HINTERNET hSession = WinHttpOpen(KAZE_USER_AGENT,
         WINHTTP_ACCESS_TYPE_NO_PROXY,
@@ -215,11 +239,14 @@ auto http::sendHttpRequestSync(
         if (secureProtocols)
             WinHttpSetOption(hSession, WINHTTP_OPTION_SECURE_PROTOCOLS, &secureProtocols, sizeof(secureProtocols));
 
-        HINTERNET hConnect = WinHttpConnect(hSession, hostname.data(), INTERNET_DEFAULT_HTTP_PORT, 0);
+        if (port < 0)
+            port = INTERNET_DEFAULT_HTTP_PORT;
+
+        HINTERNET hConnect = WinHttpConnect(hSession, hostname.data(), port, 0);
         if (hConnect)
         {
             auto method = str::toWstring(req.methodString());
-            HINTERNET hRequest = WinHttpOpenRequest(hConnect, method.c_str(), pathAndQuery.c_str(), Null,
+            HINTERNET hRequest = WinHttpOpenRequest(hConnect, method.c_str(), (path + query).c_str(), Null,
                 WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, secureProtocols ? WINHTTP_FLAG_SECURE : 0);
 
             if (hRequest)
@@ -239,15 +266,36 @@ auto http::sendHttpRequestSync(
                 }
 
                 // Send the request with no initial data
-                if (WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
-                    WINHTTP_NO_REQUEST_DATA, 0, 0, 0))
+                if (WinHttpSendRequest(hRequest,
+                    WINHTTP_NO_ADDITIONAL_HEADERS,
+                    0,
+                    WINHTTP_NO_REQUEST_DATA,
+                    0,
+                    static_cast<DWORD>(bodyStr.size()),
+                    0))
                 {
                     // Write body to buffer/stream data
-                    if (!req.body().empty())
+                    if (!bodyStr.empty())
                     {
-                        if (!WinHttpWriteData(hRequest, req.body().data(), req.body().size(), Null))
+                        DWORD bytesWritten = 0;
+                        if (!WinHttpWriteData(hRequest,
+                            static_cast<void *>(bodyStr.data()),
+                            static_cast<DWORD>(bodyStr.size()),
+                            &bytesWritten))
                         {
-                            KAZE_PUSH_ERR(Error::RuntimeErr, "Failed to write body data");
+                            KAZE_PUSH_ERR(Error::RuntimeErr,
+                                "Failed to write HttpRequest body data, error code: {}",
+                                GetLastError());
+                        }
+                        else
+                        {
+                            if (bytesWritten != bodyStr.size())
+                            {
+                                KAZE_CORE_WARN("Number of bytes in HttpRequest body "
+                                    "do not match the number of bytes written. "
+                                    "Requested: {}, but actually wrote: {}",
+                                    bodyStr.size(), bytesWritten);
+                            }
                         }
                     }
 
@@ -255,6 +303,23 @@ auto http::sendHttpRequestSync(
                     {
                         // Successful request-response
                         res.body = std::move(getResponseBody(hRequest));
+
+                        {
+                            DWORD statusCode = -1;
+                            DWORD statusCodeSize = static_cast<DWORD>(sizeof(statusCode));
+
+                            if (!WinHttpQueryHeaders(
+                                hRequest, WINHTTP_QUERY_STATUS_CODE | WINHTTP_QUERY_FLAG_NUMBER,
+                                WINHTTP_HEADER_NAME_BY_INDEX, &statusCode, &statusCodeSize, WINHTTP_NO_HEADER_INDEX))
+                            {
+                                KAZE_PUSH_ERR(Error::RuntimeErr,
+                                    "WinHTTP failed to query the status code, error code: {}",
+                                    GetLastError());
+                            }
+
+                            res.status = static_cast<Int>(statusCode);
+                        }
+
 
                         parseResponseHeaders(hRequest, &res.headers, &res.cookies);
                     }
