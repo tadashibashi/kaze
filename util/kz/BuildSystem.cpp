@@ -6,6 +6,7 @@
 #include "lib/Env.h"
 #include "lib/console.h"
 
+#include <filesystem>
 #include <iostream>
 #include <string_view>
 #include <thread>
@@ -115,6 +116,24 @@ namespace kz {
         return Result::Ok;
     }
 
+    static auto copyCompileCommands(const fs::path &buildDir) -> void
+    {
+        const auto curCompileCommands = fs::path(buildDir) / "compile_commands.json";
+        if ( !fs::exists( curCompileCommands )) return;
+
+        auto oldCompileCommands = fs::path("build/compile_commands.json");
+
+        if ( !fs::equivalent(curCompileCommands, oldCompileCommands) )
+        {
+            if (fs::exists(oldCompileCommands))
+                fs::remove(oldCompileCommands);
+
+            fs::create_hard_link(curCompileCommands, oldCompileCommands);
+            std::cout << "Creating hardlink of compile commands at build/compile_commands.json from "
+                << curCompileCommands << '\n';
+        }
+    }
+
     auto BuildSystem::execute(int argc, char **argv) -> Result
     {
         if (const auto result = parseVars(argc, argv); !result )
@@ -174,6 +193,7 @@ namespace kz {
                 }
 
                 result = doBuild(targetName);
+                copyCompileCommands(m_buildPath);
             } break;
         case Command::Run:
             {

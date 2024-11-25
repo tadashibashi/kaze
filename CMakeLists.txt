@@ -74,7 +74,7 @@ set(KAZE_TK_IMGUI_PLUGIN      ${KAZE_GFX_IMGUI}  CACHE BOOL "Add ImGUI plugin to
 
 # ----- Kaze Util -----
 set(KAZE_BUILD_UTIL           OFF              CACHE BOOL   "Build")
-if (NOT EXISTS "${CMAKE_SOURCE_DIR}/build/util" AND KAZE_PLATFORM_DESKTOP)
+if (NOT EXISTS "${CMAKE_SOURCE_DIR}/build/util" OR KAZE_PLATFORM_DESKTOP)
     set(KAZE_BUILD_UTIL ON CACHE BOOL "" FORCE)
 endif()
 
