@@ -203,6 +203,10 @@ function(_kaze_compile_shaders_impl)
     set(multiValueArgs SHADERS INCLUDE_DIRS)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" "${ARGN}")
 
+    if (KAZE_PLATFORM_WINDOWS)
+        set(IN_SHADERC "${IN_SHADERC}.exe")
+    endif()
+
     if (NOT EXISTS "${IN_SHADERC}")
         set(IN_SHADERC bgfx::shaderc)
     endif()
@@ -314,6 +318,10 @@ function(_kaze_target_shaders_impl TARGET)
     set(oneValueArgs TYPE VARYING_DEF OUTPUT_DIR SHADERC)
     set(multiValueArgs SHADERS INCLUDE_DIRS)
     cmake_parse_arguments(IN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    if (KAZE_PLATFORM_WINDOWS)
+        set(IN_SHADERC "${IN_SHADERC}.exe")
+    endif()
 
     if (NOT EXISTS "${IN_SHADERC}")
         set(IN_SHADERC $<TARGET_FILE:bgfx::shaderc>)
@@ -471,7 +479,7 @@ function(kaze_compile_shaders)
         endif()
 
         _kaze_compile_shaders_impl(
-            SHADERC "${KAZE_ROOT}/build/util/bin/shaderc" # if this wasn't built by util/setup it will attempt to build it with this configuration
+            SHADERC "${CMAKE_SOURCE_DIR}/build/util/bin/shaderc" # if this wasn't built by util/setup it will attempt to build it with this configuration
             TYPE "${SHADER_TYPE}"
             SHADERS "${SHADER_DIR_ABSOLUTE}/${SHADER_FILE}"
             VARYING_DEF "${IN_VARYING_DEF}"
@@ -519,7 +527,7 @@ function(kaze_target_shaders TARGET)
         endif()
 
         _kaze_target_shaders_impl("${TARGET}"
-            SHADERC "${KAZE_ROOT}/build/util/bin/shaderc" # if this wasn't built by util/setup it will attempt to build it with this configuration
+            SHADERC "${CMAKE_SOURCE_DIR}/build/util/bin/shaderc" # if this wasn't built by util/setup it will attempt to build it with this configuration
             TYPE "${SHADER_TYPE}"
             SHADERS "${SHADER_FILE_ABSOLUTE}"
             VARYING_DEF "${IN_VARYING_DEF}"
